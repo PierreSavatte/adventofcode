@@ -12,6 +12,6 @@ def test_puzzle_is_resolved():
 
 
 def test_file_is_correctly_parsed():
-    result = parse_file(os.path.join("data", "test_file_day1_part1"))
+    result = parse_file(os.path.join("data", "test_file_day1"))
 
     assert result == [141, 152, 164, 163, 164, 179, 210, 209, 208, 236]

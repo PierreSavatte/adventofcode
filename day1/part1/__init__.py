@@ -1,4 +1,8 @@
-FILE = "input"
+import os
+
+from day1.utils import parse_file
+
+FILE = os.path.join("..", "input")
 
 
 def resolution(series):
@@ -13,14 +17,6 @@ def resolution(series):
         last_item = item
 
     return nb_increased
-
-
-def parse_file(file_path):
-    with open(file_path, "r") as fp:
-        data = fp.readlines()
-
-    parsed_values = list(map(lambda x: int(x.strip("/n")), data))
-    return parsed_values
 
 
 def challenge_resolution():
