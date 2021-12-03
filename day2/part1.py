@@ -1,4 +1,6 @@
-import utils
+import aoc_utils
+
+FILE = "input"
 
 direction_to_axis_and_sign = {
     "forward": ["x", 1],
@@ -16,7 +18,7 @@ def parse_line(line):
 
 
 def parse_file(file_path):
-    return utils.parse_file(file_path, line_parser=parse_line)
+    return aoc_utils.parse_file(file_path, line_parser=parse_line)
 
 
 def resolution(instructions):
@@ -27,7 +29,6 @@ def resolution(instructions):
         position[axis] += value
 
     return position["x"] * position["z"]
-
 
 
 def challenge_resolution():
