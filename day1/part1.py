@@ -1,8 +1,6 @@
-import os
-
 from day1.utils import parse_file
 
-FILE = os.path.join("", "input")
+FILE = "input"
 
 
 def resolution(series):
