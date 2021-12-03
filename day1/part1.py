@@ -2,7 +2,7 @@ import os
 
 from day1.utils import parse_file
 
-FILE = os.path.join("..", "input")
+FILE = os.path.join("", "input")
 
 
 def resolution(series):

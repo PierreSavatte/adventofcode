@@ -2,7 +2,7 @@ from day1.utils import parse_file
 from day1.part1 import resolution as part1_resolution
 import os
 
-FILE = os.path.join("..", "input")
+FILE = os.path.join("", "input")
 
 
 def compute_window(series):
