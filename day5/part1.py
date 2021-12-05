@@ -17,31 +17,25 @@ def parse_file(file_path):
     return aoc_utils.parse_file(file_path, line_parser)
 
 
-def _compute_points_on_line_same_row(x, y_start, y_end):
-    for y in range(y_start, y_end + 1):
-        yield x, y
+def _compute_points(x_1, y_1, x_2, y_2):
+    if x_2 != x_1:
+        slope = (y_2 - y_1) / (x_2 - x_1)
+        y_intercept = (x_1 * y_2 - x_2 * y_1) / (x_1 - x_2)
+    else:
+        slope = 1
+        y_intercept = y_1
 
-
-def _compute_points_on_line_same_column(y, x_start, x_end):
-    for x in range(x_start, x_end + 1):
-        yield x, y
+    x_increment = 1 if x_1 < x_2 else -1
+    for x in range(x_1, x_2 + x_increment, x_increment):
+        yield x, int(x * slope + y_intercept)
 
 
 def compute_points_on_line(start, end):
     x_1, y_1 = start
     x_2, y_2 = end
-
-    if x_1 == x_2:
-        y_start = min(y_1, y_2)
-        y_end = max(y_1, y_2)
-        return list(_compute_points_on_line_same_row(x_1, y_start, y_end))
-
-    if y_1 == y_2:
-        x_start = min(x_1, x_2)
-        x_end = max(x_1, x_2)
-        return list(_compute_points_on_line_same_column(y_1, x_start, x_end))
-    else:
+    if not (x_1 == x_2 or y_1 == y_2):
         raise NotImplementedError()
+    return _compute_points(x_1, y_1, x_2, y_2)
 
 
 class Diagram:

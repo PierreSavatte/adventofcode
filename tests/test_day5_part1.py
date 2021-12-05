@@ -23,7 +23,7 @@ def test_file_is_parsed_correctly():
 def test_points_on_line_are_computed_from_start_and_end_points():
     points = list(compute_points_on_line(start=(9, 7), end=(7, 7)))
 
-    assert points == [(7, 7), (8, 7), (9, 7)]
+    assert points == [(9, 7), (8, 7), (7, 7)]
 
 
 def test_puzzle_is_resolved():
