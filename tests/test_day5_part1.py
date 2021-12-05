@@ -1,5 +1,7 @@
 import os
 
+import pytest
+
 from day5.part1 import parse_file, compute_points_on_line, resolution
 
 
@@ -20,10 +22,19 @@ def test_file_is_parsed_correctly():
     ]
 
 
-def test_points_on_line_are_computed_from_start_and_end_points():
-    points = list(compute_points_on_line(start=(9, 7), end=(7, 7)))
+@pytest.mark.parametrize(
+    "start, end, expected_points",
+    [
+        ((1, 1), (1, 3), [(1, 1), (1, 2), (1, 3)]),
+        ((9, 7), (7, 7), [(9, 7), (8, 7), (7, 7)]),
+    ],
+)
+def test_points_on_line_are_computed_from_start_and_end_points(
+    start, end, expected_points
+):
+    points = compute_points_on_line(start, end)
 
-    assert points == [(9, 7), (8, 7), (7, 7)]
+    assert points == expected_points
 
 
 def test_puzzle_is_resolved():

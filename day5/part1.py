@@ -30,12 +30,21 @@ def _compute_points(x_1, y_1, x_2, y_2):
         yield x, int(x * slope + y_intercept)
 
 
+def _compute_points_on_vertical_line(x, y_1, y_2):
+    y_increment = 1 if y_1 < y_2 else -1
+    for y in range(y_1, y_2 + y_increment, y_increment):
+        yield x, y
+
+
 def compute_points_on_line(start, end):
     x_1, y_1 = start
     x_2, y_2 = end
-    if not (x_1 == x_2 or y_1 == y_2):
+    if x_1 == x_2:
+        return list(_compute_points_on_vertical_line(x_1, y_1, y_2))
+    elif not y_1 == y_2:
         raise NotImplementedError()
-    return _compute_points(x_1, y_1, x_2, y_2)
+    else:
+        return list(_compute_points(x_1, y_1, x_2, y_2))
 
 
 class Diagram:
