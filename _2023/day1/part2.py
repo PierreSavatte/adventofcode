@@ -22,6 +22,17 @@ def has_digit_spelled_out_in_string(string: str) -> Optional[str]:
     return None
 
 
+def _get_digit(character: str, already_parsed: str) -> Optional[str]:
+    # Handle digit
+    if character.isdecimal():
+        return character
+
+    # Handle spelled out digit
+    digit = has_digit_spelled_out_in_string(already_parsed)
+    if digit is not None:
+        return digit
+
+
 def get_first_integer(line: str) -> str:
     i = 0
     already_parsed = ""
@@ -29,13 +40,8 @@ def get_first_integer(line: str) -> str:
         character = line[i]
         already_parsed = f"{already_parsed}{character}"
 
-        # Handle digit
-        if character.isdecimal():
-            return character
-
-        # Handle spelled out digit
-        digit = has_digit_spelled_out_in_string(already_parsed)
-        if digit is not None:
+        digit = _get_digit(character, already_parsed)
+        if digit:
             return digit
 
         i += 1
@@ -48,13 +54,8 @@ def get_last_integer(line: str) -> str:
         character = line[i]
         already_parsed = f"{character}{already_parsed}"
 
-        # Handle digit
-        if character.isdecimal():
-            return character
-
-        # Handle spelled out digit
-        digit = has_digit_spelled_out_in_string(already_parsed)
-        if digit is not None:
+        digit = _get_digit(character, already_parsed)
+        if digit:
             return digit
 
         i -= 1
