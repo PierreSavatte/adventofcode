@@ -1,6 +1,6 @@
 import pytest
 
-from _2023.day1 import parse_line, compute_answer
+from _2023.day1.part1 import parse_line, compute_answer
 
 
 @pytest.mark.parametrize(
@@ -17,4 +17,4 @@ def test_line_is_properly_parsed(line, expected_value):
 
 
 def test_answer_can_be_computed(get_data):
-    assert compute_answer(get_data("test_file_day1")) == 142
+    assert compute_answer(get_data("test_file_day1_part1")) == 142
