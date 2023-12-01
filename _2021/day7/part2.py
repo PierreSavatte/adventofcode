@@ -1,4 +1,4 @@
-from day7.part1 import parse_file, diff
+from _2021.day7.part1 import parse_file, diff
 
 FILE = "input"
 

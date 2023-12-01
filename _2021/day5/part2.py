@@ -1,4 +1,4 @@
-from day5.part1 import (
+from _2021.day5.part1 import (
     parse_file,
     Diagram,
     _compute_points,

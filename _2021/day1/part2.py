@@ -1,5 +1,5 @@
-from day1.utils import parse_file
-from day1.part1 import resolution as part1_resolution
+from _2021.day1.utils import parse_file
+from _2021.day1.part1 import resolution as part1_resolution
 
 FILE = "input"
 

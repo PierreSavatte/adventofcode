@@ -1,4 +1,4 @@
-from day3.part1 import readlines, count_bit_occurrence, binary_to_integer
+from _2021.day3.part1 import readlines, count_bit_occurrence, binary_to_integer
 
 FILE = "input"
 

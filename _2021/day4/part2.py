@@ -1,4 +1,4 @@
-from day4.part1 import parse_file, compute_score, check_board_won
+from _2021.day4.part1 import parse_file, compute_score, check_board_won
 
 FILE = "input"
 

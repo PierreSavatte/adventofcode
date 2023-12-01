@@ -1,4 +1,4 @@
-from day1.utils import parse_file
+from _2021.day1.utils import parse_file
 
 FILE = "input"
 

@@ -1,4 +1,4 @@
-from day2.part1 import parse_file
+from _2021.day2.part1 import parse_file
 
 FILE = "input"
 
