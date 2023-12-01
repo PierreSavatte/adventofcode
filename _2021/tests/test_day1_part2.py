@@ -1,4 +1,4 @@
-from day1.part2 import compute_window
+from _2021.day1.part2 import compute_window
 
 
 def test_windows_are_correctly_computed():

@@ -1,7 +1,7 @@
 import os
 
 import pytest
-from day8.part1 import parse_file, Signal, resolution
+from _2021.day8.part1 import parse_file, Signal, resolution
 
 
 @pytest.fixture

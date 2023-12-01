@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-from day6.part1 import parse_file, compute_new_generation, resolution
+from _2021.day6.part1 import parse_file, compute_new_generation, resolution
 
 
 def test_file_is_parsed_correctly():

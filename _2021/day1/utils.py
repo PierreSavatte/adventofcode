@@ -1,4 +1,4 @@
-import aoc_utils
+from _2021 import aoc_utils
 
 
 def parse_file(file_path):

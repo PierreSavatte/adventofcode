@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-from day5.part1 import parse_file, compute_points_on_line, resolution
+from _2021.day5.part1 import parse_file, compute_points_on_line, resolution
 
 
 def test_file_is_parsed_correctly():

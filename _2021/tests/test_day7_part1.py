@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-from day7.part1 import parse_file, median, resolution
+from _2021.day7.part1 import parse_file, median, resolution
 
 
 def test_file_is_parsed_correctly():

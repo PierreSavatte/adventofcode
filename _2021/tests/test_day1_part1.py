@@ -1,6 +1,6 @@
 import os
 
-from day1.part1 import resolution, parse_file
+from _2021.day1.part1 import resolution, parse_file
 
 
 def test_puzzle_is_resolved():

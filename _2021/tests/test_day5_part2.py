@@ -1,5 +1,5 @@
 import pytest
-from day5.part2 import resolution, compute_points_on_line
+from _2021.day5.part2 import resolution, compute_points_on_line
 
 
 @pytest.mark.parametrize(

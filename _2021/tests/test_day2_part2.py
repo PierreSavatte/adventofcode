@@ -1,4 +1,4 @@
-from day2.part2 import resolution
+from _2021.day2.part2 import resolution
 
 
 def test_puzzle_is_resolved():

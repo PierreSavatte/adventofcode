@@ -1,6 +1,6 @@
 import os
 
-from day4.part1 import parse_file, resolution
+from _2021.day4.part1 import parse_file, resolution
 
 
 def test_file_is_parsed_correctly():

@@ -1,6 +1,6 @@
 import os
 
-from day3.part2 import keep_only_binaries_by_value_at_index, resolution
+from _2021.day3.part2 import keep_only_binaries_by_value_at_index, resolution
 
 
 def test_list_of_binaries_can_be_filtered_on_bit_value_at_index():

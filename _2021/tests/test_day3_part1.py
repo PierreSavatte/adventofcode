@@ -1,6 +1,6 @@
 import os
 
-from day3.part1 import resolution
+from _2021.day3.part1 import resolution
 
 
 def test_puzzle_is_resolved():
