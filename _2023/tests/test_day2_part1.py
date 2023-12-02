@@ -1,5 +1,5 @@
 import pytest
-from _2023.day2 import parse_line, Game, filter_games, compute_answer
+from _2023.day2.part1 import parse_line, Game, filter_games, compute_answer
 
 
 @pytest.mark.parametrize(
