@@ -17,4 +17,4 @@ def test_power_of_a_set_can_be_computed(game, power):
 
 
 def test_answer_can_be_computed(get_data):
-    assert compute_answer(get_data("test_file_day2_part1")) == 2286
+    assert compute_answer(get_data("test_file_day2")) == 2286

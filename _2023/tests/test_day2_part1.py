@@ -47,4 +47,4 @@ def test_games_can_be_filtered():
 
 
 def test_answer_can_be_computed(get_data):
-    assert compute_answer(get_data("test_file_day2_part1")) == 8
+    assert compute_answer(get_data("test_file_day2")) == 8
