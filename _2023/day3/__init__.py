@@ -17,6 +17,15 @@ class Symbol:
     value: str
     position: Position
 
+    def get_numbers_it_is_close_to(
+        self, numbers: list["Number"]
+    ) -> list["Number"]:
+        numbers_it_is_close_to = []
+        for number in numbers:
+            if number.is_close_to_a_symbol([self]):
+                numbers_it_is_close_to.append(number)
+        return numbers_it_is_close_to
+
 
 @dataclass
 class Number:
@@ -41,6 +50,19 @@ class Number:
             for symbol in symbols
             for own_position in self.positions
         )
+
+
+@dataclass
+class Gear:
+    position: Position
+    numbers: list[Number]
+
+    @property
+    def ratio(self) -> int:
+        ratio = 1
+        for number in self.numbers:
+            ratio *= number.value
+        return ratio
 
 
 class Schematic:
@@ -95,6 +117,21 @@ class Schematic:
 
         self.numbers = numbers
         self.symbols = symbols
+
+    def get_gears(self):
+        gears = []
+        for symbol in self.symbols:
+            numbers_it_is_closed_to = symbol.get_numbers_it_is_close_to(
+                self.numbers
+            )
+            if len(numbers_it_is_closed_to) == 2:
+                gears.append(
+                    Gear(
+                        position=symbol.position,
+                        numbers=numbers_it_is_closed_to,
+                    )
+                )
+        return gears
 
     def __repr__(self):
         return f"<Schematic cells={self.cells}>"
