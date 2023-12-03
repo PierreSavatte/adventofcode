@@ -86,6 +86,14 @@ class Schematic:
                             Symbol(value=cell, position=Position(x=x, y=y))
                         )
 
+            if is_in_number:
+                numbers.append(
+                    Number.create_from_schematic(
+                        value_str=current_number,
+                        positions_tuple=current_number_positions,
+                    )
+                )
+
         self.numbers = numbers
         self.symbols = symbols
 
@@ -102,9 +110,9 @@ def compute_answer(data: str) -> int:
     part_numbers = []
     for number in schematic.numbers:
         if number.is_close_to_a_symbol(schematic.symbols):
-            part_numbers.append(number.value)
+            part_numbers.append(number)
 
-    return sum(part_numbers)
+    return sum(part_number.value for part_number in part_numbers)
 
 
 if __name__ == "__main__":
