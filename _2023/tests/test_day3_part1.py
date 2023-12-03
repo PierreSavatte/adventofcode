@@ -1,6 +1,7 @@
 import pytest
 
-from _2023.day3 import Schematic, Number, Position, Symbol, compute_answer
+from _2023.day3 import Schematic, Number, Position, Symbol
+from _2023.day3.part1 import compute_answer
 
 DATA_FILENAME = "test_file_day3"
 
