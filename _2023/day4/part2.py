@@ -14,9 +14,9 @@ class Deck:
         card_index = 0
         while card_index < len(cards):
             card = cards[card_index]
-            matches = card.compute_match_numbers()
+            nb_match = card.compute_nb_match()
             nb_copies = copies[card]
-            for i in range(matches):
+            for i in range(nb_match):
                 new_card_index = card_index + 1 + i
                 if new_card_index > len(cards):
                     # Cards will never make you copy a card past

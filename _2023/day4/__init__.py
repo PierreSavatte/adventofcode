@@ -17,7 +17,7 @@ class Card:
                     points *= 2
         return points
 
-    def compute_match_numbers(self):
+    def compute_nb_match(self):
         return sum(
             1
             for number in self.numbers_you_have
@@ -33,7 +33,7 @@ def parse_numbers_list(numbers_txt: str) -> list[int]:
 
 
 def parse_card_number(card_and_number: str) -> int:
-    # expected input = Card 4
+    # expected input = "Card 4"
     return int(card_and_number.split()[1].strip())
 
 

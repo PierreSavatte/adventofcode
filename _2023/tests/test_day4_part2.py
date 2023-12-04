@@ -47,7 +47,7 @@ CARD_6 = Card(
     ],
 )
 def test_card_can_compute_its_numbers_of_matches(card, expected_copies_won):
-    assert card.compute_match_numbers() == expected_copies_won
+    assert card.compute_nb_match() == expected_copies_won
 
 
 def test_deck_can_be_computed(get_data):
