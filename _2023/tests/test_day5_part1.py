@@ -1,6 +1,6 @@
 import pytest
 
-from _2023.day5 import Almanach, Page, Range
+from _2023.day5 import Almanach, Page, Mapping
 from _2023.day5.part1 import compute_solution
 
 
@@ -18,11 +18,11 @@ def test_page_can_be_parsed():
     assert Page.from_input(data=page_data) == Page(
         source="fertilizer",
         destination="water",
-        ranges=[
-            Range(destination_start=49, source_start=53, length=8),
-            Range(destination_start=0, source_start=11, length=42),
-            Range(destination_start=42, source_start=0, length=7),
-            Range(destination_start=57, source_start=7, length=4),
+        mappings=[
+            Mapping(destination_start=49, source_start=53, length=8),
+            Mapping(destination_start=0, source_start=11, length=42),
+            Mapping(destination_start=42, source_start=0, length=7),
+            Mapping(destination_start=57, source_start=7, length=4),
         ],
     )
 
@@ -65,9 +65,9 @@ def test_page_can_map_source_and_destination_numbers(
     page = Page(
         source="seed",
         destination="soil",
-        ranges=[
-            Range(destination_start=50, source_start=98, length=2),
-            Range(destination_start=52, source_start=50, length=48),
+        mappings=[
+            Mapping(destination_start=50, source_start=98, length=2),
+            Mapping(destination_start=52, source_start=50, length=48),
         ],
     )
 
@@ -75,9 +75,9 @@ def test_page_can_map_source_and_destination_numbers(
 
 
 def test_almanach_can_get_page_for_any_key():
-    page_seed_soil = Page(source="seed", destination="soil", ranges=[])
+    page_seed_soil = Page(source="seed", destination="soil", mappings=[])
     page_soil_fertilizer = Page(
-        source="soil", destination="fertilizer", ranges=[]
+        source="soil", destination="fertilizer", mappings=[]
     )
     pages = [page_seed_soil, page_soil_fertilizer]
     almanach = Almanach(seeds=[], pages=pages)

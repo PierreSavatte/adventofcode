@@ -3,7 +3,7 @@ from typing import Optional
 
 
 @dataclass
-class Range:
+class Mapping:
     destination_start: int
     source_start: int
     length: int
@@ -25,7 +25,7 @@ class Range:
 class Page:
     source: str
     destination: str
-    ranges: list[Range]
+    mappings: list[Mapping]
 
     @classmethod
     def from_input(cls, data: str) -> "Page":
@@ -34,11 +34,11 @@ class Page:
         mapping_name, _ = header.split()
         source, destination = mapping_name.split("-to-")
 
-        ranges = []
+        mappings = []
         for line in lines:
             destination_start, source_start, length = line.split()
-            ranges.append(
-                Range(
+            mappings.append(
+                Mapping(
                     destination_start=int(destination_start),
                     source_start=int(source_start),
                     length=int(length),
@@ -48,14 +48,14 @@ class Page:
         return Page(
             source=source,
             destination=destination,
-            ranges=ranges,
+            mappings=mappings,
         )
 
     def map(self, source: int) -> int:
-        for range in self.ranges:
-            mapping = range.map(source)
-            if mapping is not None:
-                return mapping
+        for mapping in self.mappings:
+            destination = mapping.map(source)
+            if destination is not None:
+                return destination
         # Any source numbers that aren't mapped correspond
         # to the same destination number
         return source
