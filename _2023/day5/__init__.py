@@ -91,3 +91,11 @@ class Almanach:
             input = page.map(input)
         return input
 
+    @property
+    def seeds_ranges(self) -> list[range]:
+        groups = [self.seeds[i : i + 2] for i in range(0, len(self.seeds), 2)]
+
+        ranges = []
+        for start, length in groups:
+            ranges.append(range(start, start + length + 1))
+        return ranges
