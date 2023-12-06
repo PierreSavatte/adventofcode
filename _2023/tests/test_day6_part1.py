@@ -1,7 +1,7 @@
 import pytest
 
-from _2023.day6 import parse_input, Race, Option
-from _2023.day6.part1 import compute_solution
+from _2023.day6 import Race, Option
+from _2023.day6.part1 import compute_solution, parse_input
 
 
 def test_input_can_be_parsed(get_data):
