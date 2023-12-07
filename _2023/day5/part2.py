@@ -14,6 +14,9 @@ def compute_solution(data: str) -> int:
             seed = almanach.revert_map(
                 mapping.source_start, source=page.source
             )
+            if location != almanach.map(seed):
+                # To fix my computation problem somewhere 🙈
+                continue
             if any(seed in range for range in almanach.seeds_ranges):
                 locations.append(location)
 
