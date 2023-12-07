@@ -3,6 +3,21 @@ from enum import Enum, auto
 from collections import defaultdict
 
 CARD_ORDER = ["A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"]
+CARD_ORDER_SPICY_RULES = [
+    "A",
+    "K",
+    "Q",
+    "T",
+    "9",
+    "8",
+    "7",
+    "6",
+    "5",
+    "4",
+    "3",
+    "2",
+    "J",
+]
 
 
 def list_has_distinct_items(l: list[int], items: list[int]) -> bool:
@@ -26,7 +41,7 @@ class HandType(Enum):
     HIGH_CARD = auto()
 
     @classmethod
-    def from_hand(cls, hand: "Hand") -> "HandType":
+    def _from_hand_classic_rules(cls, hand: "Hand") -> "HandType":
         groups = hand.group()
         values = list(groups.values())
         if 5 in values:
@@ -43,40 +58,83 @@ class HandType(Enum):
             return HandType.ONE_PAIR
         return HandType.HIGH_CARD
 
+    @classmethod
+    def _from_hand_spicy_rules(cls, hand: "Hand") -> "HandType":
+        groups = hand.group()
+        try:
+            nb_jokers = groups[Card(face_value="J", spicy_rules=True)]
+        except KeyError:
+            nb_jokers = 0
 
-def get_card_index(face_value: str) -> int:
-    return CARD_ORDER.index(face_value)
+        values = list(groups.values())
+        if 5 - nb_jokers in values:
+            return HandType.FIVE_OF_A_KIND
+        if 4 - nb_jokers in values:
+            return HandType.FOUR_OF_A_KIND
+        if list_has_distinct_items(values, [3 - nb_jokers, 2]):
+            return HandType.FULL_HOUSE
+        if 3 - nb_jokers in values:
+            return HandType.THREE_OF_A_KIND
+        if list_has_distinct_items(values, [2 - nb_jokers, 2]):
+            return HandType.TWO_PAIR
+        if 2 - nb_jokers in values:
+            return HandType.ONE_PAIR
+        return HandType.HIGH_CARD
+
+    @classmethod
+    def from_hand(cls, hand: "Hand", spicy_rules: bool = False) -> "HandType":
+        if spicy_rules:
+            return cls._from_hand_spicy_rules(hand)
+        else:
+            return cls._from_hand_classic_rules(hand)
+
+
+def get_card_index(face_value: str, spicy_rules: bool) -> int:
+    if spicy_rules:
+        return CARD_ORDER_SPICY_RULES.index(face_value)
+    else:
+        return CARD_ORDER.index(face_value)
 
 
 @dataclass
 class Card:
     face_value: str
+    spicy_rules: bool = False
 
     def __gt__(self, other):
-        self_index = get_card_index(self.face_value)
-        other_index = get_card_index(other.face_value)
+        self_index = get_card_index(
+            self.face_value, spicy_rules=self.spicy_rules
+        )
+        other_index = get_card_index(
+            other.face_value, spicy_rules=self.spicy_rules
+        )
         return self_index < other_index
 
     def __eq__(self, other):
-        self_index = get_card_index(self.face_value)
-        other_index = get_card_index(other.face_value)
+        self_index = get_card_index(
+            self.face_value, spicy_rules=self.spicy_rules
+        )
+        other_index = get_card_index(
+            other.face_value, spicy_rules=self.spicy_rules
+        )
         return self_index == other_index
 
     def __lt__(self, other):
         return not self > other and self != other
 
     def __hash__(self):
-        return get_card_index(self.face_value)
+        return get_card_index(self.face_value, spicy_rules=self.spicy_rules)
 
 
 @dataclass
 class Hand:
     cards: list[Card]
     bid: int = 0
+    spicy_rules: bool = False
 
     @property
     def hand_type(self) -> HandType:
-        return HandType.from_hand(self)
+        return HandType.from_hand(self, spicy_rules=self.spicy_rules)
 
     def __gt__(self, other):
         self_hand_type = self.hand_type
@@ -99,10 +157,17 @@ class Hand:
         return dict(values_dict)
 
     @classmethod
-    def from_input_line(cls, input_line: str) -> "Hand":
+    def from_input_line(
+        cls, input_line: str, spicy_rules: bool = False
+    ) -> "Hand":
         cards_txt, bid_str = input_line.split()
         return Hand(
-            cards=[Card(card_str) for card_str in cards_txt], bid=int(bid_str)
+            cards=[
+                Card(card_str, spicy_rules=spicy_rules)
+                for card_str in cards_txt
+            ],
+            bid=int(bid_str),
+            spicy_rules=spicy_rules,
         )
 
     def __repr__(self):
@@ -112,5 +177,8 @@ class Hand:
         return f"<Hand {cards=} {bid=} {hand_type=}>"
 
 
-def parse_input(data: str) -> list[Hand]:
-    return [Hand.from_input_line(line) for line in data.split("\n")]
+def parse_input(data: str, spicy_rules: bool = False) -> list[Hand]:
+    return [
+        Hand.from_input_line(line, spicy_rules=spicy_rules)
+        for line in data.split("\n")
+    ]
