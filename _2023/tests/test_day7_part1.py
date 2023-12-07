@@ -119,6 +119,23 @@ def test_hands_can_be_sorted():
     assert sorted(input_hands) == expected_output_hands
 
 
+def test_similar_hands_are_sorted_properly():
+    hands = [
+        Hand(cards=[_2, _6, _5, J, K]),
+        Hand(cards=[_2, _5, T, _4, _6]),
+        Hand(cards=[_2, A, _5, _7, _3]),
+        Hand(cards=[_2, K, _8, _4, J]),
+        Hand(cards=[_2, _6, _8, _5, _9]),
+    ]
+    assert sorted(hands) == [
+        Hand(cards=[_2, _5, T, _4, _6]),
+        Hand(cards=[_2, _6, _5, J, K]),
+        Hand(cards=[_2, _6, _8, _5, _9]),
+        Hand(cards=[_2, K, _8, _4, J]),
+        Hand(cards=[_2, A, _5, _7, _3]),
+    ]
+
+
 @pytest.mark.parametrize(
     "line, expected_hand",
     [

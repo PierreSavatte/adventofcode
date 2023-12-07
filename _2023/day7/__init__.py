@@ -85,6 +85,8 @@ class Hand:
             return self_hand_type.value < other_hand_type.value
 
         for self_card, other_card in zip(self.cards, other.cards):
+            if self_card == other_card:
+                continue
             return self_card > other_card
 
     def __lt__(self, other):
