@@ -62,13 +62,17 @@ class HandType(Enum):
     def _from_hand_spicy_rules(cls, hand: "Hand") -> "HandType":
         groups = hand.group()
         try:
-            nb_jokers = groups[Card(face_value="J", spicy_rules=True)]
+            nb_jokers = groups.pop(Card(face_value="J", spicy_rules=True))
         except KeyError:
             nb_jokers = 0
 
         values = list(groups.values())
+        if nb_jokers == 5:
+            return HandType.FIVE_OF_A_KIND
         if 5 - nb_jokers in values:
             return HandType.FIVE_OF_A_KIND
+        if nb_jokers == 4:
+            return HandType.FOUR_OF_A_KIND
         if 4 - nb_jokers in values:
             return HandType.FOUR_OF_A_KIND
         if list_has_distinct_items(values, [3 - nb_jokers, 2]):

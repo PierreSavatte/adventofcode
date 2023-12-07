@@ -36,9 +36,50 @@ FOUR_OF_A_KIND_3 = Hand(cards=[K, T, J, J, T], spicy_rules=True)
     [
         (TWO_PAIR, HandType.TWO_PAIR),
         (ONE_PAIR, HandType.ONE_PAIR),
-        (FOUR_OF_A_KIND_1, HandType.FOUR_OF_A_KIND),
-        (FOUR_OF_A_KIND_2, HandType.FOUR_OF_A_KIND),
-        (FOUR_OF_A_KIND_3, HandType.FOUR_OF_A_KIND),
+        (
+            Hand.from_input_line("JJJJJ 847", spicy_rules=True),
+            HandType.FIVE_OF_A_KIND,
+        ),
+        (
+            Hand.from_input_line("JAJJJ 847", spicy_rules=True),
+            HandType.FIVE_OF_A_KIND,
+        ),
+        (
+            Hand.from_input_line("T55J5 847", spicy_rules=True),
+            HandType.FOUR_OF_A_KIND,
+        ),
+        (
+            Hand.from_input_line("QQQJA 847", spicy_rules=True),
+            HandType.FOUR_OF_A_KIND,
+        ),
+        (
+            Hand.from_input_line("QQJJA 847", spicy_rules=True),
+            HandType.FOUR_OF_A_KIND,
+        ),
+        (
+            Hand.from_input_line("JQJJA 847", spicy_rules=True),
+            HandType.FOUR_OF_A_KIND,
+        ),
+        (
+            Hand.from_input_line("JJJJA 847", spicy_rules=True),
+            HandType.FIVE_OF_A_KIND,
+        ),
+        (
+            Hand.from_input_line("KTJJT 847", spicy_rules=True),
+            HandType.FOUR_OF_A_KIND,
+        ),
+        (
+            Hand.from_input_line("J2382 26", spicy_rules=True),
+            HandType.THREE_OF_A_KIND,
+        ),
+        (
+            Hand.from_input_line("J2332 26", spicy_rules=True),
+            HandType.FULL_HOUSE,
+        ),
+        (
+            Hand.from_input_line("JJ432 26", spicy_rules=True),
+            HandType.THREE_OF_A_KIND,
+        ),
     ],
 )
 def test_hand_type_can_be_computed_from_hand(hand, expected_hand_type):
