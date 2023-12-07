@@ -1,4 +1,4 @@
-from _2023.day5 import Almanach
+from _2023.day5 import Almanach, Page
 from _2023.load_input import load_input
 
 
@@ -6,10 +6,16 @@ def compute_solution(data: str) -> int:
     almanach = Almanach.from_input(data)
 
     locations = []
-    for range_number, range in enumerate(almanach.seeds_ranges):
-        for seed in range:
-            location = almanach.map(seed)
-            locations.append(location)
+    for page in almanach.pages:
+        if page.source == "seed":
+            continue
+        for mapping in page.mappings:
+            location = almanach.map(mapping.source_start, source=page.source)
+            seed = almanach.revert_map(
+                mapping.source_start, source=page.source
+            )
+            if any(seed in range for range in almanach.seeds_ranges):
+                locations.append(location)
 
     return min(locations)
 

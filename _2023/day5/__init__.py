@@ -8,17 +8,31 @@ class Mapping:
     source_start: int
     length: int
 
+    @property
+    def source_range(self):
+        return range(self.source_start, self.source_start + self.length + 1)
+
+    @property
+    def destination_range(self):
+        return range(self.source_start, self.source_start + self.length + 1)
+
     def map(self, source: int) -> Optional[int]:
-        source_range = range(
-            self.source_start, self.source_start + self.length + 1
-        )
-        if source not in source_range:
+        if source not in self.source_range:
             return None
 
         distance_from_source_start = source - self.source_start
         destination = self.destination_start + distance_from_source_start
 
         return destination
+
+    def revert_map(self, destination: int) -> Optional[int]:
+        if destination not in self.destination_range:
+            return None
+
+        distance_from_destination_start = destination - self.destination_start
+        source = self.source_start + distance_from_destination_start
+
+        return source
 
 
 @dataclass
@@ -60,6 +74,15 @@ class Page:
         # to the same destination number
         return source
 
+    def revert_map(self, destination: int) -> int:
+        for mapping in self.mappings:
+            source = mapping.revert_map(destination)
+            if source is not None:
+                return source
+        # Any source numbers that aren't mapped correspond
+        # to the same destination number
+        return destination
+
 
 @dataclass
 class Almanach:
@@ -82,13 +105,24 @@ class Almanach:
             if page.source == source:
                 return page
 
-    def map(self, seed: int) -> int:
-        source = "seed"
+    def get_page_from_destination(self, destination: str) -> Page:
+        for page in self.pages:
+            if page.destination == destination:
+                return page
+
+    def map(self, seed: int, source: str = "seed") -> int:
         input = seed
         while source != "location":
             page = self.get_page(source)
             source = page.destination
             input = page.map(input)
+        return input
+
+    def revert_map(self, input: int, source: str = "location"):
+        while source != "seed":
+            page = self.get_page_from_destination(source)
+            source = page.source
+            input = page.revert_map(input)
         return input
 
     @property

@@ -1,5 +1,8 @@
+import math
+
 from _2023.day5 import Almanach, Page
 from _2023.load_input import load_input
+from tqdm import tqdm
 
 
 def get_page(pages: list[Page], source: str) -> Page:
@@ -29,16 +32,20 @@ def get_location(pages: list[Page], seed: int) -> int:
 def compute_solution(data: str) -> int:
     almanach = Almanach.from_input(data)
 
-    locations = []
-    for range_number, range in enumerate(almanach.seeds_ranges):
+    lowest_location = math.inf
+    total_number_ranges = len(almanach.seeds_ranges)
+    for range_number, range in enumerate(almanach.seeds_ranges, start=1):
         print(
-            f"running computation for {range_number}: {range} (length={range.stop - range.start})"
+            f"running computation for {range_number}/{total_number_ranges}: "
+            f"{range} (length={range.stop - range.start})"
         )
-        for seed_number, seed in enumerate(range):
+        for seed in tqdm(range):
             location = get_location(almanach.pages, seed)
-            locations.append(location)
+            if location < lowest_location:
+                print(f"got a lower location: {location}")
+                lowest_location = location
 
-    return min(locations)
+    return lowest_location
 
 
 if __name__ == "__main__":
