@@ -12,6 +12,27 @@ class Map:
     instructions: str
     tree: dict[str, Node]
 
+    @property
+    def starting_nodes(self):
+        return [node for node in self.tree.keys() if node.endswith("A")]
+
+    @property
+    def ending_nodes(self):
+        return [node for node in self.tree.keys() if node.endswith("Z")]
+
+    def count_steps(self, starting_node: str, ending_node: str) -> int:
+        nb_total_instructions = len(self.instructions)
+
+        node_key = starting_node
+        steps = 0
+        while node_key != ending_node:
+            node = self.tree[node_key]
+            direction = self.instructions[steps % nb_total_instructions]
+            node_key = getattr(node, direction)
+            steps += 1
+
+        return steps
+
 
 def parse_input(data: str) -> Map:
     lines = data.split("\n")

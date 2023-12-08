@@ -5,7 +5,7 @@ from _2023.day8.part1 import compute_solution
 
 
 def test_input_can_be_parsed_as_tree(get_data):
-    map = parse_input(get_data("test_file_day8"))
+    map = parse_input(get_data("test_file_day8_part1"))
 
     assert map.instructions == "RL"
     tree = map.tree
