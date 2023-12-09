@@ -28,3 +28,16 @@ class Sequence(list):
             differences[key].append(new_value)
 
         return differences[0][-1]
+
+    def get_previous_value(self) -> int:
+        differences = self.compute_differences()
+        max_key = max(differences.keys())
+
+        differences[max_key].insert(0, 0)
+        for key in range(max_key - 1, -1, -1):
+            first_value = differences[key][0]
+            increase = differences[key + 1][0]
+            new_value = first_value - increase
+            differences[key].insert(0, new_value)
+
+        return differences[0][0]
