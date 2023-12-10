@@ -14,35 +14,6 @@ class TileType(Enum):
     GROUND = "."
     STARTING_POSITION = "S"
 
-    def get_connected_positions(
-        self, tile_position: Position
-    ) -> set[Position]:
-        x, y = tile_position
-        connected_positions = set()
-        connected_position_computation = (
-            CONNECTED_POSITION_COMPUTATION_MAPPING[self]
-        )
-        for (x_diff, y_diff) in connected_position_computation:
-            connected_position = (x + x_diff, y + y_diff)
-            connected_positions.add(connected_position)
-
-        return connected_positions
-
-    def is_connected_to(
-        self, position: Position, other: "TileType", other_position: Position
-    ) -> bool:
-        self_connected_to = self.get_connected_positions(position)
-        print(f"{self_connected_to=}", other_position)
-        if other_position not in self_connected_to:
-            return False
-
-        other_connected_to = other.get_connected_positions(other_position)
-        print(f"{other_connected_to=}", position)
-        if position not in other_connected_to:
-            return False
-
-        return True
-
 
 NORTH_DIFF = (0, -1)
 SOUTH_DIFF = (0, 1)
@@ -65,6 +36,29 @@ CONNECTED_POSITION_COMPUTATION_MAPPING = {
 class Tile:
     position: Position
     type: TileType
+
+    def get_connected_positions(self) -> set[Position]:
+        x, y = self.position
+        connected_positions = set()
+        connected_position_computation = (
+            CONNECTED_POSITION_COMPUTATION_MAPPING[self.type]
+        )
+        for (x_diff, y_diff) in connected_position_computation:
+            connected_position = (x + x_diff, y + y_diff)
+            connected_positions.add(connected_position)
+
+        return connected_positions
+
+    def is_connected_to(self, other: "Tile") -> bool:
+        self_connected_to = self.get_connected_positions()
+        if other.position not in self_connected_to:
+            return False
+
+        other_connected_to = other.get_connected_positions()
+        if self.position not in other_connected_to:
+            return False
+
+        return True
 
 
 @dataclass

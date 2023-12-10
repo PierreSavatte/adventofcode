@@ -21,6 +21,16 @@ L|7||
 -L-J|
 L|-JF"""
 EXPECTED_POSITION_REGULAR_MAP = (1, 1)
+EXPECTED_LOOP_POSITIONS_REGULAR_MAP = {
+    (1, 1),
+    (2, 1),
+    (3, 1),
+    (1, 2),
+    (3, 2),
+    (1, 4),
+    (2, 4),
+    (3, 4),
+}
 
 MORE_COMPLEX_MAP = """7-F7-
 .FJ|7
@@ -28,6 +38,24 @@ SJLL7
 |F--J
 LJ.LJ"""
 EXPECTED_POSITION_MORE_COMPLEX_MAP = (0, 2)
+EXPECTED_LOOP_POSITIONS_MORE_COMPLEX_MAP = {
+    (2, 0),
+    (3, 0),
+    (1, 1),
+    (2, 1),
+    (3, 1),
+    (0, 2),
+    (1, 2),
+    (3, 2),
+    (4, 2),
+    (0, 3),
+    (1, 3),
+    (2, 3),
+    (3, 3),
+    (4, 3),
+    (0, 4),
+    (1, 4),
+}
 
 MORE_COMPLEX_LOOP_MAP = """..F7.
 .FJ|.
@@ -252,36 +280,44 @@ def test_starting_position_can_be_computed_from_map(
 
 
 def test_tile_can_give_its_tiles_its_connected_to():
+    tile = Tile(type=TileType.EAST_WEST, position=(1, 1))
     expected_connected_positions = {
         (0, 1),
         (2, 1),
     }
-    assert (
-        TileType.EAST_WEST.get_connected_positions(tile_position=(1, 1))
-        == expected_connected_positions
-    )
+
+    assert tile.get_connected_positions() == expected_connected_positions
 
 
 @pytest.mark.parametrize(
-    "tile_a, position_a, tile_b, position_b, expected_result",
+    "tile_a, tile_b, expected_result",
     [
         # -7
-        (TileType.EAST_WEST, (1, 1), TileType.SOUTH_WEST, (2, 1), True),
+        (
+            Tile(type=TileType.EAST_WEST, position=(1, 1)),
+            Tile(type=TileType.SOUTH_WEST, position=(2, 1)),
+            True,
+        ),
         # |
         # L
-        (TileType.NORTH_SOUTH, (12, 4), TileType.NORTH_EAST, (12, 5), True),
+        (
+            Tile(type=TileType.NORTH_SOUTH, position=(12, 4)),
+            Tile(type=TileType.NORTH_EAST, position=(12, 5)),
+            True,
+        ),
         # 7-
-        (TileType.EAST_WEST, (1, 1), TileType.SOUTH_WEST, (0, 1), False),
+        (
+            Tile(type=TileType.EAST_WEST, position=(1, 1)),
+            Tile(type=TileType.SOUTH_WEST, position=(0, 1)),
+            False,
+        ),
         # -.7
-        (TileType.EAST_WEST, (1, 1), TileType.SOUTH_WEST, (3, 1), False),
+        (
+            Tile(type=TileType.EAST_WEST, position=(1, 1)),
+            Tile(type=TileType.SOUTH_WEST, position=(3, 1)),
+            False,
+        ),
     ],
 )
-def test_tiles_can_say_if_they_are_connected(
-    tile_a, position_a, tile_b, position_b, expected_result
-):
-    assert (
-        tile_a.is_connected_to(
-            position=position_a, other=tile_b, other_position=position_b
-        )
-        is expected_result
-    )
+def test_tiles_can_say_if_they_are_connected(tile_a, tile_b, expected_result):
+    assert tile_a.is_connected_to(tile_b) is expected_result
