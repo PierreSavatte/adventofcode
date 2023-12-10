@@ -62,6 +62,47 @@ class Tile:
 
 
 @dataclass
+class LoopTile(Tile):
+    distance_from_start: int
+
+    @classmethod
+    def from_tile(cls, tile: Tile, distance_from_start: int) -> "LoopTile":
+        return LoopTile(
+            position=tile.position,
+            type=tile.type,
+            distance_from_start=distance_from_start,
+        )
+
+
+class Loop(list):
+    def add_tile(self, tile: Tile, distance_from_start: int):
+        self.append(
+            LoopTile.from_tile(
+                tile=tile, distance_from_start=distance_from_start
+            )
+        )
+
+    @property
+    def positions(self) -> list[Position]:
+        return [tile.position for tile in self]
+
+    @property
+    def distances(self) -> dict[Position, int]:
+        return {tile.position: tile.distance_from_start for tile in self}
+
+    def validate_distances(self):
+        new_distance = 0
+        for tile_index in range(len(self) - 1, -1, -1):
+            tile = self[tile_index]
+
+            if tile.distance_from_start <= new_distance:
+                break
+            else:
+                tile.distance_from_start = new_distance
+            new_distance += 1
+
+
+@dataclass
 class Map:
     tiles: list[list[Tile]]
 
@@ -94,10 +135,13 @@ class Map:
 
     def _compute_loop(
         self, starting_position: Position, next_position: Position
-    ) -> list[Position]:
+    ) -> Loop:
         current_tile = self.get_tile(starting_position)
         next_tile = self.get_tile(next_position)
-        positions = [starting_position, next_position]
+        loop = Loop()
+        loop.add_tile(tile=current_tile, distance_from_start=0)
+        loop.add_tile(tile=next_tile, distance_from_start=1)
+        distance = 2
         while (
             current_tile.is_connected_to(other=next_tile)
             and next_tile.position != starting_position
@@ -113,16 +157,17 @@ class Map:
 
             current_tile = next_tile
             next_tile = self.get_tile(next_position)
+            loop.add_tile(tile=next_tile, distance_from_start=distance)
+            distance += 1
 
-            positions.append(next_position)
         if (
             next_tile.position != starting_position
             or not current_tile.is_connected_to(other=next_tile)
         ):
             raise RuntimeError("Loop cannot have been computed.")
-        return positions
+        return loop
 
-    def compute_loop(self) -> list[Position]:
+    def compute_loop(self) -> Loop:
         # For each cell next to S, try to compute the loop.
         # If it fails, restart trying to compute loop from next
         starting_position = self.get_starting_position()
@@ -141,6 +186,7 @@ class Map:
             except RuntimeError:
                 continue
             else:
+                loop.validate_distances()
                 return loop
 
         raise RuntimeError("Couldn't have computed any loops within the map.")

@@ -31,6 +31,16 @@ EXPECTED_LOOP_POSITIONS_REGULAR_MAP = {
     (2, 3),
     (3, 3),
 }
+EXPECTED_DISTANCES_REGULAR_MAP = {
+    (1, 1): 0,
+    (2, 1): 1,
+    (3, 1): 2,
+    (1, 2): 1,
+    (3, 2): 3,
+    (1, 3): 2,
+    (2, 3): 3,
+    (3, 3): 4,
+}
 
 MORE_COMPLEX_MAP = """7-F7-
 .FJ|7
@@ -55,6 +65,24 @@ EXPECTED_LOOP_POSITIONS_MORE_COMPLEX_MAP = {
     (4, 3),
     (0, 4),
     (1, 4),
+}
+EXPECTED_DISTANCES_MORE_COMPLEX_MAP = {
+    (2, 0): 4,
+    (3, 0): 5,
+    (1, 1): 2,
+    (2, 1): 3,
+    (3, 1): 6,
+    (0, 2): 0,
+    (1, 2): 1,
+    (3, 2): 7,
+    (4, 2): 8,
+    (0, 3): 1,
+    (1, 3): 4,
+    (2, 3): 5,
+    (3, 3): 6,
+    (4, 3): 7,
+    (0, 4): 2,
+    (1, 4): 3,
 }
 
 MORE_COMPLEX_LOOP_MAP = """..F7.
@@ -324,7 +352,7 @@ def test_tiles_can_say_if_they_are_connected(tile_a, tile_b, expected_result):
 
 
 @pytest.mark.parametrize(
-    "input_data, expected_loop",
+    "input_data, expected_loop_positions",
     [
         (REGULAR_MAP, EXPECTED_LOOP_POSITIONS_REGULAR_MAP),
         (SIMPLE_MAP, EXPECTED_LOOP_POSITIONS_REGULAR_MAP),
@@ -332,7 +360,26 @@ def test_tiles_can_say_if_they_are_connected(tile_a, tile_b, expected_result):
         (MORE_COMPLEX_LOOP_MAP, EXPECTED_LOOP_POSITIONS_MORE_COMPLEX_MAP),
     ],
 )
-def test_map_can_compute_its_loop(input_data, expected_loop):
+def test_map_can_compute_its_loop(input_data, expected_loop_positions):
     map = Map.from_input(input_data)
 
-    assert set(map.compute_loop()) == expected_loop
+    loop = map.compute_loop()
+
+    assert set(loop.positions) == expected_loop_positions
+
+
+@pytest.mark.parametrize(
+    "input_data, expected_distances",
+    [
+        (REGULAR_MAP, EXPECTED_DISTANCES_REGULAR_MAP),
+        (SIMPLE_MAP, EXPECTED_DISTANCES_REGULAR_MAP),
+        (MORE_COMPLEX_MAP, EXPECTED_DISTANCES_MORE_COMPLEX_MAP),
+        (MORE_COMPLEX_LOOP_MAP, EXPECTED_DISTANCES_MORE_COMPLEX_MAP),
+    ],
+)
+def test_map_can_compute_distances_in_loop(input_data, expected_distances):
+    map = Map.from_input(input_data)
+
+    loop = map.compute_loop()
+
+    assert loop.distances == expected_distances
