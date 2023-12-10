@@ -95,7 +95,7 @@ def test_map_can_compute_enclosed_map(input_data, expected_enclosed_map):
 
 @pytest.mark.parametrize(
     "input_data, expected_enclosed_tiles",
-    [(LOOP_MAP, 3), (COMPLEX_LOOP_MAP, 4)],
+    [(SIMPLE_LOOP_MAP, 4), (LOOP_MAP, 4), (COMPLEX_LOOP_MAP, 8)],
 )
 def test_map_can_compute_enclosed_tiles(input_data, expected_enclosed_tiles):
     map = Map.from_input(input_data)

@@ -243,7 +243,7 @@ class Map:
     def compute_enclosed_tiles(self):
         map = self.compute_enclosed_map()
         enclosed_tiles = 0
-        for tile_line in self.tiles:
+        for tile_line in map.tiles:
             for tile in tile_line:
                 if tile.type == TileType.ENCLOSED:
                     enclosed_tiles += 1
