@@ -4,7 +4,7 @@ from dataclasses import dataclass
 Position = tuple[int, int]
 
 
-class Tile(Enum):
+class TileType(Enum):
     NORTH_SOUTH = "|"
     EAST_WEST = "-"
     NORTH_EAST = "L"
@@ -29,7 +29,7 @@ class Tile(Enum):
         return connected_positions
 
     def is_connected_to(
-        self, position: Position, other: "Tile", other_position: Position
+        self, position: Position, other: "TileType", other_position: Position
     ) -> bool:
         self_connected_to = self.get_connected_positions(position)
         print(f"{self_connected_to=}", other_position)
@@ -50,26 +50,26 @@ EAST_DIFF = (1, 0)
 WEST_DIFF = (-1, 0)
 
 CONNECTED_POSITION_COMPUTATION_MAPPING = {
-    Tile.NORTH_SOUTH: [NORTH_DIFF, SOUTH_DIFF],
-    Tile.EAST_WEST: [EAST_DIFF, WEST_DIFF],
-    Tile.NORTH_EAST: [NORTH_DIFF, EAST_DIFF],
-    Tile.NORTH_WEST: [NORTH_DIFF, WEST_DIFF],
-    Tile.SOUTH_WEST: [SOUTH_DIFF, WEST_DIFF],
-    Tile.SOUTH_EAST: [SOUTH_DIFF, EAST_DIFF],
-    Tile.GROUND: [],
-    Tile.STARTING_POSITION: [],
+    TileType.NORTH_SOUTH: [NORTH_DIFF, SOUTH_DIFF],
+    TileType.EAST_WEST: [EAST_DIFF, WEST_DIFF],
+    TileType.NORTH_EAST: [NORTH_DIFF, EAST_DIFF],
+    TileType.NORTH_WEST: [NORTH_DIFF, WEST_DIFF],
+    TileType.SOUTH_WEST: [SOUTH_DIFF, WEST_DIFF],
+    TileType.SOUTH_EAST: [SOUTH_DIFF, EAST_DIFF],
+    TileType.GROUND: [],
+    TileType.STARTING_POSITION: [],
 }
 
 
 @dataclass
 class Map:
-    tiles: list[list[Tile]]
+    tiles: list[list[TileType]]
 
     @classmethod
     def from_input(cls, data: str) -> "Map":
         tiles = []
         for input_line in data.splitlines():
-            tile_line = [Tile(character) for character in input_line]
+            tile_line = [TileType(character) for character in input_line]
             tiles.append(tile_line)
         return Map(tiles=tiles)
 
@@ -83,5 +83,5 @@ class Map:
     def get_starting_position(self) -> Position:
         for y, tile_line in enumerate(self.tiles):
             for x, tile in enumerate(tile_line):
-                if tile == Tile.STARTING_POSITION:
+                if tile == TileType.STARTING_POSITION:
                     return x, y

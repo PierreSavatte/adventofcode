@@ -1,7 +1,6 @@
 import pytest
 
-from _2023.day10 import Tile, Map
-
+from _2023.day10 import TileType, Map
 
 SQUARE_MAP = """.....
 .F-7.
@@ -41,29 +40,59 @@ EXPECTED_POSITION_MORE_COMPLEX_LOOP_MAP = (0, 2)
 @pytest.mark.parametrize(
     "tile_character, expected_tile",
     [
-        ("|", Tile.NORTH_SOUTH),
-        ("-", Tile.EAST_WEST),
-        ("L", Tile.NORTH_EAST),
-        ("J", Tile.NORTH_WEST),
-        ("7", Tile.SOUTH_WEST),
-        ("F", Tile.SOUTH_EAST),
-        (".", Tile.GROUND),
-        ("S", Tile.STARTING_POSITION),
+        ("|", TileType.NORTH_SOUTH),
+        ("-", TileType.EAST_WEST),
+        ("L", TileType.NORTH_EAST),
+        ("J", TileType.NORTH_WEST),
+        ("7", TileType.SOUTH_WEST),
+        ("F", TileType.SOUTH_EAST),
+        (".", TileType.GROUND),
+        ("S", TileType.STARTING_POSITION),
     ],
 )
 def test_tiles_can_be_computed(tile_character, expected_tile):
-    assert Tile(tile_character) == expected_tile
+    assert TileType(tile_character) == expected_tile
 
 
 def test_map_can_be_parsed_():
     map = Map.from_input(SIMPLE_MAP)
 
     assert map.tiles == [
-        [Tile("."), Tile("."), Tile("."), Tile("."), Tile(".")],
-        [Tile("."), Tile("S"), Tile("-"), Tile("7"), Tile(".")],
-        [Tile("."), Tile("|"), Tile("."), Tile("|"), Tile(".")],
-        [Tile("."), Tile("L"), Tile("-"), Tile("J"), Tile(".")],
-        [Tile("."), Tile("."), Tile("."), Tile("."), Tile(".")],
+        [
+            TileType("."),
+            TileType("."),
+            TileType("."),
+            TileType("."),
+            TileType("."),
+        ],
+        [
+            TileType("."),
+            TileType("S"),
+            TileType("-"),
+            TileType("7"),
+            TileType("."),
+        ],
+        [
+            TileType("."),
+            TileType("|"),
+            TileType("."),
+            TileType("|"),
+            TileType("."),
+        ],
+        [
+            TileType("."),
+            TileType("L"),
+            TileType("-"),
+            TileType("J"),
+            TileType("."),
+        ],
+        [
+            TileType("."),
+            TileType("."),
+            TileType("."),
+            TileType("."),
+            TileType("."),
+        ],
     ]
 
 
@@ -73,41 +102,161 @@ def test_map_can_be_parsed_():
         (
             SQUARE_MAP,
             [
-                [Tile("."), Tile("."), Tile("."), Tile("."), Tile(".")],
-                [Tile("."), Tile("F"), Tile("-"), Tile("7"), Tile(".")],
-                [Tile("."), Tile("|"), Tile("."), Tile("|"), Tile(".")],
-                [Tile("."), Tile("L"), Tile("-"), Tile("J"), Tile(".")],
-                [Tile("."), Tile("."), Tile("."), Tile("."), Tile(".")],
+                [
+                    TileType("."),
+                    TileType("."),
+                    TileType("."),
+                    TileType("."),
+                    TileType("."),
+                ],
+                [
+                    TileType("."),
+                    TileType("F"),
+                    TileType("-"),
+                    TileType("7"),
+                    TileType("."),
+                ],
+                [
+                    TileType("."),
+                    TileType("|"),
+                    TileType("."),
+                    TileType("|"),
+                    TileType("."),
+                ],
+                [
+                    TileType("."),
+                    TileType("L"),
+                    TileType("-"),
+                    TileType("J"),
+                    TileType("."),
+                ],
+                [
+                    TileType("."),
+                    TileType("."),
+                    TileType("."),
+                    TileType("."),
+                    TileType("."),
+                ],
             ],
         ),
         (
             SIMPLE_MAP,
             [
-                [Tile("."), Tile("."), Tile("."), Tile("."), Tile(".")],
-                [Tile("."), Tile("S"), Tile("-"), Tile("7"), Tile(".")],
-                [Tile("."), Tile("|"), Tile("."), Tile("|"), Tile(".")],
-                [Tile("."), Tile("L"), Tile("-"), Tile("J"), Tile(".")],
-                [Tile("."), Tile("."), Tile("."), Tile("."), Tile(".")],
+                [
+                    TileType("."),
+                    TileType("."),
+                    TileType("."),
+                    TileType("."),
+                    TileType("."),
+                ],
+                [
+                    TileType("."),
+                    TileType("S"),
+                    TileType("-"),
+                    TileType("7"),
+                    TileType("."),
+                ],
+                [
+                    TileType("."),
+                    TileType("|"),
+                    TileType("."),
+                    TileType("|"),
+                    TileType("."),
+                ],
+                [
+                    TileType("."),
+                    TileType("L"),
+                    TileType("-"),
+                    TileType("J"),
+                    TileType("."),
+                ],
+                [
+                    TileType("."),
+                    TileType("."),
+                    TileType("."),
+                    TileType("."),
+                    TileType("."),
+                ],
             ],
         ),
         (
             REGULAR_MAP,
             [
-                [Tile("-"), Tile("L"), Tile("|"), Tile("F"), Tile("7")],
-                [Tile("7"), Tile("S"), Tile("-"), Tile("7"), Tile("|")],
-                [Tile("L"), Tile("|"), Tile("7"), Tile("|"), Tile("|")],
-                [Tile("-"), Tile("L"), Tile("-"), Tile("J"), Tile("|")],
-                [Tile("L"), Tile("|"), Tile("-"), Tile("J"), Tile("F")],
+                [
+                    TileType("-"),
+                    TileType("L"),
+                    TileType("|"),
+                    TileType("F"),
+                    TileType("7"),
+                ],
+                [
+                    TileType("7"),
+                    TileType("S"),
+                    TileType("-"),
+                    TileType("7"),
+                    TileType("|"),
+                ],
+                [
+                    TileType("L"),
+                    TileType("|"),
+                    TileType("7"),
+                    TileType("|"),
+                    TileType("|"),
+                ],
+                [
+                    TileType("-"),
+                    TileType("L"),
+                    TileType("-"),
+                    TileType("J"),
+                    TileType("|"),
+                ],
+                [
+                    TileType("L"),
+                    TileType("|"),
+                    TileType("-"),
+                    TileType("J"),
+                    TileType("F"),
+                ],
             ],
         ),
         (
             MORE_COMPLEX_MAP,
             [
-                [Tile("7"), Tile("-"), Tile("F"), Tile("7"), Tile("-")],
-                [Tile("."), Tile("F"), Tile("J"), Tile("|"), Tile("7")],
-                [Tile("S"), Tile("J"), Tile("L"), Tile("L"), Tile("7")],
-                [Tile("|"), Tile("F"), Tile("-"), Tile("-"), Tile("J")],
-                [Tile("L"), Tile("J"), Tile("."), Tile("L"), Tile("J")],
+                [
+                    TileType("7"),
+                    TileType("-"),
+                    TileType("F"),
+                    TileType("7"),
+                    TileType("-"),
+                ],
+                [
+                    TileType("."),
+                    TileType("F"),
+                    TileType("J"),
+                    TileType("|"),
+                    TileType("7"),
+                ],
+                [
+                    TileType("S"),
+                    TileType("J"),
+                    TileType("L"),
+                    TileType("L"),
+                    TileType("7"),
+                ],
+                [
+                    TileType("|"),
+                    TileType("F"),
+                    TileType("-"),
+                    TileType("-"),
+                    TileType("J"),
+                ],
+                [
+                    TileType("L"),
+                    TileType("J"),
+                    TileType("."),
+                    TileType("L"),
+                    TileType("J"),
+                ],
             ],
         ),
     ],
@@ -150,7 +299,7 @@ def test_tile_can_give_its_tiles_its_connected_to():
         (2, 1),
     }
     assert (
-        Tile.EAST_WEST.get_connected_positions(tile_position=(1, 1))
+        TileType.EAST_WEST.get_connected_positions(tile_position=(1, 1))
         == expected_connected_positions
     )
 
@@ -159,14 +308,14 @@ def test_tile_can_give_its_tiles_its_connected_to():
     "tile_a, position_a, tile_b, position_b, expected_result",
     [
         # -7
-        (Tile.EAST_WEST, (1, 1), Tile.SOUTH_WEST, (2, 1), True),
+        (TileType.EAST_WEST, (1, 1), TileType.SOUTH_WEST, (2, 1), True),
         # |
         # L
-        (Tile.NORTH_SOUTH, (12, 4), Tile.NORTH_EAST, (12, 5), True),
+        (TileType.NORTH_SOUTH, (12, 4), TileType.NORTH_EAST, (12, 5), True),
         # 7-
-        (Tile.EAST_WEST, (1, 1), Tile.SOUTH_WEST, (0, 1), False),
+        (TileType.EAST_WEST, (1, 1), TileType.SOUTH_WEST, (0, 1), False),
         # -.7
-        (Tile.EAST_WEST, (1, 1), Tile.SOUTH_WEST, (3, 1), False),
+        (TileType.EAST_WEST, (1, 1), TileType.SOUTH_WEST, (3, 1), False),
     ],
 )
 def test_tiles_can_say_if_they_are_connected(
