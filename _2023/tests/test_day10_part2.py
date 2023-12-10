@@ -1,6 +1,7 @@
 import pytest
 
 from _2023.day10 import Map
+from _2023.day10.part2 import compute_solution
 from .test_day10_part1 import (
     REGULAR_MAP,
     SIMPLE_MAP,
@@ -101,3 +102,11 @@ def test_map_can_compute_enclosed_tiles(input_data, expected_enclosed_tiles):
     map = Map.from_input(input_data)
 
     assert map.compute_enclosed_tiles() == expected_enclosed_tiles
+
+
+@pytest.mark.parametrize(
+    "input_data, expected_solution",
+    [(SIMPLE_LOOP_MAP, 4), (LOOP_MAP, 4), (COMPLEX_LOOP_MAP, 8)],
+)
+def test_solution_can_be_computed(input_data, expected_solution):
+    assert compute_solution(input_data) == expected_solution
