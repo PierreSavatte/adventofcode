@@ -1,4 +1,4 @@
-from _2023.day10 import Map
+from _2023.day10.map import Map
 from _2023.load_input import load_input
 
 

@@ -1,6 +1,6 @@
 import pytest
 
-from _2023.day10 import Map
+from _2023.day10.map import Map
 from _2023.day10.part2 import compute_solution
 from .test_day10_part1 import (
     REGULAR_MAP,
@@ -8,7 +8,6 @@ from .test_day10_part1 import (
     MORE_COMPLEX_MAP,
     MORE_COMPLEX_LOOP_MAP,
 )
-
 
 SIMPLE_LOOP_MAP = """...........
 .S-------7.

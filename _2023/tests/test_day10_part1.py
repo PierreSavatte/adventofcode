@@ -1,6 +1,7 @@
 import pytest
 
-from _2023.day10 import Tile, TileType, Map
+from _2023.day10 import Tile, TileType
+from _2023.day10.map import Map
 from _2023.day10.part1 import compute_solution
 
 SQUARE_MAP = """.....
