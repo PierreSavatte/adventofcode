@@ -1,3 +1,4 @@
+import math
 from enum import Enum
 from dataclasses import dataclass
 
@@ -13,6 +14,7 @@ class TileType(Enum):
     SOUTH_EAST = "F"
     GROUND = "."
     STARTING_POSITION = "S"
+    ENCLOSED = "I"
 
 
 NORTH_DIFF = (0, -1)
@@ -28,6 +30,7 @@ CONNECTED_POSITION_COMPUTATION_MAPPING = {
     TileType.SOUTH_WEST: [SOUTH_DIFF, WEST_DIFF],
     TileType.SOUTH_EAST: [SOUTH_DIFF, EAST_DIFF],
     TileType.GROUND: [],
+    TileType.ENCLOSED: [],
     TileType.STARTING_POSITION: [NORTH_DIFF, SOUTH_DIFF, EAST_DIFF, WEST_DIFF],
 }
 
@@ -82,6 +85,13 @@ class Loop(list):
             )
         )
 
+    def get_position_index(self, position: Position) -> int:
+        for i, tile in enumerate(self):
+            if tile.position == position:
+                return i
+
+        raise ValueError(f"{position} is not in list")
+
     @property
     def positions(self) -> list[Position]:
         return [tile.position for tile in self]
@@ -108,6 +118,10 @@ class Map:
 
     def get_tile(self, position: Position) -> Tile:
         return self.tiles[position[1]][position[0]]
+
+    @property
+    def max_x(self) -> int:
+        return len(self.tiles[0]) - 1
 
     @classmethod
     def from_input(cls, data: str) -> "Map":
@@ -167,7 +181,7 @@ class Map:
             raise RuntimeError("Loop cannot have been computed.")
         return loop
 
-    def compute_loop(self) -> Loop:
+    def compute_loop(self, validate_distances: bool = True) -> Loop:
         # For each cell next to S, try to compute the loop.
         # If it fails, restart trying to compute loop from next
         starting_position = self.get_starting_position()
@@ -186,7 +200,8 @@ class Map:
             except RuntimeError:
                 continue
             else:
-                loop.validate_distances()
+                if validate_distances:
+                    loop.validate_distances()
                 return loop
 
         raise RuntimeError("Couldn't have computed any loops within the map.")
@@ -205,3 +220,78 @@ class Map:
             new_tiles.append(new_tiles_line)
 
         return Map(tiles=new_tiles)
+
+    def compute_enclosed_map(self) -> "Map":
+        loop = self.compute_loop(validate_distances=False)
+
+        new_tiles = []
+        for tile_line in self.tiles:
+            new_tiles_line = []
+            for tile in tile_line:
+                if (
+                    tile.type == TileType.GROUND
+                    and is_position_enclosed_by_loop_using_winding_number(
+                        position=tile.position, loop=loop, max_x=self.max_x
+                    )
+                ):
+                    tile = Tile(position=tile.position, type=TileType.ENCLOSED)
+                new_tiles_line.append(tile)
+            new_tiles.append(new_tiles_line)
+
+        return Map(tiles=new_tiles)
+
+    def compute_enclosed_tiles(self):
+        map = self.compute_enclosed_map()
+        enclosed_tiles = 0
+        for tile_line in self.tiles:
+            for tile in tile_line:
+                if tile.type == TileType.ENCLOSED:
+                    enclosed_tiles += 1
+        return enclosed_tiles
+
+
+def is_position_enclosed_by_loop_using_ray_casting(
+    position: Position, loop: Loop, max_x: int
+) -> bool:
+    starting_x = position[0]
+    ending_x = max_x
+    loop_positions = loop.positions
+
+    y = position[1]
+    count = 0
+    for x in range(starting_x, ending_x + 1):
+        if (x, y) in loop_positions:
+            count += 1
+    # If the point is on the inside of the polygon then it will intersect
+    # the edge an odd number of times.
+    return count % 2 != 0
+
+
+def edge_function(p: Position, vertices: tuple[Position, Position]) -> float:
+    a, b = vertices
+    return (p[0] - a[0]) * (b[1] - a[1]) - (p[1] - a[1]) * (b[0] - a[0])
+
+
+def is_position_enclosed_by_loop_using_winding_number(
+    position: Position, loop: Loop, max_x: int
+) -> bool:
+    starting_x = position[0]
+    ending_x = max_x + 1
+    loop_positions = loop.positions
+
+    y = position[1]
+    winding_number = 0
+    for x in range(starting_x, ending_x + 1):
+        current_position = (x, y)
+        if current_position in loop_positions:
+            i = loop.get_position_index(current_position)
+            vertices = loop[i].position, loop[i + 1].position
+            edge = edge_function(position, vertices)
+            if edge == 0:
+                pass
+            elif edge > 0:
+                winding_number += 1
+            else:
+                winding_number -= 1
+
+    return winding_number != 0
