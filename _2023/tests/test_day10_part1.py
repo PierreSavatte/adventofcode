@@ -1,6 +1,7 @@
 import pytest
 
 from _2023.day10 import Tile, TileType, Map
+from _2023.day10.part1 import compute_solution
 
 SQUARE_MAP = """.....
 .F-7.
@@ -383,3 +384,16 @@ def test_map_can_compute_distances_in_loop(input_data, expected_distances):
     loop = map.compute_loop()
 
     assert loop.distances == expected_distances
+
+
+@pytest.mark.parametrize(
+    "input_data, expected_solution",
+    [
+        (REGULAR_MAP, 4),
+        (SIMPLE_MAP, 4),
+        (MORE_COMPLEX_MAP, 8),
+        (MORE_COMPLEX_LOOP_MAP, 8),
+    ],
+)
+def test_solution_can_be_computed(input_data, expected_solution):
+    assert compute_solution(input_data) == expected_solution

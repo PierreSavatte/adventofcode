@@ -190,3 +190,18 @@ class Map:
                 return loop
 
         raise RuntimeError("Couldn't have computed any loops within the map.")
+
+    def compute_loop_map(self) -> "Map":
+        loop = self.compute_loop()
+        loop_positions = loop.positions
+
+        new_tiles = []
+        for tile_line in self.tiles:
+            new_tiles_line = []
+            for tile in tile_line:
+                if tile.position not in loop_positions:
+                    tile = Tile(position=tile.position, type=TileType.GROUND)
+                new_tiles_line.append(tile)
+            new_tiles.append(new_tiles_line)
+
+        return Map(tiles=new_tiles)
