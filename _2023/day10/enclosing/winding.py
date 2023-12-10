@@ -3,6 +3,7 @@ from _2023.day10 import Position, Loop
 
 def edge_function(p: Position, vertices: tuple[Position, Position]) -> float:
     a, b = vertices
+    # From https://www.scratchapixel.com/lessons/3d-basic-rendering/rasterization-practical-implementation/rasterization-stage.html
     return (p[0] - a[0]) * (b[1] - a[1]) - (p[1] - a[1]) * (b[0] - a[0])
 
 
