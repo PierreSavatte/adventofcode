@@ -27,9 +27,9 @@ EXPECTED_LOOP_POSITIONS_REGULAR_MAP = {
     (3, 1),
     (1, 2),
     (3, 2),
-    (1, 4),
-    (2, 4),
-    (3, 4),
+    (1, 3),
+    (2, 3),
+    (3, 3),
 }
 
 MORE_COMPLEX_MAP = """7-F7-
@@ -321,3 +321,18 @@ def test_tile_can_give_its_tiles_its_connected_to():
 )
 def test_tiles_can_say_if_they_are_connected(tile_a, tile_b, expected_result):
     assert tile_a.is_connected_to(tile_b) is expected_result
+
+
+@pytest.mark.parametrize(
+    "input_data, expected_loop",
+    [
+        (REGULAR_MAP, EXPECTED_LOOP_POSITIONS_REGULAR_MAP),
+        (SIMPLE_MAP, EXPECTED_LOOP_POSITIONS_REGULAR_MAP),
+        (MORE_COMPLEX_MAP, EXPECTED_LOOP_POSITIONS_MORE_COMPLEX_MAP),
+        (MORE_COMPLEX_LOOP_MAP, EXPECTED_LOOP_POSITIONS_MORE_COMPLEX_MAP),
+    ],
+)
+def test_map_can_compute_its_loop(input_data, expected_loop):
+    map = Map.from_input(input_data)
+
+    assert set(map.compute_loop()) == expected_loop

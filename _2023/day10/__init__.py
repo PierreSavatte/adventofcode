@@ -28,7 +28,7 @@ CONNECTED_POSITION_COMPUTATION_MAPPING = {
     TileType.SOUTH_WEST: [SOUTH_DIFF, WEST_DIFF],
     TileType.SOUTH_EAST: [SOUTH_DIFF, EAST_DIFF],
     TileType.GROUND: [],
-    TileType.STARTING_POSITION: [],
+    TileType.STARTING_POSITION: [NORTH_DIFF, SOUTH_DIFF, EAST_DIFF, WEST_DIFF],
 }
 
 
@@ -65,6 +65,9 @@ class Tile:
 class Map:
     tiles: list[list[Tile]]
 
+    def get_tile(self, position: Position) -> Tile:
+        return self.tiles[position[1]][position[0]]
+
     @classmethod
     def from_input(cls, data: str) -> "Map":
         tiles = []
@@ -88,3 +91,56 @@ class Map:
             for x, tile in enumerate(tile_line):
                 if tile.type == TileType.STARTING_POSITION:
                     return x, y
+
+    def _compute_loop(
+        self, starting_position: Position, next_position: Position
+    ) -> list[Position]:
+        current_tile = self.get_tile(starting_position)
+        next_tile = self.get_tile(next_position)
+        positions = [starting_position, next_position]
+        while (
+            current_tile.is_connected_to(other=next_tile)
+            and next_tile.position != starting_position
+        ):
+            possible_positions = next_tile.get_connected_positions()
+            possible_positions.remove(current_tile.position)
+            if len(possible_positions) != 1:
+                raise RuntimeError(
+                    f"Tile {next_tile} has not 2 connected tiles."
+                )
+
+            next_position = possible_positions.pop()
+
+            current_tile = next_tile
+            next_tile = self.get_tile(next_position)
+
+            positions.append(next_position)
+        if (
+            next_tile.position != starting_position
+            or not current_tile.is_connected_to(other=next_tile)
+        ):
+            raise RuntimeError("Loop cannot have been computed.")
+        return positions
+
+    def compute_loop(self) -> list[Position]:
+        # For each cell next to S, try to compute the loop.
+        # If it fails, restart trying to compute loop from next
+        starting_position = self.get_starting_position()
+        for diff in [NORTH_DIFF, SOUTH_DIFF, EAST_DIFF, WEST_DIFF]:
+
+            current_x, current_y = starting_position
+            next_x = current_x + diff[0]
+            next_y = current_y + diff[1]
+            next_position = (next_x, next_y)
+
+            try:
+                loop = self._compute_loop(
+                    starting_position=starting_position,
+                    next_position=next_position,
+                )
+            except RuntimeError:
+                continue
+            else:
+                return loop
+
+        raise RuntimeError("Couldn't have computed any loops within the map.")
