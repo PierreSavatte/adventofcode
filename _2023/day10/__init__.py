@@ -62,26 +62,35 @@ CONNECTED_POSITION_COMPUTATION_MAPPING = {
 
 
 @dataclass
+class Tile:
+    position: Position
+    type: TileType
+
+
+@dataclass
 class Map:
-    tiles: list[list[TileType]]
+    tiles: list[list[Tile]]
 
     @classmethod
     def from_input(cls, data: str) -> "Map":
         tiles = []
-        for input_line in data.splitlines():
-            tile_line = [TileType(character) for character in input_line]
+        for y, input_line in enumerate(data.splitlines()):
+            tile_line = [
+                Tile(position=(x, y), type=TileType(character))
+                for x, character in enumerate(input_line)
+            ]
             tiles.append(tile_line)
         return Map(tiles=tiles)
 
     def to_str(self):
         output_lines = []
         for tile_line in self.tiles:
-            output_line = "".join([tile.value for tile in tile_line])
+            output_line = "".join([tile.type.value for tile in tile_line])
             output_lines.append(output_line)
         return "\n".join(output_lines)
 
     def get_starting_position(self) -> Position:
         for y, tile_line in enumerate(self.tiles):
             for x, tile in enumerate(tile_line):
-                if tile == TileType.STARTING_POSITION:
+                if tile.type == TileType.STARTING_POSITION:
                     return x, y
