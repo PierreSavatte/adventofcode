@@ -129,12 +129,14 @@ class Map:
 
     def compute_enclosed_map(self) -> "Map":
         loop = self.compute_loop(validate_distances=False)
+        loop_positions = loop.positions
 
         new_tiles = []
         for tile_line in self.tiles:
             new_tiles_line = []
             for tile in tile_line:
-                if tile.type == TileType.GROUND:
+
+                if tile.position not in loop_positions:
                     is_enclosed = compute_enclosing(
                         function=EnclosingType.RAY_TRACING,
                         position=tile.position,
