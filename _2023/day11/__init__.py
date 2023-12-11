@@ -47,8 +47,8 @@ class Universe:
 
     tiles: Table
 
+    expanded_columns: list[int]
     expanded_rows: list[int]
-    expanded_lines: list[int]
 
     def get_tile_at_position(self, position: Position) -> Any:
         (x, y) = position
@@ -60,17 +60,17 @@ class Universe:
             [character for character in line] for line in data.splitlines()
         ]
 
-        expanded_lines = _compute_expanded_lines(tiles)
+        expanded_rows = _compute_expanded_lines(tiles)
 
         transposed_tiles = transpose_table(tiles)
 
-        expanded_rows = _compute_expanded_lines(transposed_tiles)
+        expanded_columns = _compute_expanded_lines(transposed_tiles)
 
         return Universe(
             age=age,
             tiles=tiles,
             expanded_rows=expanded_rows,
-            expanded_lines=expanded_lines,
+            expanded_columns=expanded_columns,
         )
 
     def compute_expanded_distance_between_points(
@@ -89,13 +89,13 @@ class Universe:
         min_x = min(x_a, x_b)
         max_x = max(x_a, x_b)
         for x in range(min_x, max_x):
-            if x in self.expanded_rows:
+            if x in self.expanded_columns:
                 distance += age - 1
 
         min_y = min(y_a, y_b)
         max_y = max(y_a, y_b)
         for y in range(min_y, max_y):
-            if y in self.expanded_lines:
+            if y in self.expanded_rows:
                 distance += age - 1
 
         return distance
