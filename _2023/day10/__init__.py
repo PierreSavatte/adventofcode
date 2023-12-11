@@ -1,3 +1,4 @@
+import copy
 from dataclasses import dataclass
 from enum import Enum
 
@@ -110,3 +111,14 @@ class Loop(list):
             else:
                 tile.distance_from_start = new_distance
             new_distance += 1
+
+    @property
+    def shape(self):
+        return [
+            tile.position
+            for tile in self
+            if (
+                tile.type != TileType.NORTH_SOUTH
+                or tile.type != TileType.EAST_WEST
+            )
+        ]

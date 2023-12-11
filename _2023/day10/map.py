@@ -136,7 +136,7 @@ class Map:
             for tile in tile_line:
                 if tile.type == TileType.GROUND:
                     is_enclosed = compute_enclosing(
-                        function=EnclosingType.WINDING,
+                        function=EnclosingType.RAY_TRACING,
                         position=tile.position,
                         loop=loop,
                         max_x=self.max_x,
