@@ -10,14 +10,20 @@ def is_list_composed_only_of_character(l: list, character: str) -> bool:
     return all(c == character for c in l)
 
 
-def expand_lines_of_table(table: Table) -> Table:
+def expand_lines_of_table(table: Table, age: int) -> Table:
     table = deepcopy(table)
     i = 0
     while i < len(table):
         line = table[i]
         if is_list_composed_only_of_character(line, "."):
-            table.insert(i, line)
-            i += 1
+
+            # To overcome a problem I did not totally understood 🙈
+            if age == 1:
+                age += 1
+
+            new_lines = [line for _ in range(age)]
+            table = [*table[:i], *new_lines, *table[i + 1 :]]
+            i += age
         i += 1
 
     return table
@@ -59,10 +65,10 @@ class Universe:
         ]
         return Universe(tiles=tiles)
 
-    def expand(self) -> "Universe":
-        expanded_lines = expand_lines_of_table(self.tiles)
+    def expand(self, age: int = 1) -> "Universe":
+        expanded_lines = expand_lines_of_table(self.tiles, age=age)
         tiles = transpose_table(
-            expand_lines_of_table(transpose_table(expanded_lines))
+            expand_lines_of_table(transpose_table(expanded_lines), age=age)
         )
         return Universe(tiles=tiles)
 
