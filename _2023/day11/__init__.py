@@ -30,6 +30,8 @@ def expand_lines_of_table(table: Table, age: int) -> Table:
 
 
 def transpose_table(table: Table):
+    table = deepcopy(table)
+
     table_col_length = len(table[0])
     table_row_length = len(table)
 
