@@ -1,19 +1,15 @@
-from _2023.day11 import Universe, manhattan_distance
+from _2023.day11 import Universe
 
 from _2023.load_input import load_input
 
 
 def compute_solution(data: str, age: int) -> int:
-    universe = Universe.from_input(data)
-
-    print("Expanding universe...")
-    expanded_universe = universe.expand(age=age)
+    universe = Universe.from_input(data=data, age=age)
 
     total = 0
-    pairs = expanded_universe.galaxy_pairs
-    print(f"Starting computing the {len(pairs)} pairs...")
+    pairs = universe.galaxy_pairs
     for (a, b) in pairs:
-        distance = manhattan_distance(a, b)
+        distance = universe.compute_expanded_distance_between_points(a, b)
         total += distance
 
     return total

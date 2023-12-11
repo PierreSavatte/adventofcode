@@ -1,41 +1,6 @@
 import pytest
 
-from _2023.day11 import expand_lines_of_table
 from _2023.day11.part2 import compute_solution
-
-
-def test_lines_of_table_can_be_expanded_based_on_age():
-    table = [
-        [".", ".", "."],
-        [".", "#", "."],
-        [".", ".", "."],
-        [".", "#", "."],
-    ]
-    expected_result = [
-        [".", ".", "."],
-        [".", ".", "."],
-        [".", ".", "."],
-        [".", ".", "."],
-        [".", ".", "."],
-        [".", ".", "."],
-        [".", ".", "."],
-        [".", ".", "."],
-        [".", ".", "."],
-        [".", ".", "."],
-        [".", "#", "."],
-        [".", ".", "."],
-        [".", ".", "."],
-        [".", ".", "."],
-        [".", ".", "."],
-        [".", ".", "."],
-        [".", ".", "."],
-        [".", ".", "."],
-        [".", ".", "."],
-        [".", ".", "."],
-        [".", ".", "."],
-        [".", "#", "."],
-    ]
-    assert expand_lines_of_table(table, age=10) == expected_result
 
 
 @pytest.mark.parametrize(

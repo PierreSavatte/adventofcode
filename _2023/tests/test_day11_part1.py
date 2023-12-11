@@ -62,13 +62,6 @@ def test_table_can_be_transposed(input_table, expected_transposed_table):
     assert transpose_table(input_table) == expected_transposed_table
 
 
-def test_universe_can_expand(get_data, expanded_universe):
-    data = get_data("test_file_day11")
-    universe = Universe.from_input(data)
-
-    assert universe.expand().tiles == expanded_universe.tiles
-
-
 def test_universe_can_give_its_galaxies_positions(expanded_universe):
     assert expanded_universe.galaxy_positions == [
         (4, 0),

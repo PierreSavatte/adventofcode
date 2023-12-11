@@ -10,23 +10,12 @@ def is_list_composed_only_of_character(l: list, character: str) -> bool:
     return all(c == character for c in l)
 
 
-def expand_lines_of_table(table: Table, age: int) -> Table:
-    table = deepcopy(table)
-    i = 0
-    while i < len(table):
-        line = table[i]
+def _compute_expanded_lines(table: Table):
+    expanded_lines = []
+    for i, line in enumerate(table):
         if is_list_composed_only_of_character(line, "."):
-
-            # To overcome a problem I did not totally understood 🙈
-            if age == 1:
-                age += 1
-
-            new_lines = [line for _ in range(age)]
-            table = [*table[:i], *new_lines, *table[i + 1 :]]
-            i += age
-        i += 1
-
-    return table
+            expanded_lines.append(i)
+    return expanded_lines
 
 
 def transpose_table(table: Table):
@@ -54,25 +43,62 @@ def manhattan_distance(a: Position, b: Position) -> int:
 
 @dataclass
 class Universe:
+    age: int
+
     tiles: Table
+
+    expanded_rows: list[int]
+    expanded_lines: list[int]
 
     def get_tile_at_position(self, position: Position) -> Any:
         (x, y) = position
         return self.tiles[y][x]
 
     @classmethod
-    def from_input(cls, data: str) -> "Universe":
+    def from_input(cls, data: str, age: int = 1) -> "Universe":
         tiles = [
             [character for character in line] for line in data.splitlines()
         ]
-        return Universe(tiles=tiles)
 
-    def expand(self, age: int = 1) -> "Universe":
-        expanded_lines = expand_lines_of_table(self.tiles, age=age)
-        tiles = transpose_table(
-            expand_lines_of_table(transpose_table(expanded_lines), age=age)
+        expanded_lines = _compute_expanded_lines(tiles)
+
+        transposed_tiles = transpose_table(tiles)
+
+        expanded_rows = _compute_expanded_lines(transposed_tiles)
+
+        return Universe(
+            age=age,
+            tiles=tiles,
+            expanded_rows=expanded_rows,
+            expanded_lines=expanded_lines,
         )
-        return Universe(tiles=tiles)
+
+    def compute_expanded_distance_between_points(
+        self, a: Position, b: Position
+    ) -> int:
+        distance = manhattan_distance(a, b)
+
+        # To overcome a problem I did not totally understood 🙈
+        age = self.age
+        if age == 1:
+            age += 1
+
+        x_a, y_a = a
+        x_b, y_b = b
+
+        min_x = min(x_a, x_b)
+        max_x = max(x_a, x_b)
+        for x in range(min_x, max_x):
+            if x in self.expanded_rows:
+                distance += age - 1
+
+        min_y = min(y_a, y_b)
+        max_y = max(y_a, y_b)
+        for y in range(min_y, max_y):
+            if y in self.expanded_lines:
+                distance += age - 1
+
+        return distance
 
     @property
     def galaxy_positions(self) -> list[Position]:
