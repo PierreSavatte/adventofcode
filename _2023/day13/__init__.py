@@ -31,16 +31,14 @@ class Pattern:
         lines = data.splitlines()
 
         reflection_line = get_reflection_line(
-            lines=lines,
-            potential_reflections=[],
-            fix_smudge=fix_smudge,
+            lines=lines, fix_smudge=fix_smudge
         )
         if reflection_line is not None:
             reflection = Reflection(y=reflection_line, x=None)
         else:
             columns = transpose(lines)
             reflection_column = get_reflection_line(
-                lines=columns, potential_reflections=[], fix_smudge=fix_smudge
+                lines=columns, fix_smudge=fix_smudge
             )
             if reflection_column is not None:
                 reflection = Reflection(x=reflection_column, y=None)
@@ -54,14 +52,9 @@ def compute_smudges(a: str, b: str) -> int:
     return sum(i != j for i, j in zip(a, b))
 
 
-def get_reflection_line(
-    lines: list[str], potential_reflections: list[int], fix_smudge: bool
-) -> Optional[int]:
-    if not potential_reflections:
-        potential_reflections = range(len(lines) - 1)
-
+def get_reflection_line(lines: list[str], fix_smudge: bool) -> Optional[int]:
     smudges = 0
-    for x in potential_reflections:
+    for x in range(len(lines) - 1):
         is_reflection = True
         for i in range(x + 1):
             current_line = x - i
