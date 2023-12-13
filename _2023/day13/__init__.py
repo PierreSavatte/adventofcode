@@ -57,9 +57,9 @@ def compute_smudges(a: str, b: str) -> int:
 def get_reflection_line(
     lines: list[str], should_fix_smudge: bool
 ) -> Optional[int]:
-    smudges = 0
     for x in range(len(lines) - 1):
         is_reflection = True
+        has_fixed_smudge = False
         for i in range(x + 1):
             current_line = x - i
             expected_reflected_line = x + i + 1
@@ -68,20 +68,21 @@ def get_reflection_line(
                 continue
 
             if lines[current_line] != lines[expected_reflected_line]:
-                if (
-                    should_fix_smudge
-                    and smudges == 0
-                    and compute_smudges(
+                if should_fix_smudge and not has_fixed_smudge:
+                    smudges_on_these_lines = compute_smudges(
                         lines[current_line], lines[expected_reflected_line]
                     )
-                    == 1
-                ):
-                    smudges = 1
-                    continue
+                    if smudges_on_these_lines == 1:
+                        has_fixed_smudge = True
+                        continue
+
                 is_reflection = False
                 break
 
         if is_reflection:
+            if should_fix_smudge:
+                if not has_fixed_smudge:
+                    continue
             return x
 
 
