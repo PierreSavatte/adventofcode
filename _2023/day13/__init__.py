@@ -57,7 +57,7 @@ def get_reflection_line(
     lines: list[str], potential_reflections: list[int]
 ) -> Optional[int]:
     if not potential_reflections:
-        potential_reflections = range(1, len(lines) - 1)
+        potential_reflections = range(len(lines) - 1)
 
     for x in potential_reflections:
         is_reflection = True

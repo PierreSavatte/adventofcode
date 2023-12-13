@@ -37,6 +37,24 @@ TRANSPOSED_PATTERN_2 = """##.##.#
 ..####.
 ###..##"""
 
+COMPLEX_PATTERN = """##....##.#.
+##.##.#..#.
+..####....#
+#######..##
+##..#......
+...##......
+###....##..
+..#.#..##..
+...#.#....#
+..##.......
+..##.#.##.#
+##...##..##
+######.##.#
+###...#..#.
+...###....#
+..##.......
+###.##....#"""
+
 
 @pytest.mark.parametrize(
     "data, expected_transposed_pattern",
@@ -57,6 +75,7 @@ def test_pattern_can_be_transposed(data, expected_transposed_pattern):
     [
         (PATTERN_1, Reflection(x=4, y=None)),
         (PATTERN_2, Reflection(y=3, x=None)),
+        (COMPLEX_PATTERN, Reflection(x=0, y=None)),
     ],
 )
 def test_reflection_line_can_be_found(pattern, expected_reflection_line):
