@@ -27,23 +27,22 @@ class Pattern:
     lines: list[str]
 
     @classmethod
-    def from_data(cls, data: str) -> "Pattern":
+    def from_data(cls, data: str, fix_smudge: bool = False) -> "Pattern":
         lines = []
-        potential_reflections = []
         for i, line in enumerate(data.splitlines()):
-            if lines and line == lines[-1]:
-                potential_reflections.append(i - 1)
             lines.append(line)
 
         reflection_line = get_reflection_line(
-            lines=lines, potential_reflections=potential_reflections
+            lines=lines,
+            potential_reflections=[],
+            fix_smudge=fix_smudge,
         )
         if reflection_line is not None:
             reflection = Reflection(y=reflection_line, x=None)
         else:
             columns = transpose(lines)
             reflection_column = get_reflection_line(
-                lines=columns, potential_reflections=[]
+                lines=columns, potential_reflections=[], fix_smudge=fix_smudge
             )
             if reflection_column is not None:
                 reflection = Reflection(x=reflection_column, y=None)
@@ -53,12 +52,17 @@ class Pattern:
         return Pattern(reflection=reflection, lines=lines)
 
 
+def compute_smudges(a: str, b: str) -> int:
+    return sum(i != j for i, j in zip(a, b))
+
+
 def get_reflection_line(
-    lines: list[str], potential_reflections: list[int]
+    lines: list[str], potential_reflections: list[int], fix_smudge: bool
 ) -> Optional[int]:
     if not potential_reflections:
         potential_reflections = range(len(lines) - 1)
 
+    smudges = 0
     for x in potential_reflections:
         is_reflection = True
         for i in range(x + 1):
@@ -69,6 +73,16 @@ def get_reflection_line(
                 continue
 
             if lines[current_line] != lines[expected_reflected_line]:
+                if (
+                    fix_smudge
+                    and smudges == 0
+                    and compute_smudges(
+                        lines[current_line], lines[expected_reflected_line]
+                    )
+                    == 1
+                ):
+                    smudges = 1
+                    continue
                 is_reflection = False
                 break
 
