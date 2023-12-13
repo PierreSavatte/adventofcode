@@ -27,18 +27,20 @@ class Pattern:
     lines: list[str]
 
     @classmethod
-    def from_data(cls, data: str, fix_smudge: bool = False) -> "Pattern":
+    def from_data(
+        cls, data: str, should_fix_smudge: bool = False
+    ) -> "Pattern":
         lines = data.splitlines()
 
         reflection_line = get_reflection_line(
-            lines=lines, fix_smudge=fix_smudge
+            lines=lines, should_fix_smudge=should_fix_smudge
         )
         if reflection_line is not None:
             reflection = Reflection(y=reflection_line, x=None)
         else:
             columns = transpose(lines)
             reflection_column = get_reflection_line(
-                lines=columns, fix_smudge=fix_smudge
+                lines=columns, should_fix_smudge=should_fix_smudge
             )
             if reflection_column is not None:
                 reflection = Reflection(x=reflection_column, y=None)
@@ -52,7 +54,9 @@ def compute_smudges(a: str, b: str) -> int:
     return sum(i != j for i, j in zip(a, b))
 
 
-def get_reflection_line(lines: list[str], fix_smudge: bool) -> Optional[int]:
+def get_reflection_line(
+    lines: list[str], should_fix_smudge: bool
+) -> Optional[int]:
     smudges = 0
     for x in range(len(lines) - 1):
         is_reflection = True
@@ -65,7 +69,7 @@ def get_reflection_line(lines: list[str], fix_smudge: bool) -> Optional[int]:
 
             if lines[current_line] != lines[expected_reflected_line]:
                 if (
-                    fix_smudge
+                    should_fix_smudge
                     and smudges == 0
                     and compute_smudges(
                         lines[current_line], lines[expected_reflected_line]

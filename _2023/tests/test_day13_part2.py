@@ -46,7 +46,7 @@ def test_smudges_can_be_computed(line_a, line_b, expected_smudges):
 )
 def test_reflection_line_can_be_found(pattern, expected_reflection_line):
     assert (
-        Pattern.from_data(pattern, fix_smudge=True).reflection
+        Pattern.from_data(pattern, should_fix_smudge=True).reflection
         == expected_reflection_line
     )
 
