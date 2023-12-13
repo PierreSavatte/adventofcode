@@ -28,9 +28,7 @@ class Pattern:
 
     @classmethod
     def from_data(cls, data: str, fix_smudge: bool = False) -> "Pattern":
-        lines = []
-        for i, line in enumerate(data.splitlines()):
-            lines.append(line)
+        lines = data.splitlines()
 
         reflection_line = get_reflection_line(
             lines=lines,
