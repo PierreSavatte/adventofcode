@@ -2,7 +2,6 @@ from copy import deepcopy
 from dataclasses import dataclass
 from typing import Callable
 
-from tqdm import tqdm
 
 Position = tuple[int, int]
 Tiles = list[list[str]]
@@ -186,7 +185,7 @@ class Platform:
         first_tilted_platforms = None
         last_tilted_platforms = None
         circle_started_at = None
-        for i in tqdm(range(n)):
+        for i in range(n):
 
             platforms = []
             for step_name in [
