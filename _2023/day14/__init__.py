@@ -234,14 +234,18 @@ class Platform:
     def spin_cycle(self, n: int = 1) -> "Platform":
         circle_data = self._compute_circle(n)
 
-        rest_of_iterations_after_first_cycle = (
-            n - circle_data.circle_started_at
-        )
-        rest_of_iterations = rest_of_iterations_after_first_cycle % (
-            len(circle_data.circle)
-        )
+        if circle_data:
+            rest_of_iterations_after_first_cycle = (
+                n - circle_data.circle_started_at
+            )
+            rest_of_iterations = rest_of_iterations_after_first_cycle % (
+                len(circle_data.circle)
+            )
 
-        platform = circle_data.platform_at_end_of_circle
+            platform = circle_data.platform_at_end_of_circle
+        else:
+            platform = self
+            rest_of_iterations = n
         for i in range(rest_of_iterations):
             platform = platform._compute_next_cycle()
 
