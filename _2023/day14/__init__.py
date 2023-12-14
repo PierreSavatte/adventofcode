@@ -17,6 +17,11 @@ def get_tile_at_position(tiles: Tiles, position: Position) -> str:
     return tiles[y][x]
 
 
+def test_position_is_found(tiles: Tiles, position: Position):
+    tile = get_tile_at_position(tiles=tiles, position=position)
+    return tile == "#" or tile == "O"
+
+
 def compute_most_north_position(
     tiles: Tiles, rounded_rock_position: Position
 ) -> Position:
@@ -26,10 +31,7 @@ def compute_most_north_position(
         min_y = y
         if y == 0:
             continue
-        tile_above = get_tile_at_position(
-            tiles=tiles, position=(rock_x, y - 1)
-        )
-        if tile_above == "#" or tile_above == "O":
+        if test_position_is_found(tiles=tiles, position=(rock_x, y - 1)):
             break
     return rock_x, min_y
 
@@ -44,10 +46,7 @@ def compute_most_south_position(
         max_y = y
         if y == tiles_max_y:
             continue
-        tile_below = get_tile_at_position(
-            tiles=tiles, position=(rock_x, y + 1)
-        )
-        if tile_below == "#" or tile_below == "O":
+        if test_position_is_found(tiles=tiles, position=(rock_x, y + 1)):
             break
     return rock_x, max_y
 
@@ -61,10 +60,7 @@ def compute_most_west_position(
         min_x = x
         if x == 0:
             continue
-        tile_on_left = get_tile_at_position(
-            tiles=tiles, position=(x - 1, rock_y)
-        )
-        if tile_on_left == "#" or tile_on_left == "O":
+        if test_position_is_found(tiles=tiles, position=(x - 1, rock_y)):
             break
     return min_x, rock_y
 
@@ -79,10 +75,7 @@ def compute_most_east_position(
         max_x = x
         if x == tiles_max_x:
             continue
-        tile_on_right = get_tile_at_position(
-            tiles=tiles, position=(x + 1, rock_y)
-        )
-        if tile_on_right == "#" or tile_on_right == "O":
+        if test_position_is_found(tiles=tiles, position=(x + 1, rock_y)):
             break
     return max_x, rock_y
 
