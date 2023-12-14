@@ -6,11 +6,21 @@ class Node:
     L: str
     R: str
 
+    def __hash__(self):
+        return hash((self.L, self.R))
+
 
 @dataclass
 class Map:
     instructions: str
     tree: dict[str, Node]
+
+    @property
+    def total_instructions(self):
+        return len(self.instructions)
+
+    def get_instruction_at(self, step: int) -> str:
+        return self.instructions[step % self.total_instructions]
 
     @property
     def starting_nodes(self):
