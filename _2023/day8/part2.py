@@ -7,7 +7,6 @@ from _2023.load_input import load_input
 
 @dataclass
 class Loop:
-    started_at_step: int
     length: int
 
 
@@ -24,11 +23,8 @@ class Ghost:
             direction = self.map.get_instruction_at(step)
             node = self.map.tree[node_key]
             node_key = getattr(node, direction)
-            if node_key in seen.keys():
-                return Loop(
-                    started_at_step=seen[node_key],
-                    length=len(seen),
-                )
+            if node_key in self.map.ending_nodes:
+                return Loop(length=step + 1)
             seen[node_key] = step
             step += 1
 
@@ -36,12 +32,6 @@ class Ghost:
 class Ghosts(list):
     def compute_steps(self):
         loops = [ghost.compute_loop() for ghost in self]
-        print(loops)
-
-        # Assumption: loops started at the same time
-        started_at = loops[0].started_at_step
-        assert all([loop.started_at_step == started_at for loop in loops])
-
         return math.lcm(*[loop.length for loop in loops])
 
 
@@ -57,8 +47,4 @@ def compute_solution(data: str) -> int:
 
 
 if __name__ == "__main__":
-    # tried:
-    # 52766656211
-    # 8288280
-    # 8451648
     print(compute_solution(load_input(8)))
