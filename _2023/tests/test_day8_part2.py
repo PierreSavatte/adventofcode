@@ -9,10 +9,6 @@ def test_map_can_give_the_starting_nodes(get_data):
     assert map.starting_nodes == ["11A", "22A"]
 
 
-def test_solution_can_be_computed(get_data):
-    assert compute_solution(get_data("test_file_day8_part2")) == 6
-
-
 def test_end_nodes_can_be_computed(get_data):
     map = parse_input(get_data("test_file_day8_part2"))
 
@@ -23,3 +19,7 @@ def test_end_nodes_for_puzzle_can_be_computed(get_data):
     map = parse_input(load_input(8))
 
     assert map.ending_nodes == ["CPZ", "ZZZ", "FPZ", "DPZ", "MLZ", "MTZ"]
+
+
+def test_solution_can_be_computed(get_data):
+    assert compute_solution(get_data("test_file_day8_part2")) == 6
