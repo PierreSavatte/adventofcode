@@ -179,9 +179,16 @@ class Platform:
             sorted_rounded_rocks_positions=sorted_rounded_rocks_positions,
         )
 
-    def spin_cycle(self, n: int = 1) -> "Platform":
+    def _compute_circle(self, n: int) -> "CircleData":
         platform = self
+        cache = {}
+        circle = []
+        first_tilted_platforms = None
+        last_tilted_platforms = None
+        circle_started_at = None
         for i in tqdm(range(n)):
+
+            platforms = []
             for step_name in [
                 "tilt_north",
                 "tilt_west",
@@ -190,6 +197,55 @@ class Platform:
             ]:
                 step = getattr(platform, step_name)
                 platform = step()
+                platforms.append(platform)
+
+            tilted_platforms = TiltedPlatforms(
+                north=platforms[0],
+                west=platforms[1],
+                south=platforms[2],
+                east=platforms[3],
+            )
+            if tilted_platforms in cache.values():
+                if first_tilted_platforms is None:
+                    circle_started_at = i
+                    first_tilted_platforms = tilted_platforms
+                else:
+                    if tilted_platforms == first_tilted_platforms:
+                        return CircleData(
+                            circle_started_at=circle_started_at,  # noqa: E501
+                            platform_at_end_of_circle=last_tilted_platforms.east,  # noqa: E501
+                            circle=circle,
+                        )
+                circle.append(i)
+            cache[i] = tilted_platforms
+            last_tilted_platforms = tilted_platforms
+
+    def _compute_next_cycle(self) -> "Platform":
+        platform = self
+        for step_name in [
+            "tilt_north",
+            "tilt_west",
+            "tilt_south",
+            "tilt_east",
+        ]:
+            step = getattr(platform, step_name)
+            platform = step()
+        return platform
+
+    def spin_cycle(self, n: int = 1) -> "Platform":
+        circle_data = self._compute_circle(n)
+
+        rest_of_iterations_after_first_cycle = (
+            n - circle_data.circle_started_at
+        )
+        rest_of_iterations = rest_of_iterations_after_first_cycle % (
+            len(circle_data.circle)
+        )
+
+        platform = circle_data.platform_at_end_of_circle
+        for i in range(rest_of_iterations):
+            platform = platform._compute_next_cycle()
+
         return platform
 
     def compute_load(self) -> int:
@@ -199,3 +255,26 @@ class Platform:
             _, y = rounded_rock_position
             load += max_y - y
         return load
+
+
+@dataclass
+class TiltedPlatforms:
+    north: Platform
+    south: Platform
+    east: Platform
+    west: Platform
+
+    def __eq__(self, other):
+        equal = True
+        for attr in ["north", "south", "east", "west"]:
+            self_platform = getattr(self, attr)
+            other_platform = getattr(other, attr)
+            equal = equal and (self_platform.tiles == other_platform.tiles)
+        return equal
+
+
+@dataclass
+class CircleData:
+    circle_started_at: int
+    platform_at_end_of_circle: Platform
+    circle: list[int]
