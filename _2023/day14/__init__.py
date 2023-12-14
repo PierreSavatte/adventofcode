@@ -1,5 +1,8 @@
-from dataclasses import dataclass
 from copy import deepcopy
+from dataclasses import dataclass
+from typing import Callable
+
+from tqdm import tqdm
 
 Position = tuple[int, int]
 Tiles = list[list[str]]
@@ -15,7 +18,9 @@ def get_tile_at_position(tiles: Tiles, position: Position) -> str:
     return tiles[y][x]
 
 
-def compute_min_y(tiles: Tiles, rounded_rock_position: Position) -> int:
+def compute_most_north_position(
+    tiles: Tiles, rounded_rock_position: Position
+) -> Position:
     rock_x, rock_y = rounded_rock_position
     min_y = rock_y
     for y in range(rock_y, -1, -1):
@@ -27,7 +32,60 @@ def compute_min_y(tiles: Tiles, rounded_rock_position: Position) -> int:
         )
         if tile_above == "#" or tile_above == "O":
             break
-    return min_y
+    return rock_x, min_y
+
+
+def compute_most_south_position(
+    tiles: Tiles, rounded_rock_position: Position
+) -> Position:
+    tiles_max_y = len(tiles) - 1
+    rock_x, rock_y = rounded_rock_position
+    max_y = rock_y
+    for y in range(rock_y, tiles_max_y + 1):
+        max_y = y
+        if y == tiles_max_y:
+            continue
+        tile_below = get_tile_at_position(
+            tiles=tiles, position=(rock_x, y + 1)
+        )
+        if tile_below == "#" or tile_below == "O":
+            break
+    return rock_x, max_y
+
+
+def compute_most_west_position(
+    tiles: Tiles, rounded_rock_position: Position
+) -> Position:
+    rock_x, rock_y = rounded_rock_position
+    min_x = rock_y
+    for x in range(rock_x, -1, -1):
+        min_x = x
+        if x == 0:
+            continue
+        tile_on_left = get_tile_at_position(
+            tiles=tiles, position=(x - 1, rock_y)
+        )
+        if tile_on_left == "#" or tile_on_left == "O":
+            break
+    return min_x, rock_y
+
+
+def compute_most_east_position(
+    tiles: Tiles, rounded_rock_position: Position
+) -> Position:
+    tiles_max_x = len(tiles[0]) - 1
+    rock_x, rock_y = rounded_rock_position
+    max_x = rock_x
+    for x in range(rock_x, tiles_max_x + 1):
+        max_x = x
+        if x == tiles_max_x:
+            continue
+        tile_on_right = get_tile_at_position(
+            tiles=tiles, position=(x + 1, rock_y)
+        )
+        if tile_on_right == "#" or tile_on_right == "O":
+            break
+    return max_x, rock_y
 
 
 @dataclass
@@ -64,24 +122,75 @@ class Platform:
             tiles[y][x] = "."
         return tiles
 
-    def tilt_north(self) -> "Platform":
+    def _tilt(
+        self,
+        compute_new_position: Callable,
+        sorted_rounded_rocks_positions: list[Position],
+    ) -> "Platform":
         rounded_rocks_positions = []
         new_tiles = self.compute_tiles_with_no_rounded_rocks()
 
-        for rounded_rock_position in self.rounded_rocks_positions:
-            rock_x, rock_y = rounded_rock_position
-
-            min_y = compute_min_y(
+        for rounded_rock_position in sorted_rounded_rocks_positions:
+            new_position = compute_new_position(
                 tiles=new_tiles, rounded_rock_position=rounded_rock_position
             )
 
-            new_position = (rock_x, min_y)
-            new_tiles[min_y][rock_x] = "O"
+            x, y = new_position
+            new_tiles[y][x] = "O"
             rounded_rocks_positions.append(new_position)
 
         return Platform(
             tiles=new_tiles, rounded_rocks_positions=rounded_rocks_positions
         )
+
+    def tilt_north(self) -> "Platform":
+        sorted_rounded_rocks_positions = sorted(
+            self.rounded_rocks_positions, key=lambda x: x[1]
+        )
+        return self._tilt(
+            compute_new_position=compute_most_north_position,
+            sorted_rounded_rocks_positions=sorted_rounded_rocks_positions,
+        )
+
+    def tilt_south(self) -> "Platform":
+        sorted_rounded_rocks_positions = sorted(
+            self.rounded_rocks_positions, key=lambda x: x[1], reverse=True
+        )
+        return self._tilt(
+            compute_new_position=compute_most_south_position,
+            sorted_rounded_rocks_positions=sorted_rounded_rocks_positions,
+        )
+
+    def tilt_east(self) -> "Platform":
+        sorted_rounded_rocks_positions = sorted(
+            self.rounded_rocks_positions, key=lambda x: x[0], reverse=True
+        )
+        return self._tilt(
+            compute_new_position=compute_most_east_position,
+            sorted_rounded_rocks_positions=sorted_rounded_rocks_positions,
+        )
+
+    def tilt_west(self) -> "Platform":
+        sorted_rounded_rocks_positions = sorted(
+            self.rounded_rocks_positions, key=lambda x: x[0]
+        )
+        return self._tilt(
+            compute_new_position=compute_most_west_position,
+            sorted_rounded_rocks_positions=sorted_rounded_rocks_positions,
+        )
+
+    def spin_cycle(self, n: int = 1) -> "Platform":
+        platform = self
+        for i in tqdm(range(n)):
+            for step_name in [
+                "tilt_north",
+                "tilt_west",
+                "tilt_south",
+                "tilt_east",
+            ]:
+                step = getattr(platform, step_name)
+                platform = step()
+        return platform
 
     def compute_load(self) -> int:
         max_y = len(self.tiles)
