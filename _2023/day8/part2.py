@@ -10,7 +10,7 @@ def compute_solution(data: str) -> int:
     total_instructions = len(map.instructions)
     node_keys = map.starting_nodes
     steps = 0
-    while not node_keys != ending_nodes:
+    while node_keys != ending_nodes:
         direction = map.instructions[steps % total_instructions]
         new_node_keys = []
         for node_key in node_keys:
