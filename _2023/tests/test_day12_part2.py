@@ -1,6 +1,6 @@
 import pytest
 
-from _2023.day12.part2 import compute_solution, compute_arrangements
+from _2023.day12.part2 import compute_solution, compute_unfolded_arrangements
 
 
 @pytest.mark.parametrize(
@@ -17,7 +17,9 @@ from _2023.day12.part2 import compute_solution, compute_arrangements
 def test_number_of_arrangements_can_be_computed_from_line(
     line, expected_number_of_arrangements
 ):
-    assert compute_arrangements(line) == expected_number_of_arrangements
+    assert (
+        compute_unfolded_arrangements(line) == expected_number_of_arrangements
+    )
 
 
 def test_solution_can_be_computed(get_data):
