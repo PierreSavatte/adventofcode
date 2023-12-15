@@ -58,7 +58,7 @@ class Boxes(list):
             label, focal = command.split("=")
             self.equals_operation(lens=Lens(label=label, focal=int(focal)))
         else:
-            RuntimeError(f"We got a problem {command}")
+            raise RuntimeError(f"We got a problem {command}")
 
 
 def compute_solution(data: str):
