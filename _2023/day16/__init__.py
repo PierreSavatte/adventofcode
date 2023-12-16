@@ -80,25 +80,21 @@ class Lightbeam:
         return self.current_state.direction
 
     def check_already_visited_tile(self, tile) -> bool:
+        if tile.type not in [
+            TileType.SPLITTER_UP_DOWN,
+            TileType.SPLITTER_RIGHT_LEFT,
+        ]:
+            return False
+
+        splitter_directions = SPLITTER_MAPPING[tile.type]
+        if self.direction in splitter_directions:
+            # We consider the tile as an empty cell, so we can pass
+            return False
+
         for state in self.states:
-            if state.position == tile.position:
-
-                if tile.type in [
-                    TileType.EMPTY_SPACE,
-                    TileType.MIRROR_UP,
-                    TileType.MIRROR_DOWN,
-                ]:
-                    return self.direction == state.direction
-
-                elif tile.type in [
-                    TileType.SPLITTER_UP_DOWN,
-                    TileType.SPLITTER_RIGHT_LEFT,
-                ]:
-                    splitter_directions = SPLITTER_MAPPING[tile.type]
-                    if state.direction in splitter_directions:
-                        return self.direction not in splitter_directions
-                    else:
-                        return state.direction not in splitter_directions
+            if state.position == self.head:
+                splitter_directions = SPLITTER_MAPPING[tile.type]
+                return state.direction not in splitter_directions
 
     def _update_state(self, state: State):
         self.states.append(self.current_state)
