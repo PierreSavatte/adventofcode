@@ -79,23 +79,6 @@ class Lightbeam:
     def direction(self) -> Direction:
         return self.current_state.direction
 
-    def check_already_visited_tile(self, tile) -> bool:
-        if tile.type not in [
-            TileType.SPLITTER_UP_DOWN,
-            TileType.SPLITTER_RIGHT_LEFT,
-        ]:
-            return False
-
-        splitter_directions = SPLITTER_MAPPING[tile.type]
-        if self.direction in splitter_directions:
-            # We consider the tile as an empty cell, so we can pass
-            return False
-
-        for state in self.states:
-            if state.position == self.head:
-                splitter_directions = SPLITTER_MAPPING[tile.type]
-                return state.direction not in splitter_directions
-
     def _update_state(self, state: State):
         self.states.append(self.current_state)
         self.current_state = state
@@ -113,12 +96,6 @@ class Lightbeam:
             raise RuntimeError(
                 "It is expected to continue on the tile the laser "
                 "is currently on."
-            )
-
-        if self.check_already_visited_tile(tile):
-            raise StopIteration(
-                "The lightbeam already visited this tile with this state "
-                "(or a similar)"
             )
 
         if tile.type == TileType.EMPTY_SPACE:
@@ -205,6 +182,7 @@ class Contraption:
             computed_lightbeams.append(l)
 
         while active_lightbeams:
+            print(f"{len(active_lightbeams)=} {len(computed_lightbeams)=}")
             new_lightbeams = []
             for lightbeam in active_lightbeams:
                 try:
@@ -213,11 +191,16 @@ class Contraption:
                     set_lightbeam_as_computed(lightbeam)
                     continue
 
-                try:
-                    new_lightbeam = lightbeam.continues(tile)
-                except StopIteration:
+                if check_already_visited_tile(
+                    lightbeams=[*active_lightbeams, *computed_lightbeams],
+                    tile_type=tile.type,
+                    position=lightbeam.head,
+                    direction=lightbeam.direction,
+                ):
                     set_lightbeam_as_computed(lightbeam)
                     continue
+
+                new_lightbeam = lightbeam.continues(tile)
 
                 if new_lightbeam and self.is_position_valid(
                     new_lightbeam.head
@@ -232,3 +215,32 @@ class Contraption:
                 energized_positions.append(state.position)
 
         return energized_positions
+
+
+def check_already_visited_tile(
+    lightbeams: list[Lightbeam],
+    tile_type: TileType,
+    position: Position,
+    direction: Direction,
+) -> bool:
+    if tile_type not in [
+        TileType.SPLITTER_UP_DOWN,
+        TileType.SPLITTER_RIGHT_LEFT,
+    ]:
+        for lightbeam in lightbeams:
+            for state in lightbeam.states:
+                if state.position == position:
+                    return state.direction == direction
+
+        return False
+
+    for lightbeam in lightbeams:
+        splitter_directions = SPLITTER_MAPPING[tile_type]
+        if lightbeam.direction in splitter_directions:
+            # We consider the tile as an empty cell, so we can pass
+            return False
+
+        for state in lightbeam.states:
+            if state.position == position:
+                splitter_directions = SPLITTER_MAPPING[tile_type]
+                return state.direction not in splitter_directions

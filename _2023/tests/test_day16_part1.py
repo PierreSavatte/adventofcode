@@ -1,6 +1,13 @@
 import pytest
 
-from _2023.day16 import Lightbeam, Contraption, Tile, Direction, TileType
+from _2023.day16 import (
+    Lightbeam,
+    Contraption,
+    Tile,
+    Direction,
+    TileType,
+    check_already_visited_tile,
+)
 from _2023.day16.part1 import compute_solution
 
 
@@ -186,10 +193,15 @@ def test_lightbeam_stops_if_already_encountered_one_its_previous_state():
     assert lightbeam.head == (0, 1)
     assert lightbeam.direction == Direction.UP
 
-    with pytest.raises(StopIteration, match="already visited this tile"):
-        lightbeam.continues(
-            Tile(type=TileType.SPLITTER_RIGHT_LEFT, position=(0, 1))
+    assert (
+        check_already_visited_tile(
+            lightbeams=[lightbeam],
+            tile_type=TileType.SPLITTER_RIGHT_LEFT,
+            position=(0, 1),
+            direction=Direction.UP,
         )
+        is True
+    )
 
 
 def test_contraption_can_be_parsed(get_data):
