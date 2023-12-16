@@ -179,5 +179,19 @@ def test_lightbeam_stops_if_already_encountered_one_its_previous_state():
         )
 
 
+def test_contraption_can_be_parsed(get_data):
+    contraption = Contraption.from_data(get_data("test_file_day16"))
+
+    assert contraption.get_tile_at_position((0, 0)) == Tile(
+        type=TileType.EMPTY_SPACE, position=(0, 0)
+    )
+    assert contraption.get_tile_at_position((1, 0)) == Tile(
+        type=TileType.SPLITTER_UP_DOWN, position=(1, 0)
+    )
+    assert contraption.get_tile_at_position((9, 9)) == Tile(
+        type=TileType.EMPTY_SPACE, position=(9, 9)
+    )
+
+
 def test_lightbeam_path_can_be_computed():
     ...

@@ -154,4 +154,20 @@ class Lightbeam:
 
 @dataclass
 class Contraption:
-    ...
+    tiles: list[list[Tile]]
+
+    @classmethod
+    def from_data(cls, data: str) -> "Contraption":
+        tiles = []
+        for y, line in enumerate(data.splitlines()):
+            tiles_line = []
+            for x, character in enumerate(line):
+                tiles_line.append(
+                    Tile(type=TileType(character), position=(x, y))
+                )
+            tiles.append(tiles_line)
+        return Contraption(tiles=tiles)
+
+    def get_tile_at_position(self, position: Position) -> Tile:
+        x, y = position
+        return self.tiles[y][x]
