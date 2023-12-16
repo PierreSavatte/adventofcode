@@ -160,7 +160,23 @@ def test_lightbeam_encountering_flat_side_of_splitter_splits(
 
 
 def test_lightbeam_stops_if_already_encountered_one_its_previous_state():
-    ...
+    # \..
+    # -\.
+    # \/.
+    lightbeam = Lightbeam(head=(0, 0), direction=Direction.RIGHT)
+    for accepted_tiles in [
+        Tile(type=TileType.MIRROR_DOWN, position=(0, 0)),
+        Tile(type=TileType.SPLITTER_RIGHT_LEFT, position=(0, 1)),
+        Tile(type=TileType.MIRROR_DOWN, position=(1, 1)),
+        Tile(type=TileType.MIRROR_UP, position=(1, 2)),
+        Tile(type=TileType.MIRROR_DOWN, position=(0, 2)),
+    ]:
+        lightbeam.continues(accepted_tiles)
+
+    with pytest.raises(StopIteration, match="already visited this tile"):
+        lightbeam.continues(
+            Tile(type=TileType.SPLITTER_RIGHT_LEFT, position=(0, 1))
+        )
 
 
 def test_lightbeam_path_can_be_computed():

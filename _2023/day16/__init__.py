@@ -69,7 +69,7 @@ class State:
 class Lightbeam:
     def __init__(self, head: Position, direction: Direction):
         self.current_state = State(position=head, direction=direction)
-        self.states = [self.current_state]
+        self.states = []
 
     @property
     def head(self) -> Position:
@@ -79,8 +79,29 @@ class Lightbeam:
     def direction(self) -> Direction:
         return self.current_state.direction
 
+    def check_already_visited_tile(self, tile) -> bool:
+        for state in self.states:
+            if state.position == tile.position:
+
+                if tile.type in [
+                    TileType.EMPTY_SPACE,
+                    TileType.MIRROR_UP,
+                    TileType.MIRROR_DOWN,
+                ]:
+                    return self.direction == state.direction
+
+                elif tile.type in [
+                    TileType.SPLITTER_UP_DOWN,
+                    TileType.SPLITTER_RIGHT_LEFT,
+                ]:
+                    splitter_directions = SPLITTER_MAPPING[tile.type]
+                    if state.direction in splitter_directions:
+                        return self.direction == state.direction
+                    else:
+                        return state not in splitter_directions
+
     def _update_state(self, state: State):
-        self.states.append(state)
+        self.states.append(self.current_state)
         self.current_state = state
 
     def _continues_empty_space(self, tile: Tile):
@@ -91,6 +112,12 @@ class Lightbeam:
         self._update_state(new_state)
 
     def continues(self, tile: Tile) -> Optional["Lightbeam"]:
+        if self.check_already_visited_tile(tile):
+            raise StopIteration(
+                "The lightbeam already visited this tile with this state "
+                "(or a similar)"
+            )
+
         if tile.type == TileType.EMPTY_SPACE:
             self._continues_empty_space(tile)
 
