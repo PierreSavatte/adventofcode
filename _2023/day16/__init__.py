@@ -160,6 +160,14 @@ class Lightbeam:
 class Contraption:
     tiles: list[list[Tile]]
 
+    @property
+    def max_x(self):
+        return len(self.tiles[0]) - 1
+
+    @property
+    def max_y(self):
+        return len(self.tiles) - 1
+
     @classmethod
     def from_data(cls, data: str) -> "Contraption":
         tiles = []
@@ -176,32 +184,43 @@ class Contraption:
         x, y = position
         return self.tiles[y][x]
 
+    def is_position_valid(self, position: Position) -> bool:
+        x, y = position
+        return 0 <= x <= self.max_x and 0 <= y <= self.max_y
+
     def compute_energized_positions(self) -> list[Position]:
         active_lightbeams = [
             Lightbeam(head=(-1, 0), direction=Direction.RIGHT)
         ]
         computed_lightbeams = []
 
+        def set_lightbeam_as_computed(l: Lightbeam):
+            active_lightbeams.pop(active_lightbeams.index(l))
+            computed_lightbeams.append(l)
+
         while active_lightbeams:
-            print(f"{len(active_lightbeams)=}; {len(computed_lightbeams)=}")
+            new_lightbeams = []
             for lightbeam in active_lightbeams:
                 next_position = lightbeam.next_position
 
                 try:
                     next_tile = self.get_tile_at_position(next_position)
                 except IndexError:
-                    active_lightbeams.pop(active_lightbeams.index(lightbeam))
-                    computed_lightbeams.append(lightbeam)
+                    set_lightbeam_as_computed(lightbeam)
                     continue
 
                 try:
                     new_lightbeam = lightbeam.continues(next_tile)
                 except StopIteration:
-                    active_lightbeams.pop(active_lightbeams.index(lightbeam))
-                    computed_lightbeams.append(lightbeam)
-                else:
-                    if new_lightbeam:
-                        active_lightbeams.append(new_lightbeam)
+                    set_lightbeam_as_computed(lightbeam)
+                    continue
+
+                if new_lightbeam and self.is_position_valid(
+                    new_lightbeam.head
+                ):
+                    new_lightbeams.append(new_lightbeam)
+
+            active_lightbeams.extend(new_lightbeams)
 
         energized_positions = []
         for lightbeam in computed_lightbeams:
