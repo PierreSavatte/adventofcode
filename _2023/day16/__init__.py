@@ -115,8 +115,8 @@ class Lightbeam:
     def continues(self, tile: Tile) -> Optional["Lightbeam"]:
         if self.head != tile.position:
             raise RuntimeError(
-                "We are expected to continue on the tile the laser "
-                "is curently on."
+                "It is expected to continue on the tile the laser "
+                "is currently on."
             )
 
         if self.check_already_visited_tile(tile):
