@@ -79,10 +79,6 @@ class Lightbeam:
     def direction(self) -> Direction:
         return self.current_state.direction
 
-    @property
-    def next_position(self) -> Position:
-        return self.direction.compute_new_position(self.head)
-
     def check_already_visited_tile(self, tile) -> bool:
         for state in self.states:
             if state.position == tile.position:
@@ -196,6 +192,8 @@ class Contraption:
 
     def get_tile_at_position(self, position: Position) -> Tile:
         x, y = position
+        if not self.is_position_valid(position):
+            raise IndexError("Position invalid")
         return self.tiles[y][x]
 
     def is_position_valid(self, position: Position) -> bool:
@@ -203,9 +201,7 @@ class Contraption:
         return 0 <= x <= self.max_x and 0 <= y <= self.max_y
 
     def compute_energized_positions(self) -> list[Position]:
-        active_lightbeams = [
-            Lightbeam(head=(-1, 0), direction=Direction.RIGHT)
-        ]
+        active_lightbeams = [Lightbeam(head=(0, 0), direction=Direction.RIGHT)]
         computed_lightbeams = []
 
         def set_lightbeam_as_computed(l: Lightbeam):
@@ -215,16 +211,14 @@ class Contraption:
         while active_lightbeams:
             new_lightbeams = []
             for lightbeam in active_lightbeams:
-                next_position = lightbeam.next_position
-
                 try:
-                    next_tile = self.get_tile_at_position(next_position)
+                    tile = self.get_tile_at_position(lightbeam.head)
                 except IndexError:
                     set_lightbeam_as_computed(lightbeam)
                     continue
 
                 try:
-                    new_lightbeam = lightbeam.continues(next_tile)
+                    new_lightbeam = lightbeam.continues(tile)
                 except StopIteration:
                     set_lightbeam_as_computed(lightbeam)
                     continue
