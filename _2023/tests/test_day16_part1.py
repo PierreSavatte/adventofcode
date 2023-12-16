@@ -3,12 +3,17 @@ import pytest
 from _2023.day16 import Lightbeam, Contraption, Tile, Direction, TileType
 
 
-def test_lightbeam_encountering_empty_space_continues():
-    lightbeam = Lightbeam(head=(0, 0), direction=Direction.RIGHT)
+@pytest.mark.parametrize(
+    "input_direction",
+    [Direction.UP, Direction.DOWN, Direction.RIGHT, Direction.LEFT],
+)
+def test_lightbeam_encountering_empty_space_continues(input_direction):
+    lightbeam = Lightbeam(head=(0, 0), direction=input_direction)
 
     lightbeam.continues(Tile(type=TileType.EMPTY_SPACE, position=(1, 0)))
 
     assert lightbeam.head == (1, 0)
+    assert lightbeam.direction == input_direction
 
 
 @pytest.mark.parametrize(
