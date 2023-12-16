@@ -196,6 +196,17 @@ def test_contraption_can_be_parsed(get_data):
     )
 
 
+def test_contraption_can_validate_position(get_data):
+    contraption = Contraption.from_data(get_data("test_file_day16"))
+
+    assert contraption.is_position_valid((0, 0)) is True
+    assert contraption.is_position_valid((-1, 0)) is False
+    assert contraption.is_position_valid((0, -1)) is False
+    assert contraption.is_position_valid((3, 3)) is True
+    assert contraption.is_position_valid((10, 0)) is False
+    assert contraption.is_position_valid((0, 10)) is False
+
+
 def test_solution_can_be_computed(get_data):
     data = get_data("test_file_day16")
 
