@@ -1,6 +1,7 @@
 import pytest
 
 from _2023.day16 import Lightbeam, Contraption, Tile, Direction, TileType
+from _2023.day16.part1 import compute_solution
 
 
 @pytest.mark.parametrize(
@@ -195,5 +196,7 @@ def test_contraption_can_be_parsed(get_data):
     )
 
 
-def test_lightbeam_path_can_be_computed():
-    ...
+def test_solution_can_be_computed(get_data):
+    data = get_data("test_file_day16")
+
+    assert compute_solution(data) == 46

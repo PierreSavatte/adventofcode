@@ -79,6 +79,10 @@ class Lightbeam:
     def direction(self) -> Direction:
         return self.current_state.direction
 
+    @property
+    def next_position(self) -> Position:
+        return self.direction.compute_new_position(self.head)
+
     def check_already_visited_tile(self, tile) -> bool:
         for state in self.states:
             if state.position == tile.position:
@@ -171,3 +175,37 @@ class Contraption:
     def get_tile_at_position(self, position: Position) -> Tile:
         x, y = position
         return self.tiles[y][x]
+
+    def compute_energized_positions(self) -> list[Position]:
+        active_lightbeams = [
+            Lightbeam(head=(-1, 0), direction=Direction.RIGHT)
+        ]
+        computed_lightbeams = []
+
+        while active_lightbeams:
+            print(f"{len(active_lightbeams)=}; {len(computed_lightbeams)=}")
+            for lightbeam in active_lightbeams:
+                next_position = lightbeam.next_position
+
+                try:
+                    next_tile = self.get_tile_at_position(next_position)
+                except IndexError:
+                    active_lightbeams.pop(active_lightbeams.index(lightbeam))
+                    computed_lightbeams.append(lightbeam)
+                    continue
+
+                try:
+                    new_lightbeam = lightbeam.continues(next_tile)
+                except StopIteration:
+                    active_lightbeams.pop(active_lightbeams.index(lightbeam))
+                    computed_lightbeams.append(lightbeam)
+                else:
+                    if new_lightbeam:
+                        active_lightbeams.append(new_lightbeam)
+
+        energized_positions = []
+        for lightbeam in computed_lightbeams:
+            for state in lightbeam.states:
+                energized_positions.append(state.position)
+
+        return energized_positions
