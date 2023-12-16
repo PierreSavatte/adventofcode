@@ -146,7 +146,7 @@ class Lightbeam:
                     (other, other_new_direction),
                 ]:
                     obj._update_state(
-                        State(position=tile.position, direction=obj.direction)
+                        State(position=tile.position, direction=new_direction)
                     )
                 return other
         return None

@@ -156,7 +156,9 @@ def test_lightbeam_encountering_flat_side_of_splitter_splits(
     new_lightbeam = lightbeam.continues(tile)
 
     assert lightbeam.head == expected_head
+    assert lightbeam.direction == expected_direction
     assert new_lightbeam.head == expected_new_head
+    assert new_lightbeam.direction == expected_new_direction
 
 
 def test_lightbeam_stops_if_already_encountered_one_its_previous_state():
