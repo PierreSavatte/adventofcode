@@ -182,7 +182,6 @@ class Contraption:
             computed_lightbeams.append(l)
 
         while active_lightbeams:
-            print(f"{len(active_lightbeams)=} {len(computed_lightbeams)=}")
             new_lightbeams = []
             for lightbeam in active_lightbeams:
                 try:
