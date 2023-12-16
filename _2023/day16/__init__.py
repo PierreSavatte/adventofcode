@@ -100,9 +100,9 @@ class Lightbeam:
                 ]:
                     splitter_directions = SPLITTER_MAPPING[tile.type]
                     if state.direction in splitter_directions:
-                        return self.direction == state.direction
+                        return self.direction not in splitter_directions
                     else:
-                        return state not in splitter_directions
+                        return state.direction not in splitter_directions
 
     def _update_state(self, state: State):
         self.states.append(self.current_state)
