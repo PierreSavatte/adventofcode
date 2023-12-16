@@ -62,8 +62,8 @@ class Tile:
 
 @dataclass
 class State:
-    position: Position
-    direction: Direction
+    position: Position  # current tile the head is on
+    direction: Direction  # the direction it entered the tile
 
 
 class Lightbeam:
@@ -109,13 +109,20 @@ class Lightbeam:
         self.current_state = state
 
     def _continues_empty_space(self, tile: Tile):
+        new_position = self.direction.compute_new_position(self.head)
         new_state = State(
-            position=tile.position,
+            position=new_position,
             direction=self.direction,
         )
         self._update_state(new_state)
 
     def continues(self, tile: Tile) -> Optional["Lightbeam"]:
+        if self.head != tile.position:
+            raise RuntimeError(
+                "We are expected to continue on the tile the laser "
+                "is curently on."
+            )
+
         if self.check_already_visited_tile(tile):
             raise StopIteration(
                 "The lightbeam already visited this tile with this state "
@@ -128,8 +135,9 @@ class Lightbeam:
         elif tile.type in [TileType.MIRROR_UP, TileType.MIRROR_DOWN]:
             new_direction_mapping = MIRROR_MAPPING[tile.type]
             new_direction = new_direction_mapping[self.direction]
+            new_position = new_direction.compute_new_position(self.head)
             self._update_state(
-                State(position=tile.position, direction=new_direction)
+                State(position=new_position, direction=new_direction)
             )
 
         elif tile.type in [
@@ -143,14 +151,20 @@ class Lightbeam:
                 other = deepcopy(self)
 
                 self_new_direction = splitter_directions[0]
+                self_new_position = self_new_direction.compute_new_position(
+                    self.head
+                )
                 other_new_direction = splitter_directions[1]
+                other_new_position = other_new_direction.compute_new_position(
+                    self.head
+                )
 
-                for obj, new_direction in [
-                    (self, self_new_direction),
-                    (other, other_new_direction),
+                for obj, new_direction, new_position in [
+                    (self, self_new_direction, self_new_position),
+                    (other, other_new_direction, other_new_position),
                 ]:
                     obj._update_state(
-                        State(position=tile.position, direction=new_direction)
+                        State(position=new_position, direction=new_direction)
                     )
                 return other
         return None

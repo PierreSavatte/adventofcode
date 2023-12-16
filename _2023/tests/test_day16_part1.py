@@ -5,15 +5,22 @@ from _2023.day16.part1 import compute_solution
 
 
 @pytest.mark.parametrize(
-    "input_direction",
-    [Direction.UP, Direction.DOWN, Direction.RIGHT, Direction.LEFT],
+    "input_direction, new_position",
+    [
+        (Direction.UP, (3, 2)),
+        (Direction.DOWN, (3, 4)),
+        (Direction.RIGHT, (4, 3)),
+        (Direction.LEFT, (2, 3)),
+    ],
 )
-def test_lightbeam_encountering_empty_space_continues(input_direction):
-    lightbeam = Lightbeam(head=(0, 0), direction=input_direction)
+def test_lightbeam_encountering_empty_space_continues(
+    input_direction, new_position
+):
+    lightbeam = Lightbeam(head=(3, 3), direction=input_direction)
 
-    lightbeam.continues(Tile(type=TileType.EMPTY_SPACE, position=(1, 0)))
+    lightbeam.continues(Tile(type=TileType.EMPTY_SPACE, position=(3, 3)))
 
-    assert lightbeam.head == (1, 0)
+    assert lightbeam.head == new_position
     assert lightbeam.direction == input_direction
 
 
@@ -23,29 +30,29 @@ def test_lightbeam_encountering_empty_space_continues(input_direction):
         (
             # >/
             Lightbeam(head=(3, 3), direction=Direction.RIGHT),
-            Tile(type=TileType.MIRROR_UP, position=(4, 3)),
-            (4, 3),
+            Tile(type=TileType.MIRROR_UP, position=(3, 3)),
+            (3, 2),
             Direction.UP,
         ),
         (
             # >\
             Lightbeam(head=(3, 3), direction=Direction.RIGHT),
-            Tile(type=TileType.MIRROR_DOWN, position=(4, 3)),
-            (4, 3),
+            Tile(type=TileType.MIRROR_DOWN, position=(3, 3)),
+            (3, 4),
             Direction.DOWN,
         ),
         (
             # /<
             Lightbeam(head=(3, 3), direction=Direction.LEFT),
-            Tile(type=TileType.MIRROR_UP, position=(2, 3)),
-            (2, 3),
+            Tile(type=TileType.MIRROR_UP, position=(3, 3)),
+            (3, 4),
             Direction.DOWN,
         ),
         (
             # \<
             Lightbeam(head=(3, 3), direction=Direction.LEFT),
-            Tile(type=TileType.MIRROR_DOWN, position=(2, 3)),
-            (2, 3),
+            Tile(type=TileType.MIRROR_DOWN, position=(3, 3)),
+            (3, 2),
             Direction.UP,
         ),
     ],
@@ -65,14 +72,14 @@ def test_lightbeam_encountering_mirror_is_reflected(
         (
             # >-
             Lightbeam(head=(3, 3), direction=Direction.RIGHT),
-            Tile(type=TileType.SPLITTER_RIGHT_LEFT, position=(4, 3)),
+            Tile(type=TileType.SPLITTER_RIGHT_LEFT, position=(3, 3)),
             (4, 3),
             Direction.RIGHT,
         ),
         (
             # -<
             Lightbeam(head=(3, 3), direction=Direction.LEFT),
-            Tile(type=TileType.SPLITTER_RIGHT_LEFT, position=(2, 3)),
+            Tile(type=TileType.SPLITTER_RIGHT_LEFT, position=(3, 3)),
             (2, 3),
             Direction.LEFT,
         ),
@@ -80,7 +87,7 @@ def test_lightbeam_encountering_mirror_is_reflected(
             # |
             # ^
             Lightbeam(head=(3, 3), direction=Direction.UP),
-            Tile(type=TileType.SPLITTER_UP_DOWN, position=(3, 2)),
+            Tile(type=TileType.SPLITTER_UP_DOWN, position=(3, 3)),
             (3, 2),
             Direction.UP,
         ),
@@ -88,7 +95,7 @@ def test_lightbeam_encountering_mirror_is_reflected(
             # v
             # |
             Lightbeam(head=(3, 3), direction=Direction.DOWN),
-            Tile(type=TileType.SPLITTER_UP_DOWN, position=(3, 4)),
+            Tile(type=TileType.SPLITTER_UP_DOWN, position=(3, 3)),
             (3, 4),
             Direction.DOWN,
         ),
@@ -109,29 +116,29 @@ def test_lightbeam_encountering_pointy_end_of_splitter_continues(
         (
             # >|
             Lightbeam(head=(3, 3), direction=Direction.RIGHT),
-            Tile(type=TileType.SPLITTER_UP_DOWN, position=(4, 3)),
-            (4, 3),
+            Tile(type=TileType.SPLITTER_UP_DOWN, position=(3, 3)),
+            (3, 2),
             Direction.UP,
-            (4, 3),
+            (3, 4),
             Direction.DOWN,
         ),
         (
             # |<
             Lightbeam(head=(3, 3), direction=Direction.LEFT),
-            Tile(type=TileType.SPLITTER_UP_DOWN, position=(2, 3)),
-            (2, 3),
+            Tile(type=TileType.SPLITTER_UP_DOWN, position=(3, 3)),
+            (3, 2),
             Direction.UP,
-            (2, 3),
+            (3, 4),
             Direction.DOWN,
         ),
         (
             # -
             # ^
             Lightbeam(head=(3, 3), direction=Direction.UP),
-            Tile(type=TileType.SPLITTER_RIGHT_LEFT, position=(3, 2)),
-            (3, 2),
+            Tile(type=TileType.SPLITTER_RIGHT_LEFT, position=(3, 3)),
+            (4, 3),
             Direction.RIGHT,
-            (3, 2),
+            (2, 3),
             Direction.LEFT,
         ),
         (
@@ -139,9 +146,9 @@ def test_lightbeam_encountering_pointy_end_of_splitter_continues(
             # -
             Lightbeam(head=(3, 3), direction=Direction.DOWN),
             Tile(type=TileType.SPLITTER_RIGHT_LEFT, position=(3, 3)),
-            (3, 3),
+            (4, 3),
             Direction.RIGHT,
-            (3, 3),
+            (2, 3),
             Direction.LEFT,
         ),
     ],
