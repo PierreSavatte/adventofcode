@@ -173,8 +173,16 @@ class Contraption:
         x, y = position
         return 0 <= x <= self.max_x and 0 <= y <= self.max_y
 
-    def compute_energized_positions(self) -> list[Position]:
-        active_lightbeams = [Lightbeam(head=(0, 0), direction=Direction.RIGHT)]
+    def compute_energized_positions(
+        self,
+        starting_position: Optional[Position] = None,
+        starting_direction: Direction = Direction.RIGHT,
+    ) -> list[Position]:
+        if starting_position is None:
+            starting_position = (0, 0)
+        active_lightbeams = [
+            Lightbeam(head=starting_position, direction=starting_direction)
+        ]
         computed_lightbeams = []
 
         def set_lightbeam_as_computed(l: Lightbeam):
@@ -182,6 +190,7 @@ class Contraption:
             computed_lightbeams.append(l)
 
         while active_lightbeams:
+            # print(f"{len(active_lightbeams)=} {len(computed_lightbeams)=}")
             new_lightbeams = []
             for lightbeam in active_lightbeams:
                 try:
