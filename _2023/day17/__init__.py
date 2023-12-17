@@ -2,12 +2,15 @@ import math
 from dataclasses import dataclass
 from enum import Enum
 from typing import Optional
+from functools import cache, cached_property
+from tqdm import tqdm
 
 Position = tuple[int, int]
 Distance = int
 Tiles = list[list[Distance]]
 
 
+@cache
 def is_position_valid(position: Position, max_x: int, max_y: int) -> bool:
     x, y = position
     return 0 <= x <= max_x and 0 <= y <= max_y
@@ -62,6 +65,9 @@ class Map:
     max_x: int
     max_y: int
 
+    def __hash__(self):
+        return hash(tuple(self.vertices))
+
     @classmethod
     def from_data(cls, data: str) -> "Map":
         lines = data.splitlines()
@@ -96,7 +102,7 @@ class Map:
             vertices=vertices,
         )
 
-    @property
+    @cached_property
     def start_vertices(self) -> list[Vertex]:
         start_vertexes = []
         for vertex in self.vertices:
@@ -104,7 +110,7 @@ class Map:
                 start_vertexes.append(vertex)
         return start_vertexes
 
-    @property
+    @cached_property
     def end_vertices(self) -> list[Vertex]:
         end_vertexes = []
         for vertex in self.vertices:
@@ -112,6 +118,7 @@ class Map:
                 end_vertexes.append(vertex)
         return end_vertexes
 
+    @cache
     def get_neighbors(self, vertex: Vertex) -> list[Vertex]:
         neighbors = []
         for other_vertex in self.vertices:
@@ -209,11 +216,13 @@ def dijkstra(map: Map):
         distances[start_vertex] = 0
 
     # Construct shortest_previous_point mapping
+    progress_bar = tqdm(total=len(vertices_to_visit))
     while vertices_to_visit:
         current_vertex = get_vertex_to_visit_with_min_distance(
             vertices_to_visit, distances
         )
         vertices_to_visit.remove(current_vertex)
+        progress_bar.update(1)
 
         neighbors = get_neighbors(
             map=map,
