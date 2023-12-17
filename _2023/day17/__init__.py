@@ -1,7 +1,6 @@
 import math
 from dataclasses import dataclass
 from enum import Enum, auto
-from pprint import pprint
 
 Position = tuple[int, int]
 Distance = int
@@ -198,7 +197,6 @@ def dijkstra(map: Map, starting_point: Position, end_point: Position):
             position=current_point,
         )
 
-        print(f"Visiting {current_point} ({neighbors=})")
         for neighbor in neighbors:
             current_distance = distances[current_point]
             alternative_distance = (
@@ -208,10 +206,4 @@ def dijkstra(map: Map, starting_point: Position, end_point: Position):
                 distances[neighbor] = alternative_distance
                 shortest_previous_point[neighbor] = current_point
 
-    # shortest_route = rebuild_shortest_route(
-    #     shortest_previous_point, starting_point, end_point
-    # )
-    # shortest_route.reverse()
-    # print()
-    # pprint(shortest_route)
     return distances[end_point]
