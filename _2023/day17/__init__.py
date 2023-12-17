@@ -122,7 +122,7 @@ class Map:
 
 @dataclass
 class DijkstraResult:
-    distances: dict[Position, int]
+    distances: dict[Vertex, int]
     shortest_previous_vertex: dict[Vertex, Vertex]
 
 
