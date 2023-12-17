@@ -1,7 +1,14 @@
 import pytest
 
-from _2023.day17 import Map, Direction, dijkstra, is_position_valid, Vertex
-from _2023.day17.part1 import compute_solution
+from _2023.day17 import (
+    Map,
+    Direction,
+    dijkstra,
+    is_position_valid,
+    Vertex,
+    a_star,
+)
+from _2023.day17.part1 import compute_solution, build_solution_tiles
 
 
 EXPECTED_SHORTEST_PATH = """2>>34^>>>1323
@@ -63,6 +70,13 @@ def test_direction_can_be_computed_from_two_points(
     assert (
         Direction.from_two_points(start=start, end=end) == expected_direction
     )
+
+
+def test_shortest_path_can_be_computed(get_data):
+    map = Map.from_data(get_data("test_file_day17"))
+    shortest_route = a_star(map=map)
+
+    assert build_solution_tiles(map, shortest_route) == EXPECTED_SHORTEST_PATH
 
 
 def test_solution_can_be_computed(get_data):
