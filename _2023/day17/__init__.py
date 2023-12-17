@@ -1,10 +1,16 @@
 import math
 from dataclasses import dataclass
 from enum import Enum
+from typing import Optional
 
 Position = tuple[int, int]
 Distance = int
 Tiles = list[list[Distance]]
+
+
+def is_position_valid(position: Position, max_x: int, max_y: int) -> bool:
+    x, y = position
+    return 0 <= x <= max_x and 0 <= y <= max_y
 
 
 class Direction(Enum):
@@ -36,72 +42,116 @@ class Direction(Enum):
 
 
 @dataclass
+class Vertex:
+    start: Position
+    end: Position
+    distance: int
+
+    @property
+    def direction(self) -> Direction:
+        return Direction.from_two_points(start=self.start, end=self.end)
+
+    def __hash__(self):
+        return hash((self.start, self.end, self.distance))
+
+
+@dataclass
 class Map:
-    tiles: Tiles
+    vertices: list[Vertex]
 
-    @property
-    def max_x(self) -> int:
-        return len(self.tiles[0]) - 1
-
-    @property
-    def max_y(self) -> int:
-        return len(self.tiles) - 1
+    max_x: int
+    max_y: int
 
     @classmethod
     def from_data(cls, data: str) -> "Map":
-        tiles = [
-            [int(character) for character in line]
-            for line in data.splitlines()
-        ]
-        return Map(tiles=tiles)
+        lines = data.splitlines()
+        max_y = len(lines) - 1
+        max_x = len(lines[0]) - 1
 
-    def is_position_valid(self, position: Position) -> bool:
-        x, y = position
-        return 0 <= x <= self.max_x and 0 <= y <= self.max_y
+        vertices = []
+        for y, line in enumerate(data.splitlines()):
+            for x, character in enumerate(line):
+                current_position = (x, y)
+                distance = int(character)
+                for connected_position in [
+                    (x + 1, y),
+                    (x - 1, y),
+                    (x, y + 1),
+                    (x, y - 1),
+                ]:
+                    if is_position_valid(
+                        position=connected_position, max_x=max_x, max_y=max_y
+                    ):
+                        vertices.append(
+                            Vertex(
+                                start=connected_position,
+                                end=current_position,
+                                distance=distance,
+                            )
+                        )
 
-    def get_distance_to_enter(self, position: Position) -> int:
-        if not self.is_position_valid(position):
-            raise RuntimeError(f"Position {position} is not valid")
-        x, y = position
-        return self.tiles[y][x]
+        return Map(
+            max_x=max_x,
+            max_y=max_y,
+            vertices=vertices,
+        )
+
+    @property
+    def start_vertices(self) -> list[Vertex]:
+        start_vertexes = []
+        for vertex in self.vertices:
+            if vertex.start == (0, 0):
+                start_vertexes.append(vertex)
+        return start_vertexes
+
+    @property
+    def end_vertices(self) -> list[Vertex]:
+        end_vertexes = []
+        for vertex in self.vertices:
+            if vertex.end == (self.max_x, self.max_y):
+                end_vertexes.append(vertex)
+        return end_vertexes
+
+    def get_neighbors(self, vertex: Vertex) -> list[Vertex]:
+        neighbors = []
+        for other_vertex in self.vertices:
+            if other_vertex.start == vertex.end:
+                neighbors.append(other_vertex)
+        return neighbors
 
 
 @dataclass
 class DijkstraResult:
     distances: dict[Position, int]
-    shortest_previous_point: dict[Position, Position]
+    shortest_previous_vertex: dict[Vertex, Vertex]
 
 
-def get_point_to_visit_with_min_distance(
-    points_to_visit: list[Position], distances: dict[Position, int]
-) -> Position:
-    point = None
+def get_vertex_to_visit_with_min_distance(
+    vertices_to_visit: list[Vertex], distances: dict[Vertex, int]
+) -> Vertex:
+    vertex = None
     min_distance = math.inf
-    for point_to_visit in points_to_visit:
-        current_distance = distances[point_to_visit]
+    for vertex_to_visit in vertices_to_visit:
+        current_distance = distances[vertex_to_visit]
         if current_distance <= min_distance:
-            point = point_to_visit
+            vertex = vertex_to_visit
             min_distance = current_distance
-    if not point:
+    if not vertex:
         raise RuntimeError("No points to explore")
-    return point
+    return vertex
 
 
 def get_last_directions(
-    current_point: Position,
-    shortest_previous_point: dict[Position, Position],
+    current_vertex: Vertex,
+    shortest_previous_vertex: dict[Vertex, Optional[Vertex]],
     amount: int = 2,
 ) -> list[Direction]:
     last_directions = []
     for i in range(amount):
-        previous_point = shortest_previous_point[current_point]
-        if previous_point:
-            last_directions.append(
-                Direction.from_two_points(
-                    start=previous_point, end=current_point
-                )
-            )
-            current_point = previous_point
+        last_directions.append(current_vertex.direction)
+        current_vertex = shortest_previous_vertex[current_vertex]
+        if not current_vertex:
+            break
     if len(last_directions) == amount:
         return last_directions
     else:
@@ -110,15 +160,13 @@ def get_last_directions(
 
 def get_neighbors(
     map: Map,
-    shortest_previous_point: dict[Position, Position],
-    points_to_visit: list[Position],
-    position: Position,
-) -> list[Position]:
-    x, y = position
-
+    shortest_previous_vertex: dict[Vertex, Optional[Vertex]],
+    vertices_to_visit: list[Vertex],
+    vertex: Vertex,
+) -> list[Vertex]:
     three_last_directions = get_last_directions(
-        current_point=position,
-        shortest_previous_point=shortest_previous_point,
+        current_vertex=vertex,
+        shortest_previous_vertex=shortest_previous_vertex,
         amount=3,
     )
     if three_last_directions:
@@ -129,72 +177,68 @@ def get_neighbors(
         same_last_three = False
 
     neighbors = []
-    for possible_position in [
-        (x + 1, y),
-        (x - 1, y),
-        (x, y + 1),
-        (x, y - 1),
-    ]:
-        # Skipping if position is not map
-        if not map.is_position_valid(possible_position):
-            continue
-
+    for potential_vertex in map.get_neighbors(vertex):
         # Skipping if position is already visited
-        if possible_position not in points_to_visit:
+        if potential_vertex not in vertices_to_visit:
             continue
 
         # Skipping according to puzzle constraint:
         # it can move at most three blocks in a single direction
         if same_last_three:
             # If the existing path >= 3 moves
-            additional_direction = Direction.from_two_points(
-                start=position, end=possible_position
-            )
+            additional_direction = potential_vertex.direction
             if additional_direction == three_last_directions[0]:
                 continue
 
-        neighbors.append(possible_position)
+        neighbors.append(potential_vertex)
     return neighbors
 
 
-def dijkstra(map: Map, starting_point: Position):
+def dijkstra(map: Map):
     distances = {}
-    shortest_previous_point = {}
-    points_to_visit = []
+    shortest_previous_vertex = {}
+    vertices_to_visit = []
 
     # Initiation phase
-    for x in range(map.max_x + 1):
-        for y in range(map.max_y + 1):
-            position = (x, y)
-            distances[position] = math.inf
-            shortest_previous_point[position] = None
-            points_to_visit.append(position)
-    distances[starting_point] = 0
+    for vertex in map.vertices:
+        distances[vertex] = math.inf
+        shortest_previous_vertex[vertex] = None
+        vertices_to_visit.append(vertex)
+
+    for start_vertex in map.start_vertices:
+        distances[start_vertex] = 0
 
     # Construct shortest_previous_point mapping
-    while points_to_visit:
-        current_point = get_point_to_visit_with_min_distance(
-            points_to_visit, distances
+    while vertices_to_visit:
+        current_vertex = get_vertex_to_visit_with_min_distance(
+            vertices_to_visit, distances
         )
-        points_to_visit.remove(current_point)
+        vertices_to_visit.remove(current_vertex)
 
         neighbors = get_neighbors(
             map=map,
-            shortest_previous_point=shortest_previous_point,
-            points_to_visit=points_to_visit,
-            position=current_point,
+            shortest_previous_vertex=shortest_previous_vertex,
+            vertices_to_visit=vertices_to_visit,
+            vertex=current_vertex,
         )
 
+        # print(f"Visiting {current_point}: {neighbors=}")
+
         for neighbor in neighbors:
-            current_distance = distances[current_point]
-            alternative_distance = (
-                current_distance + map.get_distance_to_enter(neighbor)
-            )
+            current_distance = distances[current_vertex]
+            alternative_distance = current_distance + neighbor.distance
+
+            # if neighbor == (4, 0):
+            #     print(
+            #         f"For point {neighbor}: {alternative_distance=}, "
+            #         f"existing={distances[neighbor]}"
+            #     )
+
             if alternative_distance < distances[neighbor]:
                 distances[neighbor] = alternative_distance
-                shortest_previous_point[neighbor] = current_point
+                shortest_previous_vertex[neighbor] = current_vertex
 
     return DijkstraResult(
         distances=distances,
-        shortest_previous_point=shortest_previous_point,
+        shortest_previous_vertex=shortest_previous_vertex,
     )
