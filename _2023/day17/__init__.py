@@ -222,17 +222,9 @@ def dijkstra(map: Map):
             vertex=current_vertex,
         )
 
-        # print(f"Visiting {current_point}: {neighbors=}")
-
         for neighbor in neighbors:
             current_distance = distances[current_vertex]
             alternative_distance = current_distance + neighbor.distance
-
-            # if neighbor == (4, 0):
-            #     print(
-            #         f"For point {neighbor}: {alternative_distance=}, "
-            #         f"existing={distances[neighbor]}"
-            #     )
 
             if alternative_distance < distances[neighbor]:
                 distances[neighbor] = alternative_distance
