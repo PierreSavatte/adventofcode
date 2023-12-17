@@ -66,6 +66,12 @@ class Map:
         return self.tiles[y][x]
 
 
+@dataclass
+class DijkstraResult:
+    distances: dict[Position, int]
+    shortest_previous_point: dict[Position, Position]
+
+
 def get_point_to_visit_with_min_distance(
     points_to_visit: list[Position], distances: dict[Position, int]
 ) -> Position:
@@ -169,7 +175,7 @@ def rebuild_shortest_route(
     return shortest_route
 
 
-def dijkstra(map: Map, starting_point: Position, end_point: Position):
+def dijkstra(map: Map, starting_point: Position):
     distances = {}
     shortest_previous_point = {}
     points_to_visit = []
@@ -206,4 +212,7 @@ def dijkstra(map: Map, starting_point: Position, end_point: Position):
                 distances[neighbor] = alternative_distance
                 shortest_previous_point[neighbor] = current_point
 
-    return distances[end_point]
+    return DijkstraResult(
+        distances=distances,
+        shortest_previous_point=shortest_previous_point,
+    )
