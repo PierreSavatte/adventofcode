@@ -154,27 +154,6 @@ def get_neighbors(
     return neighbors
 
 
-def rebuild_shortest_route(
-    shortest_previous_point: dict[Position, Position],
-    starting_point: Position,
-    end_point: Position,
-) -> list[tuple[Position, Direction]]:
-    shortest_route = []
-    current_point = end_point
-    while current_point != starting_point:
-        previous_point = shortest_previous_point[current_point]
-
-        shortest_route.append(
-            (
-                current_point,
-                Direction.from_two_points(previous_point, current_point),
-            )
-        )
-
-        current_point = previous_point
-    return shortest_route
-
-
 def dijkstra(map: Map, starting_point: Position):
     distances = {}
     shortest_previous_point = {}
