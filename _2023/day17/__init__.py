@@ -8,10 +8,10 @@ Tiles = list[list[Distance]]
 
 
 class Direction(Enum):
-    UP = auto()
-    DOWN = auto()
-    RIGHT = auto()
-    LEFT = auto()
+    UP = "^"
+    DOWN = "v"
+    RIGHT = ">"
+    LEFT = "<"
 
     @classmethod
     def from_two_points(cls, start: Position, end: Position) -> "Direction":

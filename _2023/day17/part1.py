@@ -1,4 +1,4 @@
-from pprint import pprint
+from copy import deepcopy
 
 from _2023.day17 import dijkstra, Map, Position, Direction
 from _2023.load_input import load_input
@@ -25,18 +25,24 @@ def rebuild_shortest_route(
     return shortest_route
 
 
+def build_solution_tiles(
+    map: Map, shortest_route: list[tuple[Position, Direction]]
+):
+    tiles = deepcopy(map.tiles)
+    for position, direction in shortest_route:
+        x, y = position
+        tiles[y][x] = direction.value
+
+    data = "\n".join(["".join([str(char) for char in line]) for line in tiles])
+
+    return data
+
+
 def compute_solution(data: str) -> int:
     map = Map.from_data(data)
     starting_point = (0, 0)
     end_point = (map.max_x, map.max_y)
     dijkstra_result = dijkstra(map=map, starting_point=starting_point)
-
-    shortest_route = rebuild_shortest_route(
-        dijkstra_result.shortest_previous_point, starting_point, end_point
-    )
-    shortest_route.reverse()
-    pprint(shortest_route)
-
     return dijkstra_result.distances[end_point]
 
 
