@@ -1,6 +1,6 @@
 import math
 from dataclasses import dataclass
-from enum import Enum, auto
+from enum import Enum
 
 Position = tuple[int, int]
 Distance = int
