@@ -201,7 +201,7 @@ def get_neighbors(
     return neighbors
 
 
-def dijkstra(map: Map):
+def dijkstra(map: Map) -> DijkstraResult:
     distances = {}
     shortest_previous_vertex = {}
     vertices_to_visit = []
