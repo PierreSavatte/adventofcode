@@ -1,5 +1,6 @@
 from _2023.day16 import Contraption, Direction, Position
 from _2023.load_input import load_input
+from tqdm import tqdm
 
 
 def compute_solution(data: str) -> int:
@@ -17,7 +18,8 @@ def compute_solution(data: str) -> int:
         else:
             return max_energized_positions
 
-    for x in range(contraption.max_x):
+    print("First half of the computation...")
+    for x in tqdm(range(contraption.max_x)):
         for y, direction in [
             (0, Direction.DOWN),
             (contraption.max_y, Direction.UP),
@@ -26,7 +28,8 @@ def compute_solution(data: str) -> int:
                 position=(x, y), direction=direction
             )
 
-    for y in range(contraption.max_y):
+    print("Second half of the computation...")
+    for y in tqdm(range(contraption.max_y)):
         for x, direction in [
             (0, Direction.RIGHT),
             (contraption.max_x, Direction.LEFT),
