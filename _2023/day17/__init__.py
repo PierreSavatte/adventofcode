@@ -116,11 +116,17 @@ def get_neighbors(
 ) -> list[Position]:
     x, y = position
 
-    two_last_directions = get_last_directions(
+    three_last_directions = get_last_directions(
         current_point=position,
         shortest_previous_point=shortest_previous_point,
-        amount=2,
+        amount=3,
     )
+    if three_last_directions:
+        same_last_three = all(
+            d == three_last_directions[-1] for d in three_last_directions
+        )
+    else:
+        same_last_three = False
 
     neighbors = []
     for possible_position in [
@@ -139,15 +145,12 @@ def get_neighbors(
 
         # Skipping according to puzzle constraint:
         # it can move at most three blocks in a single direction
-        if two_last_directions:
-            # If the existing path >= 2 moves
-            directions = [
-                *two_last_directions,
-                Direction.from_two_points(
-                    start=position, end=possible_position
-                ),
-            ]
-            if all(d == directions[0] for d in directions):
+        if same_last_three:
+            # If the existing path >= 3 moves
+            additional_direction = Direction.from_two_points(
+                start=position, end=possible_position
+            )
+            if additional_direction == three_last_directions[0]:
                 continue
 
         neighbors.append(possible_position)
