@@ -1,5 +1,4 @@
 import math
-from dataclasses import dataclass
 from typing import Optional
 
 from tqdm import tqdm
@@ -9,12 +8,6 @@ from _2023.day17.pathfinding import (
     get_vertex_to_visit_with_min_distance,
     ShortestRoute,
 )
-
-
-@dataclass
-class DijkstraResult:
-    distances: dict[Vertex, int]
-    shortest_previous_vertex: dict[Vertex, Vertex]
 
 
 def get_last_directions(
