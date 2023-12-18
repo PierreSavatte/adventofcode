@@ -10,9 +10,9 @@ from _2023.load_input import load_input
 
 def build_solution_tiles(map: Map, shortest_route: list[Vertex]):
     tiles = []
-    for x in range(map.max_x + 1):
+    for y in range(map.max_x + 1):
         tiles_line = []
-        for y in range(map.max_y + 1):
+        for x in range(map.max_y + 1):
             tiles_line.append(str(map.get_distance_on((x, y))))
         tiles.append(tiles_line)
 
