@@ -132,8 +132,8 @@ class Map:
             if vertex.end == position:
                 return vertex.distance
 
+    @cache
     def h(self, vertex: Vertex) -> float:
         x_a, y_a = vertex.start
         x_b, y_b = self.end_position
-        # return math.sqrt((x_b - x_a) ** 2 + (y_b - y_a) ** 2)
         return abs(x_b - x_a) + abs(y_b - y_a)
