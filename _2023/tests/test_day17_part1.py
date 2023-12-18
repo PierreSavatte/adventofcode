@@ -1,15 +1,9 @@
 import pytest
 
-from _2023.day17 import (
-    Map,
-    Direction,
-    dijkstra,
-    is_position_valid,
-    Vertex,
-    a_star,
-)
+from _2023.day17 import Map, Direction, is_position_valid, Vertex
 from _2023.day17.part1 import compute_solution, build_solution_tiles
-
+from _2023.day17.pathfinding.a_star import a_star
+from _2023.day17.pathfinding.dijkstra import dijkstra
 
 EXPECTED_SHORTEST_PATH = """2>>34^>>>1323
 32v>>>35v5623
@@ -72,12 +66,17 @@ def test_direction_can_be_computed_from_two_points(
     )
 
 
-def test_shortest_path_can_be_computed(get_data):
+@pytest.mark.parametrize("algorithm", [a_star, dijkstra])
+def test_shortest_path_can_be_computed(get_data, algorithm):
     map = Map.from_data(get_data("test_file_day17"))
-    shortest_route = a_star(map=map)
+    shortest_route = algorithm(map=map)
 
     assert build_solution_tiles(map, shortest_route) == EXPECTED_SHORTEST_PATH
 
 
-def test_solution_can_be_computed(get_data):
-    assert compute_solution(get_data("test_file_day17")) == 102
+@pytest.mark.parametrize("algorithm", [a_star, dijkstra])
+def test_solution_can_be_computed(get_data, algorithm):
+    assert (
+        compute_solution(get_data("test_file_day17"), algorithm=algorithm)
+        == 102
+    )
