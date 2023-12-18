@@ -62,9 +62,13 @@ class Map:
     max_x: int
     max_y: int
 
-    @property
+    @cached_property
+    def start_position(self) -> Position:
+        return 0, 0
+
+    @cached_property
     def end_position(self) -> Position:
-        return (self.max_x, self.max_y)
+        return self.max_x, self.max_y
 
     def __hash__(self):
         return hash(tuple(self.vertices))
@@ -107,7 +111,7 @@ class Map:
     def start_vertices(self) -> list[Vertex]:
         start_vertexes = []
         for vertex in self.vertices:
-            if vertex.start == (0, 0):
+            if vertex.start == self.start_position:
                 start_vertexes.append(vertex)
         return start_vertexes
 
@@ -115,7 +119,7 @@ class Map:
     def end_vertices(self) -> list[Vertex]:
         end_vertexes = []
         for vertex in self.vertices:
-            if vertex.end == (self.max_x, self.max_y):
+            if vertex.end == self.end_position:
                 end_vertexes.append(vertex)
         return end_vertexes
 
@@ -127,6 +131,7 @@ class Map:
                 neighbors.append(other_vertex)
         return neighbors
 
+    @cache
     def get_distance_on(self, position: Position):
         for vertex in self.vertices:
             if vertex.end == position:
