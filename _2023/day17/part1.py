@@ -22,12 +22,16 @@ def build_solution_tiles(map: Map, shortest_route: list[Node]):
     )
 
 
+def compute_heat_loss(path: list[Node]) -> int:
+    return sum(node.distance_to_enter for node in path if node.enter_direction)
+
+
 def compute_solution(data: str, algorithm: Optional[Callable] = None) -> int:
     if algorithm is None:
         algorithm = a_star
     map = Map.from_data(data)
     path = algorithm(map=map)
-    return sum(node.distance_to_enter for node in path if node.enter_direction)
+    return compute_heat_loss(path)
 
 
 def profiling():
