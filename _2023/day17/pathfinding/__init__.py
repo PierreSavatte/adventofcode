@@ -1,11 +1,11 @@
 import math
 
-from _2023.day17 import Vertex
+from _2023.day17 import Node
 
 
 def get_vertex_to_visit_with_min_distance(
-    vertices_to_visit: list[Vertex], distances: dict[Vertex, int]
-) -> Vertex:
+    vertices_to_visit: list[Node], distances: dict[Node, int]
+) -> Node:
     vertex = None
     min_distance = math.inf
     for vertex_to_visit in vertices_to_visit:
@@ -18,5 +18,5 @@ def get_vertex_to_visit_with_min_distance(
     return vertex
 
 
-class ShortestRoute(list[Vertex]):
+class ShortestRoute(list[Node]):
     ...

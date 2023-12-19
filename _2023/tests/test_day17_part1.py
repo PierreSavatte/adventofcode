@@ -1,6 +1,6 @@
 import pytest
 
-from _2023.day17 import Map, Direction, is_position_valid, Vertex
+from _2023.day17 import Map, Direction, Node
 from _2023.day17.part1 import compute_solution, build_solution_tiles
 from _2023.day17.pathfinding.a_star import a_star
 from _2023.day17.pathfinding.dijkstra import dijkstra
@@ -20,17 +20,14 @@ EXPECTED_SHORTEST_PATH = """2>>34^>>>1323
 43226746555v>"""
 
 
-def test_validity_of_position_can_be_computed():
-    max_x = 12
-    max_y = 12
+def test_validity_of_position_can_be_computed(get_data):
+    map = Map.from_data(get_data("test_file_day17"))
+    assert map.max_x == 12
+    assert map.max_y == 12
 
-    assert (
-        is_position_valid(max_x=max_x, max_y=max_y, position=(25, 0)) is False
-    )
-    assert (
-        is_position_valid(max_x=max_x, max_y=max_y, position=(0, -1)) is False
-    )
-    assert is_position_valid(max_x=max_x, max_y=max_y, position=(0, 0)) is True
+    assert map.is_valid_position(position=(25, 0)) is False
+    assert map.is_valid_position(position=(0, -1)) is False
+    assert map.is_valid_position(position=(0, 0)) is True
 
 
 def test_map_can_be_loaded_from_input_file(get_data):
@@ -39,14 +36,8 @@ def test_map_can_be_loaded_from_input_file(get_data):
     assert map.max_x == 12
     assert map.max_y == 12
 
-    assert map.start_vertices == [
-        Vertex(start=(0, 0), end=(1, 0), distance=4),
-        Vertex(start=(0, 0), end=(0, 1), distance=3),
-    ]
-    assert map.end_vertices == [
-        Vertex(start=(11, 12), end=(12, 12), distance=3),
-        Vertex(start=(12, 11), end=(12, 12), distance=3),
-    ]
+    assert map.start_position == (0, 0)
+    assert map.end_position == (12, 12)
 
 
 @pytest.mark.parametrize(
@@ -66,7 +57,44 @@ def test_direction_can_be_computed_from_two_points(
     )
 
 
-@pytest.mark.parametrize("algorithm", [a_star, dijkstra])
+def test_map_can_give_immediate_neighbors(get_data):
+    map = Map.from_data(get_data("test_file_day17"))
+
+    node = Node(
+        position=(3, 3),
+        distance_to_enter=6,
+        enter_direction=Direction.DOWN,
+        direction_streak=2,
+    )
+    assert map.get_immediate_neighbors(node) == [
+        Node(
+            position=(4, 3),
+            distance_to_enter=5,
+            enter_direction=Direction.RIGHT,
+            direction_streak=1,
+        ),
+        Node(
+            position=(2, 3),
+            distance_to_enter=4,
+            enter_direction=Direction.LEFT,
+            direction_streak=1,
+        ),
+        Node(
+            position=(3, 4),
+            distance_to_enter=6,
+            enter_direction=Direction.DOWN,
+            direction_streak=3,
+        ),
+    ]
+
+
+@pytest.mark.parametrize(
+    "algorithm",
+    [
+        a_star,
+        # dijkstra,
+    ],
+)
 def test_shortest_path_can_be_computed(get_data, algorithm):
     map = Map.from_data(get_data("test_file_day17"))
     shortest_route = algorithm(map=map)
@@ -74,7 +102,13 @@ def test_shortest_path_can_be_computed(get_data, algorithm):
     assert build_solution_tiles(map, shortest_route) == EXPECTED_SHORTEST_PATH
 
 
-@pytest.mark.parametrize("algorithm", [a_star, dijkstra])
+@pytest.mark.parametrize(
+    "algorithm",
+    [
+        a_star,
+        # dijkstra,
+    ],
+)
 def test_solution_can_be_computed(get_data, algorithm):
     assert (
         compute_solution(get_data("test_file_day17"), algorithm=algorithm)

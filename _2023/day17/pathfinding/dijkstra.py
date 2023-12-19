@@ -3,7 +3,7 @@ from typing import Optional
 
 from tqdm import tqdm
 
-from _2023.day17 import Vertex, Direction, Map
+from _2023.day17 import Node, Direction, Map
 from _2023.day17.pathfinding import (
     get_vertex_to_visit_with_min_distance,
     ShortestRoute,
@@ -11,8 +11,8 @@ from _2023.day17.pathfinding import (
 
 
 def get_last_directions(
-    current_vertex: Vertex,
-    shortest_previous_vertex: dict[Vertex, Optional[Vertex]],
+    current_vertex: Node,
+    shortest_previous_vertex: dict[Node, Optional[Node]],
     amount: int = 2,
 ) -> list[Direction]:
     last_directions = []
@@ -29,10 +29,10 @@ def get_last_directions(
 
 def get_neighbors(
     map: Map,
-    shortest_previous_vertex: dict[Vertex, Optional[Vertex]],
-    vertices_to_visit: list[Vertex],
-    vertex: Vertex,
-) -> list[Vertex]:
+    shortest_previous_vertex: dict[Node, Optional[Node]],
+    vertices_to_visit: list[Node],
+    vertex: Node,
+) -> list[Node]:
     three_last_directions = get_last_directions(
         current_vertex=vertex,
         shortest_previous_vertex=shortest_previous_vertex,
@@ -65,8 +65,8 @@ def get_neighbors(
 
 def reconstruct_path(
     map: Map,
-    shortest_previous_vertex: dict[Vertex, Optional[Vertex]],
-    distances: dict[Vertex, int],
+    shortest_previous_vertex: dict[Node, Optional[Node]],
+    distances: dict[Node, int],
 ) -> ShortestRoute:
     end_vertex = None
     min_distance = math.inf
