@@ -1,7 +1,11 @@
 import pytest
 
 from _2023.day17 import Map, Direction, Node
-from _2023.day17.part1 import compute_solution, build_solution_tiles
+from _2023.day17.part1 import (
+    compute_solution,
+    build_solution_tiles,
+    compute_heat_loss,
+)
 from _2023.day17.pathfinding.a_star import a_star
 from _2023.day17.pathfinding.dijkstra import dijkstra
 
@@ -100,6 +104,37 @@ def test_shortest_path_can_be_computed(get_data, algorithm):
     shortest_route = algorithm(map=map)
 
     assert build_solution_tiles(map, shortest_route) == EXPECTED_SHORTEST_PATH
+
+
+def test_heat_loss_can_be_computed_from_path():
+    assert (
+        compute_heat_loss(
+            path=[
+                Node(position=(0, 0), distance_to_enter=0),
+                Node(
+                    position=(1, 0),
+                    distance_to_enter=4,
+                    enter_direction=Direction.LEFT,
+                ),
+                Node(
+                    position=(2, 0),
+                    distance_to_enter=1,
+                    enter_direction=Direction.LEFT,
+                ),
+                Node(
+                    position=(2, 1),
+                    distance_to_enter=1,
+                    enter_direction=Direction.DOWN,
+                ),
+                Node(
+                    position=(3, 1),
+                    distance_to_enter=5,
+                    enter_direction=Direction.LEFT,
+                ),
+            ]
+        )
+        == 11
+    )
 
 
 @pytest.mark.parametrize(
