@@ -1,16 +1,18 @@
+import math
 from dataclasses import dataclass
 from enum import Enum
-from functools import cache, cached_property
+from typing import Optional
+from functools import cached_property
+
+from colorama import init as colorama_init
+from colorama import Fore
+from colorama import Style
 
 Position = tuple[int, int]
 Distance = int
 Tiles = list[list[Distance]]
 
-
-@cache
-def is_position_valid(position: Position, max_x: int, max_y: int) -> bool:
-    x, y = position
-    return 0 <= x <= max_x and 0 <= y <= max_y
+colorama_init()
 
 
 class Direction(Enum):
@@ -18,6 +20,14 @@ class Direction(Enum):
     DOWN = "v"
     RIGHT = ">"
     LEFT = "<"
+
+    @property
+    def colorized(self):
+        return f"{Fore.GREEN}{self.value}{Style.RESET_ALL}"
+
+    @property
+    def opposite(self) -> "Direction":
+        return OPPOSITE_MAPPING[self]
 
     @classmethod
     def from_two_points(cls, start: Position, end: Position) -> "Direction":
@@ -41,99 +51,128 @@ class Direction(Enum):
             )
 
 
+OPPOSITE_MAPPING = {
+    Direction.UP: Direction.DOWN,
+    Direction.DOWN: Direction.UP,
+    Direction.RIGHT: Direction.LEFT,
+    Direction.LEFT: Direction.RIGHT,
+}
+
+
 @dataclass
-class Vertex:
-    start: Position
-    end: Position
-    distance: int
+class Node:
+    position: Position
+    distance_to_enter: int
+    enter_direction: Optional[Direction] = None
+    direction_streak: int = 1
 
-    @property
-    def direction(self) -> Direction:
-        return Direction.from_two_points(start=self.start, end=self.end)
-
-    def __hash__(self):
-        return hash((self.start, self.end, self.distance))
+    def __hash__(self) -> int:
+        return hash(
+            (
+                self.position,
+                self.distance_to_enter,
+                self.enter_direction,
+                self.direction_streak,
+            )
+        )
 
 
 @dataclass
 class Map:
-    vertices: list[Vertex]
+    tiles: list[list[int]]
+
+    start_node: Node
 
     max_x: int
     max_y: int
 
-    @property
-    def end_position(self) -> Position:
-        return (self.max_x, self.max_y)
+    def _get_all_nodes(self, nodes: set[Node], current: Node):
+        if current in nodes:
+            return
 
-    def __hash__(self):
-        return hash(tuple(self.vertices))
+        neighbors = set(self.get_immediate_neighbors(current))
+        nodes.add(current)
+        for neighbor in neighbors:
+            if neighbor.direction_streak <= 3:
+                self._get_all_nodes(nodes, neighbor)
+
+    def get_all_nodes(self):
+        nodes = set()
+        self._get_all_nodes(nodes, self.start_node)
+        return nodes
+
+    @cached_property
+    def start_position(self) -> Position:
+        return 0, 0
+
+    @cached_property
+    def end_position(self) -> Position:
+        return self.max_x, self.max_y
 
     @classmethod
     def from_data(cls, data: str) -> "Map":
-        lines = data.splitlines()
-        max_y = len(lines) - 1
-        max_x = len(lines[0]) - 1
+        tiles = [
+            [int(character) for character in line]
+            for line in data.splitlines()
+        ]
 
-        vertices = []
-        for y, line in enumerate(data.splitlines()):
-            for x, character in enumerate(line):
-                current_position = (x, y)
-                distance = int(character)
-                for connected_position in [
-                    (x + 1, y),
-                    (x - 1, y),
-                    (x, y + 1),
-                    (x, y - 1),
-                ]:
-                    if is_position_valid(
-                        position=connected_position, max_x=max_x, max_y=max_y
-                    ):
-                        vertices.append(
-                            Vertex(
-                                start=connected_position,
-                                end=current_position,
-                                distance=distance,
-                            )
-                        )
+        max_y = len(tiles) - 1
+        max_x = len(tiles[0]) - 1
 
         return Map(
+            tiles=tiles,
             max_x=max_x,
             max_y=max_y,
-            vertices=vertices,
+            start_node=Node(
+                position=(0, 0), distance_to_enter=0, direction_streak=0
+            ),
         )
 
-    @cached_property
-    def start_vertices(self) -> list[Vertex]:
-        start_vertexes = []
-        for vertex in self.vertices:
-            if vertex.start == (0, 0):
-                start_vertexes.append(vertex)
-        return start_vertexes
-
-    @cached_property
-    def end_vertices(self) -> list[Vertex]:
-        end_vertexes = []
-        for vertex in self.vertices:
-            if vertex.end == (self.max_x, self.max_y):
-                end_vertexes.append(vertex)
-        return end_vertexes
-
-    @cache
-    def get_neighbors(self, vertex: Vertex) -> list[Vertex]:
-        neighbors = []
-        for other_vertex in self.vertices:
-            if other_vertex.start == vertex.end:
-                neighbors.append(other_vertex)
-        return neighbors
-
-    def get_distance_on(self, position: Position):
-        for vertex in self.vertices:
-            if vertex.end == position:
-                return vertex.distance
-
-    def h(self, vertex: Vertex) -> float:
-        x_a, y_a = vertex.start
+    def h(self, node: Node) -> float:
         x_b, y_b = self.end_position
-        # return math.sqrt((x_b - x_a) ** 2 + (y_b - y_a) ** 2)
+        x_a, y_a = node.position
         return abs(x_b - x_a) + abs(y_b - y_a)
+
+    def get_distance_on(self, position: Position) -> int:
+        x, y = position
+        return self.tiles[y][x]
+
+    def is_valid_position(self, position: Position) -> bool:
+        x, y = position
+        return 0 <= x <= self.max_x and 0 <= y <= self.max_y
+
+    def get_immediate_neighbors(self, node: Node) -> list[Node]:
+        x, y = node.position
+        immediate_neighbors = []
+        for connected_position, direction in [
+            ((x + 1, y), Direction.RIGHT),
+            ((x, y + 1), Direction.DOWN),
+            ((x - 1, y), Direction.LEFT),
+            ((x, y - 1), Direction.UP),
+        ]:
+            if not self.is_valid_position(connected_position):
+                continue
+
+            if (
+                node.enter_direction
+                and direction == node.enter_direction.opposite
+            ):
+                continue
+
+            if direction == node.enter_direction:
+                streak = node.direction_streak + 1
+            else:
+                streak = 1
+
+            distance_to_enter = self.get_distance_on(connected_position)
+
+            immediate_neighbors.append(
+                Node(
+                    position=connected_position,
+                    distance_to_enter=distance_to_enter,
+                    enter_direction=direction,
+                    direction_streak=streak,
+                )
+            )
+
+        return immediate_neighbors
