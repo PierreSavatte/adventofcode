@@ -85,21 +85,6 @@ class Map:
     max_x: int
     max_y: int
 
-    def _get_all_nodes(self, nodes: set[Node], current: Node):
-        if current in nodes:
-            return
-
-        neighbors = set(self.get_immediate_neighbors(current))
-        nodes.add(current)
-        for neighbor in neighbors:
-            if neighbor.direction_streak <= 3:
-                self._get_all_nodes(nodes, neighbor)
-
-    def get_all_nodes(self):
-        nodes = set()
-        self._get_all_nodes(nodes, self.start_node)
-        return nodes
-
     @cached_property
     def start_position(self) -> Position:
         return 0, 0
@@ -140,7 +125,7 @@ class Map:
         x, y = position
         return 0 <= x <= self.max_x and 0 <= y <= self.max_y
 
-    def get_immediate_neighbors(self, node: Node) -> list[Node]:
+    def get_neighbors(self, node: Node) -> list[Node]:
         x, y = node.position
         immediate_neighbors = []
         for connected_position, direction in [
@@ -162,6 +147,11 @@ class Map:
                 streak = node.direction_streak + 1
             else:
                 streak = 1
+
+            # Skipping according to puzzle constraint:
+            # it can move at most three blocks in a single direction
+            if streak >= 4:
+                continue
 
             distance_to_enter = self.get_distance_on(connected_position)
 

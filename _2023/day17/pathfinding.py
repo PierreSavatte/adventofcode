@@ -5,17 +5,6 @@ from tqdm import tqdm
 from _2023.day17 import Node, Map
 
 
-def get_neighbors(map: Map, current: Node) -> list[Node]:
-    neighbors = []
-    for node in map.get_immediate_neighbors(current):
-        # Skipping according to puzzle constraint:
-        # it can move at most three blocks in a single direction
-        if node.direction_streak >= 4:
-            continue
-        neighbors.append(node)
-    return neighbors
-
-
 def get_node_in_open_set_with_lowest_f_score(
     open_set: list[Node], f_score: dict[Node, int]
 ) -> Node:
@@ -54,7 +43,7 @@ def a_star(map: Map) -> int:
             return g_score[current]
 
         open_set.remove(current)
-        for neighbor in get_neighbors(map=map, current=current):
+        for neighbor in map.get_neighbors(current):
             tentative_g_score = g_score[current] + neighbor.distance_to_enter
             if tentative_g_score < g_score.get(neighbor, math.inf):
                 came_from[neighbor] = current

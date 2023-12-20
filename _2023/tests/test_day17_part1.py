@@ -107,15 +107,7 @@ def test_map_can_give_immediate_neighbors(
 ):
     map = Map.from_data(get_data("test_file_day17_part1"))
 
-    assert map.get_immediate_neighbors(input_node) == expected_neighbors
-
-
-def test_map_can_build_its_node_set(get_data):
-    map = Map.from_data(get_data("test_file_day17_part1"))
-
-    all_nodes = list(map.get_all_nodes())
-
-    assert len(all_nodes) == 1717
+    assert map.get_neighbors(input_node) == expected_neighbors
 
 
 def test_solution_can_be_computed(get_data):
