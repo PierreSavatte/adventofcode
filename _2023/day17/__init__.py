@@ -142,8 +142,8 @@ class Map:
         immediate_neighbors = []
         for connected_position, direction in [
             ((x + 1, y), Direction.RIGHT),
-            ((x - 1, y), Direction.LEFT),
             ((x, y + 1), Direction.DOWN),
+            ((x - 1, y), Direction.LEFT),
             ((x, y - 1), Direction.UP),
         ]:
             if not self.is_valid_position(connected_position):
