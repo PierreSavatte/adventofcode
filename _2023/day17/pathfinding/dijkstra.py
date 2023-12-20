@@ -3,132 +3,103 @@ from typing import Optional
 
 from tqdm import tqdm
 
-from _2023.day17 import Node, Direction, Map
-from _2023.day17.pathfinding import (
-    get_vertex_to_visit_with_min_distance,
-    ShortestRoute,
-)
+from _2023.day17 import Node, Map, Position
+from _2023.day17.pathfinding import get_neighbors, ShortestRoute
 
 
-def get_last_directions(
-    current_vertex: Node,
-    shortest_previous_vertex: dict[Node, Optional[Node]],
-    amount: int = 2,
-) -> list[Direction]:
-    last_directions = []
-    for i in range(amount):
-        last_directions.append(current_vertex.direction)
-        current_vertex = shortest_previous_vertex[current_vertex]
-        if not current_vertex:
-            break
-    if len(last_directions) == amount:
-        return last_directions
-    else:
-        return []
-
-
-def get_neighbors(
-    map: Map,
-    shortest_previous_vertex: dict[Node, Optional[Node]],
-    vertices_to_visit: list[Node],
-    vertex: Node,
-) -> list[Node]:
-    three_last_directions = get_last_directions(
-        current_vertex=vertex,
-        shortest_previous_vertex=shortest_previous_vertex,
-        amount=3,
-    )
-    if three_last_directions:
-        same_last_three = all(
-            d == three_last_directions[-1] for d in three_last_directions
-        )
-    else:
-        same_last_three = False
-
-    neighbors = []
-    for potential_vertex in map.get_neighbors(vertex):
-        # Skipping if position is already visited
-        if potential_vertex not in vertices_to_visit:
+def get_end_node(
+    shortest_previous_node: dict[Node, Optional[Node]],
+    distances: dict[Node, int],
+    end_position: Position,
+) -> Node:
+    node = None
+    min_distance = math.inf
+    for end_node in shortest_previous_node.keys():
+        if end_node.position != end_position:
             continue
 
-        # Skipping according to puzzle constraint:
-        # it can move at most three blocks in a single direction
-        if same_last_three:
-            # If the existing path >= 3 moves
-            additional_direction = potential_vertex.direction
-            if additional_direction == three_last_directions[0]:
-                continue
+        distance = distances[end_node]
+        if distance < min_distance:
+            min_distance = distance
+            node = end_node
 
-        neighbors.append(potential_vertex)
-    return neighbors
+    if node is None:
+        raise RuntimeError("Didn't found the end node")
+
+    return node
 
 
 def reconstruct_path(
     map: Map,
-    shortest_previous_vertex: dict[Node, Optional[Node]],
+    shortest_previous_node: dict[Node, Optional[Node]],
     distances: dict[Node, int],
 ) -> ShortestRoute:
-    end_vertex = None
-    min_distance = math.inf
-    for vertex in map.end_vertices:
-        if distances[vertex] < min_distance:
-            end_vertex = vertex
-
     vertices = []
-    current_vertex = end_vertex
-    while current_vertex not in map.start_vertices:
-        vertices.append(current_vertex)
-        current_vertex = shortest_previous_vertex[current_vertex]
+    current = get_end_node(
+        shortest_previous_node=shortest_previous_node,
+        distances=distances,
+        end_position=map.end_position,
+    )
+    while current != map.start_node:
+        vertices.append(current)
+        current = shortest_previous_node[current]
     return ShortestRoute(vertices)
+
+
+def get_node_to_visit_with_min_distance(
+    nodes_to_visit: list[Node], distances: dict[Node, int]
+) -> Node:
+    node = None
+    min_distance = math.inf
+    for node_to_visit in nodes_to_visit:
+        current_distance = distances[node_to_visit]
+        if current_distance <= min_distance:
+            node = node_to_visit
+            min_distance = current_distance
+    if not node:
+        raise RuntimeError("No points to explore")
+    return node
 
 
 def dijkstra(map: Map) -> ShortestRoute:
     distances = {}
-    shortest_previous_vertex = {}
-    vertices_to_visit = []
+    shortest_previous_node = {}
+    nodes_to_visit = []
 
     # Initiation phase
-    for vertex in map.vertices:
-        distances[vertex] = math.inf
-        shortest_previous_vertex[vertex] = None
-        vertices_to_visit.append(vertex)
+    for node in map.get_all_nodes():
+        distances[node] = math.inf
+        shortest_previous_node[node] = None
+        nodes_to_visit.append(node)
 
-    for start_vertex in map.start_vertices:
-        distances[start_vertex] = 0
+    distances[map.start_node] = 0
 
     # Construct shortest_previous_point mapping
-    progress_bar = tqdm(total=len(vertices_to_visit))
-    while vertices_to_visit:
-        current_vertex = get_vertex_to_visit_with_min_distance(
-            vertices_to_visit, distances
+    progress_bar = tqdm(total=len(nodes_to_visit))
+    while nodes_to_visit:
+        current = get_node_to_visit_with_min_distance(
+            nodes_to_visit, distances
         )
-        vertices_to_visit.remove(current_vertex)
-        progress_bar.update(1)
+        nodes_to_visit.remove(current)
 
-        neighbors = get_neighbors(
-            map=map,
-            shortest_previous_vertex=shortest_previous_vertex,
-            vertices_to_visit=vertices_to_visit,
-            vertex=current_vertex,
-        )
-
+        neighbors = get_neighbors(map=map, current=current)
         for neighbor in neighbors:
-            current_distance = distances[current_vertex]
-            alternative_distance = current_distance + neighbor.distance
+            if neighbor not in nodes_to_visit:
+                continue
+
+            current_distance = distances[current]
+            alternative_distance = (
+                current_distance + neighbor.distance_to_enter
+            )
 
             if alternative_distance < distances[neighbor]:
                 distances[neighbor] = alternative_distance
-                shortest_previous_vertex[neighbor] = current_vertex
+                shortest_previous_node[neighbor] = current
 
-                if neighbor in map.end_vertices:
-                    return reconstruct_path(
-                        map=map,
-                        distances=distances,
-                        shortest_previous_vertex=shortest_previous_vertex,
-                    )
+        progress_bar.update(1)
 
     return reconstruct_path(
         map=map,
         distances=distances,
-        shortest_previous_vertex=shortest_previous_vertex,
+        shortest_previous_node=shortest_previous_node,
     )

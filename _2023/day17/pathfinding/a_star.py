@@ -1,18 +1,7 @@
 import math
 
 from _2023.day17 import Node, Map
-from _2023.day17.pathfinding import ShortestRoute
-
-
-def get_neighbors(map: Map, current: Node) -> list[Node]:
-    neighbors = []
-    for node in map.get_immediate_neighbors(current):
-        # Skipping according to puzzle constraint:
-        # it can move at most three blocks in a single direction
-        if node.direction_streak >= 3:
-            continue
-        neighbors.append(node)
-    return neighbors
+from _2023.day17.pathfinding import ShortestRoute, get_neighbors
 
 
 def reconstruct_path(came_from: dict[Node], current: Node) -> ShortestRoute:

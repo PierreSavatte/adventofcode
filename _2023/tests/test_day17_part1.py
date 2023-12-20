@@ -92,6 +92,14 @@ def test_map_can_give_immediate_neighbors(get_data):
     ]
 
 
+def test_map_can_build_its_node_set(get_data):
+    map = Map.from_data(get_data("test_file_day17"))
+
+    all_nodes = list(map.get_all_nodes())
+
+    assert len(all_nodes) == 1717
+
+
 @pytest.mark.parametrize(
     "algorithm",
     [

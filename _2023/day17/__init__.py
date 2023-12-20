@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from enum import Enum
 from typing import Optional
-from functools import cache, cached_property
+from functools import cached_property
 
 Position = tuple[int, int]
 Distance = int
@@ -78,6 +78,21 @@ class Map:
 
     max_x: int
     max_y: int
+
+    def _get_all_nodes(self, nodes: set[Node], current: Node):
+        if current in nodes:
+            return
+
+        neighbors = set(self.get_immediate_neighbors(current))
+        nodes.add(current)
+        for neighbor in neighbors:
+            if neighbor.direction_streak <= 3:
+                self._get_all_nodes(nodes, neighbor)
+
+    def get_all_nodes(self):
+        nodes = set()
+        self._get_all_nodes(nodes, self.start_node)
+        return nodes
 
     @cached_property
     def start_position(self) -> Position:
