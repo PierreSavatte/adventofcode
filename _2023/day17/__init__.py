@@ -1,12 +1,11 @@
-import math
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional
 from functools import cached_property
+from typing import Optional
 
-from colorama import init as colorama_init
 from colorama import Fore
 from colorama import Style
+from colorama import init as colorama_init
 
 Position = tuple[int, int]
 Distance = int
