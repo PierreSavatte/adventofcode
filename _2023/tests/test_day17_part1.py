@@ -61,35 +61,73 @@ def test_direction_can_be_computed_from_two_points(
     )
 
 
-def test_map_can_give_immediate_neighbors(get_data):
+@pytest.mark.parametrize(
+    "input_node, expected_neighbors",
+    [
+        (
+            Node(
+                position=(3, 3),
+                distance_to_enter=6,
+                enter_direction=Direction.DOWN,
+                direction_streak=2,
+            ),
+            [
+                Node(
+                    position=(4, 3),
+                    distance_to_enter=5,
+                    enter_direction=Direction.RIGHT,
+                    direction_streak=1,
+                ),
+                Node(
+                    position=(3, 4),
+                    distance_to_enter=6,
+                    enter_direction=Direction.DOWN,
+                    direction_streak=3,
+                ),
+                Node(
+                    position=(2, 3),
+                    distance_to_enter=4,
+                    enter_direction=Direction.LEFT,
+                    direction_streak=1,
+                ),
+            ],
+        ),
+        (
+            Node(
+                position=(3, 3),
+                distance_to_enter=6,
+                enter_direction=Direction.RIGHT,
+                direction_streak=2,
+            ),
+            [
+                Node(
+                    position=(4, 3),
+                    distance_to_enter=5,
+                    enter_direction=Direction.RIGHT,
+                    direction_streak=3,
+                ),
+                Node(
+                    position=(3, 4),
+                    distance_to_enter=6,
+                    enter_direction=Direction.DOWN,
+                    direction_streak=1,
+                ),
+                Node(
+                    position=(3, 2),
+                    distance_to_enter=4,
+                    enter_direction=Direction.UP,
+                    direction_streak=1,
+                ),
+            ],
+        ),
+    ],
+)
+def test_map_can_give_immediate_neighbors(
+    get_data, input_node, expected_neighbors
+):
     map = Map.from_data(get_data("test_file_day17"))
 
-    node = Node(
-        position=(3, 3),
-        distance_to_enter=6,
-        enter_direction=Direction.DOWN,
-        direction_streak=2,
-    )
-    assert map.get_immediate_neighbors(node) == [
-        Node(
-            position=(4, 3),
-            distance_to_enter=5,
-            enter_direction=Direction.RIGHT,
-            direction_streak=1,
-        ),
-        Node(
-            position=(2, 3),
-            distance_to_enter=4,
-            enter_direction=Direction.LEFT,
-            direction_streak=1,
-        ),
-        Node(
-            position=(3, 4),
-            distance_to_enter=6,
-            enter_direction=Direction.DOWN,
-            direction_streak=3,
-        ),
-    ]
+    assert map.get_immediate_neighbors(input_node) == expected_neighbors
 
 
 def test_map_can_build_its_node_set(get_data):
