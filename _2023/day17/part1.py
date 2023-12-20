@@ -1,5 +1,6 @@
 import cProfile
 import pstats
+import time
 from copy import deepcopy
 from typing import Optional, Callable
 
@@ -50,4 +51,8 @@ def profiling():
 
 if __name__ == "__main__":
     # < 1249
+    # current best: 1420 in 16 seconds
+    start = time.time()
     print(compute_solution(load_input(17)))
+    end = time.time()
+    print(end - start)
