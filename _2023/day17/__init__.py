@@ -76,16 +76,12 @@ class Node:
             )
         )
 
-    def __eq__(self, other: "Node") -> bool:
-        return self.position == other.position
-
 
 @dataclass
 class Map:
     tiles: list[list[int]]
 
     start_node: Node
-    end_node: Node
 
     max_x: int
     max_y: int
@@ -129,9 +125,6 @@ class Map:
             max_y=max_y,
             start_node=Node(
                 position=(0, 0), distance_to_enter=0, direction_streak=0
-            ),
-            end_node=Node(
-                position=(max_x, max_y), distance_to_enter=tiles[max_y][max_x]
             ),
         )
 

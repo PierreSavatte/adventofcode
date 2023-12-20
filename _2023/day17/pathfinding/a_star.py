@@ -50,8 +50,8 @@ def a_star(map: Map) -> ShortestRoute:
 
         print_best_current_path(map, came_from, current)
 
-        if current == map.end_node:
-            return reconstruct_path(came_from=came_from, current=current)
+        if current.position == map.end_position:
+            return g_score[current]
 
         open_set.remove(current)
         for neighbor in get_neighbors(map=map, current=current):
