@@ -1,16 +1,7 @@
 import math
 
 from _2023.day17 import Node, Map
-from _2023.day17.pathfinding import ShortestRoute, get_neighbors
-
-
-def reconstruct_path(came_from: dict[Node], current: Node) -> ShortestRoute:
-    total_path = [current]
-    while current in came_from:
-        current = came_from[current]
-
-        total_path.insert(0, current)
-    return ShortestRoute(total_path)
+from _2023.day17.pathfinding import get_neighbors
 
 
 def get_node_in_open_set_with_lowest_f_score(
@@ -28,15 +19,7 @@ def get_node_in_open_set_with_lowest_f_score(
     return min_node
 
 
-def print_best_current_path(map, came_from, current):
-    from _2023.day17.part1 import build_solution_tiles
-
-    path = reconstruct_path(came_from=came_from, current=current)
-    print(build_solution_tiles(map, path, colorized=True))
-    print()
-
-
-def a_star(map: Map) -> ShortestRoute:
+def a_star(map: Map) -> int:
     open_set = [map.start_node]
     came_from = {}
 
@@ -47,8 +30,6 @@ def a_star(map: Map) -> ShortestRoute:
         current = get_node_in_open_set_with_lowest_f_score(
             open_set=open_set, f_score=f_score
         )
-
-        print_best_current_path(map, came_from, current)
 
         if current.position == map.end_position:
             return g_score[current]
