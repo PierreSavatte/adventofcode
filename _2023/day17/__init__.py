@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from enum import Enum
+from enum import Enum, auto
 from functools import cached_property
 from typing import Optional
 
@@ -12,6 +12,11 @@ Distance = int
 Tiles = list[list[Distance]]
 
 colorama_init()
+
+
+class CrucibleType(Enum):
+    REGULAR = auto()
+    ULTRA = auto()
 
 
 class Direction(Enum):
@@ -62,7 +67,7 @@ OPPOSITE_MAPPING = {
 class Node:
     position: Position
     distance_to_enter: int
-    enter_direction: Optional[Direction] = None
+    enter_direction: Direction
     direction_streak: int = 1
 
     def __hash__(self) -> int:
@@ -85,6 +90,8 @@ class Map:
     max_x: int
     max_y: int
 
+    crucible_type: CrucibleType
+
     @cached_property
     def start_position(self) -> Position:
         return 0, 0
@@ -94,7 +101,9 @@ class Map:
         return self.max_x, self.max_y
 
     @classmethod
-    def from_data(cls, data: str) -> "Map":
+    def from_data(
+        cls, data: str, crucible_type: CrucibleType = CrucibleType.REGULAR
+    ) -> "Map":
         tiles = [
             [int(character) for character in line]
             for line in data.splitlines()
@@ -107,8 +116,12 @@ class Map:
             tiles=tiles,
             max_x=max_x,
             max_y=max_y,
+            crucible_type=crucible_type,
             start_node=Node(
-                position=(0, 0), distance_to_enter=0, direction_streak=0
+                position=(0, 0),
+                distance_to_enter=0,
+                direction_streak=1,
+                enter_direction=Direction.RIGHT,
             ),
         )
 
@@ -148,10 +161,25 @@ class Map:
             else:
                 streak = 1
 
-            # Skipping according to puzzle constraint:
-            # it can move at most three blocks in a single direction
-            if streak >= 4:
-                continue
+            if self.crucible_type == CrucibleType.REGULAR:
+                # Skipping according to puzzle constraint:
+                # it can move at most three blocks in a single direction
+                if streak >= 4:
+                    continue
+            elif self.crucible_type == CrucibleType.ULTRA:
+                # Once an ultra crucible starts moving in a direction, it
+                # needs to move a minimum of four blocks in that direction
+                # before it can turn (or even before it can stop at the end).
+                # An ultra crucible can move a maximum of ten consecutive
+                # blocks without turning.
+                if node.direction_streak >= 4:
+                    if streak >= 10:
+                        continue
+                else:
+                    if direction != node.enter_direction:
+                        continue
+            else:
+                raise RuntimeError(f"Incorrect {self.crucible_type=}")
 
             distance_to_enter = self.get_distance_on(connected_position)
 

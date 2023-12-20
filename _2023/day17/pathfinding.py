@@ -27,17 +27,17 @@ def a_star(map: Map) -> int:
     g_score = {map.start_node: 0}
     f_score = {map.start_node: map.h(map.start_node)}
 
-    progress_bar = tqdm(total=map.max_x)
-    max_x_or_y = 0
+    progress_bar = tqdm(total=map.max_x + map.max_y)
+    progress = 0
     while open_set:
         current = get_node_in_open_set_with_lowest_f_score(
             open_set=open_set, f_score=f_score
         )
 
-        m = max(current.position)
-        if m > max_x_or_y:
-            max_x_or_y = m
-            progress_bar.update(1)
+        current_progress = sum(current.position)
+        if current_progress > progress:
+            progress_bar.update(current_progress - progress)
+            progress = current_progress
 
         if current.position == map.end_position:
             return g_score[current]
