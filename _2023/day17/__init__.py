@@ -1,3 +1,4 @@
+import math
 from dataclasses import dataclass
 from enum import Enum
 from typing import Optional
@@ -137,7 +138,7 @@ class Map:
     def h(self, node: Node) -> float:
         x_b, y_b = self.end_position
         x_a, y_a = node.position
-        return node.distance_to_enter + abs(x_b - x_a) + abs(y_b - y_a)
+        return abs(x_b - x_a) + abs(y_b - y_a)
 
     def get_distance_on(self, position: Position) -> int:
         x, y = position
