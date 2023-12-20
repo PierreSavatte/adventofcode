@@ -1,13 +1,7 @@
 import pytest
 
 from _2023.day17 import Map, Direction, Node
-from _2023.day17.part1 import (
-    compute_solution,
-    build_solution_tiles,
-    compute_heat_loss,
-)
-from _2023.day17.pathfinding.a_star import a_star
-from _2023.day17.pathfinding.dijkstra import dijkstra
+from _2023.day17.part1 import compute_solution
 
 EXPECTED_SHORTEST_PATH = """2>>34^>>>1323
 32v>>>35v5623
@@ -114,7 +108,7 @@ def test_direction_can_be_computed_from_two_points(
                 ),
                 Node(
                     position=(3, 2),
-                    distance_to_enter=4,
+                    distance_to_enter=5,
                     enter_direction=Direction.UP,
                     direction_streak=1,
                 ),
@@ -138,60 +132,5 @@ def test_map_can_build_its_node_set(get_data):
     assert len(all_nodes) == 1717
 
 
-@pytest.mark.parametrize(
-    "algorithm",
-    [
-        a_star,
-        # dijkstra,
-    ],
-)
-def test_shortest_path_can_be_computed(get_data, algorithm):
-    map = Map.from_data(get_data("test_file_day17"))
-    shortest_route = algorithm(map=map)
-
-    assert build_solution_tiles(map, shortest_route) == EXPECTED_SHORTEST_PATH
-
-
-def test_heat_loss_can_be_computed_from_path():
-    assert (
-        compute_heat_loss(
-            path=[
-                Node(position=(0, 0), distance_to_enter=0),
-                Node(
-                    position=(1, 0),
-                    distance_to_enter=4,
-                    enter_direction=Direction.LEFT,
-                ),
-                Node(
-                    position=(2, 0),
-                    distance_to_enter=1,
-                    enter_direction=Direction.LEFT,
-                ),
-                Node(
-                    position=(2, 1),
-                    distance_to_enter=1,
-                    enter_direction=Direction.DOWN,
-                ),
-                Node(
-                    position=(3, 1),
-                    distance_to_enter=5,
-                    enter_direction=Direction.LEFT,
-                ),
-            ]
-        )
-        == 11
-    )
-
-
-@pytest.mark.parametrize(
-    "algorithm",
-    [
-        a_star,
-        # dijkstra,
-    ],
-)
-def test_solution_can_be_computed(get_data, algorithm):
-    assert (
-        compute_solution(get_data("test_file_day17"), algorithm=algorithm)
-        == 102
-    )
+def test_solution_can_be_computed(get_data):
+    assert compute_solution(get_data("test_file_day17")) == 102

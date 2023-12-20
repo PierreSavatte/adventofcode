@@ -1,30 +1,11 @@
 import cProfile
 import pstats
 import time
-from copy import deepcopy
 from typing import Optional, Callable
 
-from _2023.day17 import Map, Node
-from _2023.day17.pathfinding.a_star import a_star
+from _2023.day17 import Map
+from _2023.day17.pathfinding import a_star
 from _2023.load_input import load_input
-
-
-def build_solution_tiles(
-    map: Map, shortest_route: list[Node], colorized: bool = False
-) -> str:
-    tiles = deepcopy(map.tiles)
-    for node in shortest_route:
-        x, y = node.position
-        if node.enter_direction:
-            if colorized:
-                value = node.enter_direction.colorized
-            else:
-                value = node.enter_direction.value
-            tiles[y][x] = value
-
-    return "\n".join(
-        ["".join([str(value) for value in tiles_line]) for tiles_line in tiles]
-    )
 
 
 def compute_solution(data: str, algorithm: Optional[Callable] = None) -> int:
