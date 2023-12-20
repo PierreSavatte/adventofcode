@@ -28,6 +28,14 @@ def get_node_in_open_set_with_lowest_f_score(
     return min_node
 
 
+def print_best_current_path(map, came_from, current):
+    from _2023.day17.part1 import build_solution_tiles
+
+    path = reconstruct_path(came_from=came_from, current=current)
+    print(build_solution_tiles(map, path, colorized=True))
+    print()
+
+
 def a_star(map: Map) -> ShortestRoute:
     open_set = [map.start_node]
     came_from = {}
@@ -39,6 +47,9 @@ def a_star(map: Map) -> ShortestRoute:
         current = get_node_in_open_set_with_lowest_f_score(
             open_set=open_set, f_score=f_score
         )
+
+        print_best_current_path(map, came_from, current)
+
         if current == map.end_node:
             return reconstruct_path(came_from=came_from, current=current)
 

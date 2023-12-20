@@ -3,9 +3,15 @@ from enum import Enum
 from typing import Optional
 from functools import cached_property
 
+from colorama import init as colorama_init
+from colorama import Fore
+from colorama import Style
+
 Position = tuple[int, int]
 Distance = int
 Tiles = list[list[Distance]]
+
+colorama_init()
 
 
 class Direction(Enum):
@@ -13,6 +19,10 @@ class Direction(Enum):
     DOWN = "v"
     RIGHT = ">"
     LEFT = "<"
+
+    @property
+    def colorized(self):
+        return f"{Fore.GREEN}{self.value}{Style.RESET_ALL}"
 
     @property
     def opposite(self) -> "Direction":

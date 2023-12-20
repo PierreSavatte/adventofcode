@@ -10,12 +10,17 @@ from _2023.day17.pathfinding.dijkstra import dijkstra
 from _2023.load_input import load_input
 
 
-def build_solution_tiles(map: Map, shortest_route: list[Node]):
+def build_solution_tiles(
+    map: Map, shortest_route: list[Node], colorized: bool = False
+):
     tiles = deepcopy(map.tiles)
     for node in shortest_route:
         x, y = node.position
         if node.enter_direction:
-            value = node.enter_direction.value
+            if colorized:
+                value = node.enter_direction.colorized
+            else:
+                value = node.enter_direction.value
             tiles[y][x] = value
 
     return "\n".join(
