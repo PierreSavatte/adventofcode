@@ -12,7 +12,7 @@ from _2023.load_input import load_input
 
 def build_solution_tiles(
     map: Map, shortest_route: list[Node], colorized: bool = False
-):
+) -> str:
     tiles = deepcopy(map.tiles)
     for node in shortest_route:
         x, y = node.position
