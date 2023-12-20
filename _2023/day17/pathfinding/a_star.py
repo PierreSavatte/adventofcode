@@ -1,5 +1,7 @@
 import math
 
+from tqdm import tqdm
+
 from _2023.day17 import Node, Map
 from _2023.day17.pathfinding import get_neighbors
 
@@ -26,10 +28,17 @@ def a_star(map: Map) -> int:
     g_score = {map.start_node: 0}
     f_score = {map.start_node: map.h(map.start_node)}
 
+    progress_bar = tqdm(total=map.max_x)
+    max_x_or_y = 0
     while open_set:
         current = get_node_in_open_set_with_lowest_f_score(
             open_set=open_set, f_score=f_score
         )
+
+        m = max(current.position)
+        if m > max_x_or_y:
+            max_x_or_y = m
+            progress_bar.update(1)
 
         if current.position == map.end_position:
             return g_score[current]
