@@ -13,7 +13,7 @@ def reconstruct_path(came_from: dict[Node], current: Node) -> ShortestRoute:
     return ShortestRoute(total_path)
 
 
-def get_node_in_open_set_with_lowers_f_score(
+def get_node_in_open_set_with_lowest_f_score(
     open_set: list[Node], f_score: dict[Node, int]
 ) -> Node:
     min_node = None
@@ -36,7 +36,7 @@ def a_star(map: Map) -> ShortestRoute:
     f_score = {map.start_node: map.h(map.start_node)}
 
     while open_set:
-        current = get_node_in_open_set_with_lowers_f_score(
+        current = get_node_in_open_set_with_lowest_f_score(
             open_set=open_set, f_score=f_score
         )
         if current == map.end_node:
