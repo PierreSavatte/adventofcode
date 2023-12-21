@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from enum import Enum, auto
 from functools import cached_property
+from typing import Optional
 
 from colorama import Fore
 from colorama import Style
@@ -66,7 +67,7 @@ OPPOSITE_MAPPING = {
 class Node:
     position: Position
     distance_to_enter: int
-    enter_direction: Direction
+    enter_direction: Optional[Direction]
     direction_streak: int = 1
 
     def __hash__(self) -> int:
@@ -119,8 +120,8 @@ class Map:
             start_node=Node(
                 position=(0, 0),
                 distance_to_enter=0,
-                direction_streak=1,
-                enter_direction=Direction.RIGHT,
+                direction_streak=0,
+                enter_direction=None,
             ),
         )
 
@@ -171,12 +172,13 @@ class Map:
                 # before it can turn (or even before it can stop at the end).
                 # An ultra crucible can move a maximum of ten consecutive
                 # blocks without turning.
-                if node.direction_streak >= 4:
-                    if streak >= 10:
-                        continue
-                else:
-                    if direction != node.enter_direction:
-                        continue
+                if node.direction_streak:
+                    if node.direction_streak >= 4:
+                        if streak >= 10:
+                            continue
+                    else:
+                        if direction != node.enter_direction:
+                            continue
             else:
                 raise RuntimeError(f"Incorrect {self.crucible_type=}")
 
