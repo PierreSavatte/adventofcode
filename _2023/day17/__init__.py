@@ -196,7 +196,7 @@ class Map:
 
 def build_solution_tiles(
     map: Map, shortest_route: list[Node], colorized: bool = False
-) -> list[list[str]]:
+) -> str:
     tiles = [[str(char) for char in tiles_line] for tiles_line in map.tiles]
     for node in shortest_route:
         x, y = node.position
@@ -209,14 +209,6 @@ def build_solution_tiles(
 
     return "\n".join(
         ["".join([value for value in tiles_line]) for tiles_line in tiles]
-    )
-
-
-def print_solution_tiles(tiles: list[list[str]]):
-    print(
-        "\n".join(
-            ["".join([value for value in tiles_line]) for tiles_line in tiles]
-        )
     )
 
 
