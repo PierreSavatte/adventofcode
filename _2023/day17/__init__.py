@@ -198,8 +198,8 @@ class UltraMap(Map):
         immediate_neighbors = []
 
         accepted_positions = [
-            ((x + 1, y), Direction.RIGHT),
             ((x, y + 1), Direction.DOWN),
+            ((x + 1, y), Direction.RIGHT),
             ((x - 1, y), Direction.LEFT),
             ((x, y - 1), Direction.UP),
         ]

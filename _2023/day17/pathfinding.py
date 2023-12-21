@@ -15,7 +15,7 @@ def reconstruct_path(came_from: dict[Node], current: Node) -> list[Node]:
 
 
 def get_node_in_open_set_with_lowest_f_score(
-    open_set: list[Node], f_score: dict[Node, int]
+    open_set: set[Node], f_score: dict[Node, int]
 ) -> Node:
     min_node = None
     min_distance = math.inf
@@ -30,7 +30,7 @@ def get_node_in_open_set_with_lowest_f_score(
 
 
 def a_star(map: Map) -> list[Node]:
-    open_set = [map.start_node]
+    open_set = {map.start_node}
     came_from = {}
 
     g_score = {map.start_node: 0}
@@ -59,6 +59,6 @@ def a_star(map: Map) -> list[Node]:
                 g_score[neighbor] = tentative_g_score
                 f_score[neighbor] = tentative_g_score + map.h(neighbor)
                 if neighbor not in open_set:
-                    open_set.append(neighbor)
+                    open_set.add(neighbor)
 
     raise RuntimeError("Was not able to find a path")
