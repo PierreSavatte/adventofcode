@@ -17,12 +17,14 @@ def reconstruct_path(came_from: dict[Node], current: Node) -> list[Node]:
 def get_node_in_open_set_with_lowest_f_score(
     open_set: set[Node], f_score: dict[Node, int]
 ) -> Node:
-    f_score_sorted_keys = sorted(list(f_score.items()), key=lambda x: x[1])
-    for node, distance in f_score_sorted_keys:
-        if node not in open_set:
-            continue
-        return node
-    return list(open_set)[0]
+    min_score = math.inf
+    min_node = None
+    for node in open_set:
+        score = f_score[node]
+        if score < min_score:
+            min_score = score
+            min_node = node
+    return min_node
 
 
 def a_star(map: Map) -> list[Node]:
