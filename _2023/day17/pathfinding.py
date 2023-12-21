@@ -5,6 +5,15 @@ from tqdm import tqdm
 from _2023.day17 import Node, Map
 
 
+def reconstruct_path(came_from: dict[Node], current: Node) -> list[Node]:
+    total_path = [current]
+    current = came_from[current]
+    while current in came_from:
+        total_path.insert(0, current)
+        current = came_from[current]
+    return total_path
+
+
 def get_node_in_open_set_with_lowest_f_score(
     open_set: list[Node], f_score: dict[Node, int]
 ) -> Node:
@@ -20,7 +29,7 @@ def get_node_in_open_set_with_lowest_f_score(
     return min_node
 
 
-def a_star(map: Map) -> int:
+def a_star(map: Map) -> list[Node]:
     open_set = [map.start_node]
     came_from = {}
 
@@ -40,7 +49,7 @@ def a_star(map: Map) -> int:
             progress = current_progress
 
         if current.position == map.end_position:
-            return g_score[current]
+            return reconstruct_path(came_from, current)
 
         open_set.remove(current)
         for neighbor in map.get_neighbors(current):

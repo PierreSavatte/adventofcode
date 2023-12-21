@@ -192,3 +192,33 @@ class Map:
             )
 
         return immediate_neighbors
+
+
+def build_solution_tiles(
+    map: Map, shortest_route: list[Node], colorized: bool = False
+) -> list[list[str]]:
+    tiles = [[str(char) for char in tiles_line] for tiles_line in map.tiles]
+    for node in shortest_route:
+        x, y = node.position
+        if node.enter_direction:
+            if colorized:
+                value = node.enter_direction.colorized
+            else:
+                value = node.enter_direction.value
+            tiles[y][x] = value
+
+    return "\n".join(
+        ["".join([value for value in tiles_line]) for tiles_line in tiles]
+    )
+
+
+def print_solution_tiles(tiles: list[list[str]]):
+    print(
+        "\n".join(
+            ["".join([value for value in tiles_line]) for tiles_line in tiles]
+        )
+    )
+
+
+def compute_heat_loss(path: list[Node]) -> int:
+    return sum(node.distance_to_enter for node in path if node.enter_direction)

@@ -1,7 +1,22 @@
 import pytest
 
-from _2023.day17 import Map, Direction, Node
+from _2023.day17 import Map, Direction, Node, build_solution_tiles
 from _2023.day17.part1 import compute_solution
+from _2023.day17.pathfinding import a_star
+
+EXPECTED_SHORTEST_PATH = """2>>34^>>>1323
+32v>>>35v5623
+32552456v>>54
+3446585845v52
+4546657867v>6
+14385987984v4
+44578769877v6
+36378779796v>
+465496798688v
+456467998645v
+12246868655<v
+25465488877v5
+43226746555v>"""
 
 
 def test_validity_of_position_can_be_computed(get_data):
@@ -108,6 +123,13 @@ def test_map_can_give_immediate_neighbors(
     map = Map.from_data(get_data("test_file_day17_part1"))
 
     assert map.get_neighbors(input_node) == expected_neighbors
+
+
+def test_shortest_path_can_be_computed(get_data):
+    map = Map.from_data(get_data("test_file_day17_part1"))
+    shortest_route = a_star(map=map)
+
+    assert build_solution_tiles(map, shortest_route) == EXPECTED_SHORTEST_PATH
 
 
 def test_solution_can_be_computed(get_data):
