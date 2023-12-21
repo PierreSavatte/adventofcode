@@ -12,7 +12,7 @@ def compute_solution(data: str) -> int:
 
 
 if __name__ == "__main__":
-    # solution < 1404
+    # 514 < solution < 1404
     start = time.time()
     print(compute_solution(load_input(17)))
     end = time.time()
