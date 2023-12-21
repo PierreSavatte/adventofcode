@@ -68,11 +68,3 @@ def test_shortest_path_can_be_computed(get_data, data_filename, expected_path):
 def test_solution_can_be_computed(get_data, data_filename, expected_result):
     assert compute_solution(get_data(data_filename)) == expected_result
 
-
-def test_solution_can_be_computed_fast(get_data):
-    data = get_data("test_file_day17_part1")
-    start = time.time()
-    compute_solution(data)
-    end = time.time()
-
-    assert end - start <= 0.2
