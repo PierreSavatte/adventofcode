@@ -1,4 +1,5 @@
 import math
+import time
 
 from tqdm import tqdm
 
@@ -50,9 +51,11 @@ def a_star(map: Map) -> list[Node]:
             return reconstruct_path(came_from, current)
 
         open_set.remove(current)
-        for neighbor in map.get_neighbors(current):
+        for neighbor, additional_came_from in map.get_neighbors(current):
             tentative_g_score = g_score[current] + neighbor.distance_to_enter
             if tentative_g_score < g_score.get(neighbor, math.inf):
+                if additional_came_from:
+                    came_from.update(additional_came_from)
                 came_from[neighbor] = current
                 g_score[neighbor] = tentative_g_score
                 f_score[neighbor] = tentative_g_score + map.h(neighbor)

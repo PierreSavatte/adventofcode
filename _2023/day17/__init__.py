@@ -131,7 +131,7 @@ class Map:
         x, y = position
         return 0 <= x <= self.max_x and 0 <= y <= self.max_y
 
-    def get_neighbors(self, node: Node) -> list[Node]:
+    def get_neighbors(self, node: Node) -> list[tuple[Node, dict[Node, Node]]]:
         x, y = node.position
         immediate_neighbors = []
         for connected_position, direction in [
@@ -159,12 +159,17 @@ class Map:
 
             distance_to_enter = self.get_distance_on(connected_position)
 
+            additional_came_from: dict[Node, Node] = {}
+
             immediate_neighbors.append(
-                Node(
-                    position=connected_position,
-                    distance_to_enter=distance_to_enter,
-                    enter_direction=direction,
-                    direction_streak=streak,
+                (
+                    Node(
+                        position=connected_position,
+                        distance_to_enter=distance_to_enter,
+                        enter_direction=direction,
+                        direction_streak=streak,
+                    ),
+                    additional_came_from,
                 )
             )
 
@@ -172,9 +177,10 @@ class Map:
 
 
 class UltraMap(Map):
-    def get_neighbors(self, node: Node) -> list[Node]:
+    def get_neighbors(self, node: Node) -> list[tuple[Node, dict[Node, Node]]]:
         x, y = node.position
         immediate_neighbors = []
+        additional_came_from: dict[Node, Node] = {}
 
         accepted_positions = [
             ((x, y + 1), Direction.DOWN),
@@ -223,11 +229,14 @@ class UltraMap(Map):
                 continue
 
             immediate_neighbors.append(
-                Node(
-                    position=connected_position,
-                    distance_to_enter=distance_to_enter,
-                    enter_direction=direction,
-                    direction_streak=streak,
+                (
+                    Node(
+                        position=connected_position,
+                        distance_to_enter=distance_to_enter,
+                        enter_direction=direction,
+                        direction_streak=streak,
+                    ),
+                    additional_came_from,
                 )
             )
 
