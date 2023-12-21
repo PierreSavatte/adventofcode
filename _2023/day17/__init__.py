@@ -41,27 +41,6 @@ class Direction(Enum):
             if Direction[direction] != other
         ]
 
-    @classmethod
-    def from_two_points(cls, start: Position, end: Position) -> "Direction":
-        x_start, y_start = start
-        x_end, y_end = end
-        if x_start == x_end and y_start == y_end:
-            raise RuntimeError("Cannot compute direction for the same point")
-        elif x_start == x_end:
-            if y_start < y_end:
-                return Direction.DOWN
-            else:
-                return Direction.UP
-        elif y_start == y_end:
-            if x_start < x_end:
-                return Direction.RIGHT
-            else:
-                return Direction.LEFT
-        else:
-            raise RuntimeError(
-                "Cannot compute direction for points that are not close-by"
-            )
-
 
 OPPOSITE_MAPPING = {
     Direction.UP: Direction.DOWN,

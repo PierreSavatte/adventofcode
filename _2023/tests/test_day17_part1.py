@@ -1,3 +1,5 @@
+import time
+
 import pytest
 
 from _2023.day17 import Map, Direction, Node, build_solution_tiles
@@ -37,23 +39,6 @@ def test_map_can_be_loaded_from_input_file(get_data):
 
     assert map.start_position == (0, 0)
     assert map.end_position == (12, 12)
-
-
-@pytest.mark.parametrize(
-    "start, end, expected_direction",
-    [
-        ((1, 1), (2, 1), Direction.RIGHT),
-        ((1, 1), (1, 2), Direction.DOWN),
-        ((1, 1), (0, 1), Direction.LEFT),
-        ((1, 1), (1, 0), Direction.UP),
-    ],
-)
-def test_direction_can_be_computed_from_two_points(
-    start, end, expected_direction
-):
-    assert (
-        Direction.from_two_points(start=start, end=end) == expected_direction
-    )
 
 
 @pytest.mark.parametrize(
@@ -134,3 +119,12 @@ def test_shortest_path_can_be_computed(get_data):
 
 def test_solution_can_be_computed(get_data):
     assert compute_solution(get_data("test_file_day17_part1")) == 102
+
+
+def test_solution_can_be_computed_fast(get_data):
+    data = get_data("test_file_day17_part1")
+    start = time.time()
+    compute_solution(data)
+    end = time.time()
+
+    assert end - start <= 0.4

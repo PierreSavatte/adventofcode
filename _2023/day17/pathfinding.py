@@ -2,7 +2,7 @@ import math
 
 from tqdm import tqdm
 
-from _2023.day17 import Node, Map
+from _2023.day17 import Map, Node
 
 
 def reconstruct_path(came_from: dict[Node], current: Node) -> list[Node]:
