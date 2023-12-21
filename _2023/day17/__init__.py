@@ -34,6 +34,14 @@ class Direction(Enum):
         return OPPOSITE_MAPPING[self]
 
     @classmethod
+    def all_except(cls, other: "Direction") -> list["Direction"]:
+        return [
+            Direction[direction]
+            for direction in Direction.__members__
+            if Direction[direction] != other
+        ]
+
+    @classmethod
     def from_two_points(cls, start: Position, end: Position) -> "Direction":
         x_start, y_start = start
         x_end, y_end = end
@@ -60,6 +68,14 @@ OPPOSITE_MAPPING = {
     Direction.DOWN: Direction.UP,
     Direction.RIGHT: Direction.LEFT,
     Direction.LEFT: Direction.RIGHT,
+}
+
+
+NEW_POSITION_FUNCTION_MAPPING = {
+    Direction.RIGHT: lambda x, y: (x + 1, y),
+    Direction.DOWN: lambda x, y: (x, y + 1),
+    Direction.LEFT: lambda x, y: (x - 1, y),
+    Direction.UP: lambda x, y: (x, y - 1),
 }
 
 
@@ -105,7 +121,12 @@ class Map:
         max_y = len(tiles) - 1
         max_x = len(tiles[0]) - 1
 
-        return Map(
+        if crucible_type == CrucibleType.REGULAR:
+            map_class = Map
+        else:
+            map_class = UltraMap
+
+        return map_class(
             tiles=tiles,
             max_x=max_x,
             max_y=max_y,
@@ -154,28 +175,73 @@ class Map:
             else:
                 streak = 1
 
-            if self.crucible_type == CrucibleType.REGULAR:
-                # Skipping according to puzzle constraint:
-                # it can move at most three blocks in a single direction
-                if streak >= 4:
-                    continue
-            elif self.crucible_type == CrucibleType.ULTRA:
-                # Once an ultra crucible starts moving in a direction, it
-                # needs to move a minimum of four blocks in that direction
-                # before it can turn (or even before it can stop at the end).
-                # An ultra crucible can move a maximum of ten consecutive
-                # blocks without turning.
-                if node.direction_streak:
-                    if node.direction_streak >= 4:
-                        if streak >= 10:
-                            continue
-                    else:
-                        if direction != node.enter_direction:
-                            continue
-            else:
-                raise RuntimeError(f"Incorrect {self.crucible_type=}")
+            if streak >= 4:
+                continue
 
             distance_to_enter = self.get_distance_on(connected_position)
+
+            immediate_neighbors.append(
+                Node(
+                    position=connected_position,
+                    distance_to_enter=distance_to_enter,
+                    enter_direction=direction,
+                    direction_streak=streak,
+                )
+            )
+
+        return immediate_neighbors
+
+
+class UltraMap(Map):
+    def get_neighbors(self, node: Node) -> list[Node]:
+        x, y = node.position
+        immediate_neighbors = []
+
+        accepted_positions = [
+            ((x + 1, y), Direction.RIGHT),
+            ((x, y + 1), Direction.DOWN),
+            ((x - 1, y), Direction.LEFT),
+            ((x, y - 1), Direction.UP),
+        ]
+        if node.enter_direction:
+            if node.direction_streak < 4:
+                new_position_function = NEW_POSITION_FUNCTION_MAPPING[
+                    node.enter_direction
+                ]
+                new_position = new_position_function(*node.position)
+                accepted_positions = [(new_position, node.enter_direction)]
+            elif node.direction_streak >= 10:
+                accepted_directions = Direction.all_except(
+                    node.enter_direction
+                )
+                accepted_positions = []
+                for direction in accepted_directions:
+                    new_position_function = NEW_POSITION_FUNCTION_MAPPING[
+                        direction
+                    ]
+                    accepted_positions.append(
+                        (new_position_function(*node.position), direction)
+                    )
+
+        for connected_position, direction in accepted_positions:
+            if not self.is_valid_position(connected_position):
+                continue
+
+            if (
+                node.enter_direction
+                and direction == node.enter_direction.opposite
+            ):
+                continue
+
+            if direction == node.enter_direction:
+                streak = node.direction_streak + 1
+            else:
+                streak = 1
+
+            distance_to_enter = self.get_distance_on(connected_position)
+
+            if connected_position == self.end_position and streak < 4:
+                continue
 
             immediate_neighbors.append(
                 Node(
