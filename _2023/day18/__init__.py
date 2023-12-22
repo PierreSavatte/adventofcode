@@ -79,6 +79,7 @@ class Plan:
             tiles.append(tiles_line)
 
         for dug_cell in self.dug_cells:
+            print(dug_cell)
             tiles[dug_cell.y][dug_cell.x] = "#"
 
         return Tiles(tiles)
@@ -96,6 +97,10 @@ class Plan:
         for order in dig_plan:
             for i in range(order.length):
                 current = current.next(order.direction)
+                if current.x < 0:
+                    raise RuntimeError("Wasn't expecting an x < 0")
+                if current.y < 0:
+                    raise RuntimeError("Wasn't expecting a y < 0")
                 dug_cells.append(current)
 
                 if current.x > max_x:
