@@ -52,32 +52,23 @@ def test_map_can_be_loaded_from_input_file(get_data):
                 direction_streak=2,
             ),
             [
-                (
-                    Node(
-                        position=(4, 3),
-                        distance_to_enter=5,
-                        enter_direction=Direction.RIGHT,
-                        direction_streak=1,
-                    ),
-                    {},
+                Node(
+                    position=(4, 3),
+                    distance_to_enter=5,
+                    enter_direction=Direction.RIGHT,
+                    direction_streak=1,
                 ),
-                (
-                    Node(
-                        position=(3, 4),
-                        distance_to_enter=6,
-                        enter_direction=Direction.DOWN,
-                        direction_streak=3,
-                    ),
-                    {},
+                Node(
+                    position=(3, 4),
+                    distance_to_enter=6,
+                    enter_direction=Direction.DOWN,
+                    direction_streak=3,
                 ),
-                (
-                    Node(
-                        position=(2, 3),
-                        distance_to_enter=4,
-                        enter_direction=Direction.LEFT,
-                        direction_streak=1,
-                    ),
-                    {},
+                Node(
+                    position=(2, 3),
+                    distance_to_enter=4,
+                    enter_direction=Direction.LEFT,
+                    direction_streak=1,
                 ),
             ],
         ),
@@ -89,32 +80,23 @@ def test_map_can_be_loaded_from_input_file(get_data):
                 direction_streak=2,
             ),
             [
-                (
-                    Node(
-                        position=(4, 3),
-                        distance_to_enter=5,
-                        enter_direction=Direction.RIGHT,
-                        direction_streak=3,
-                    ),
-                    {},
+                Node(
+                    position=(4, 3),
+                    distance_to_enter=5,
+                    enter_direction=Direction.RIGHT,
+                    direction_streak=3,
                 ),
-                (
-                    Node(
-                        position=(3, 4),
-                        distance_to_enter=6,
-                        enter_direction=Direction.DOWN,
-                        direction_streak=1,
-                    ),
-                    {},
+                Node(
+                    position=(3, 4),
+                    distance_to_enter=6,
+                    enter_direction=Direction.DOWN,
+                    direction_streak=1,
                 ),
-                (
-                    Node(
-                        position=(3, 2),
-                        distance_to_enter=5,
-                        enter_direction=Direction.UP,
-                        direction_streak=1,
-                    ),
-                    {},
+                Node(
+                    position=(3, 2),
+                    distance_to_enter=5,
+                    enter_direction=Direction.UP,
+                    direction_streak=1,
                 ),
             ],
         ),
@@ -125,7 +107,14 @@ def test_map_can_give_immediate_neighbors(
 ):
     map = Map.from_data(get_data("test_file_day17_part1"))
 
-    assert map.get_neighbors(input_node) == expected_neighbors
+    neighbors_data = map.get_neighbors(input_node)
+
+    neighbors = [
+        neighbor
+        for neighbor, additional_score, additional_came_from in neighbors_data
+    ]
+
+    assert neighbors == expected_neighbors
 
 
 def test_shortest_path_can_be_computed(get_data):
