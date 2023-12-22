@@ -1,5 +1,8 @@
+import math
 from dataclasses import dataclass
 from enum import Enum
+from typing import Optional
+
 from tqdm import tqdm
 
 
@@ -68,6 +71,8 @@ class Plan:
     loop_positions: list[Position]
     max_x: int
     max_y: int
+    min_x: int
+    min_y: int
 
     @property
     def tiles(self) -> Tiles:
@@ -87,34 +92,52 @@ class Plan:
         return "\n".join("".join(line) for line in self.tiles)
 
     @classmethod
-    def from_dig_plan(cls, dig_plan: DigPlan) -> "Plan":
-        current = Position((0, 0))
+    def from_dig_plan(
+        cls, dig_plan: DigPlan, starting_position: Optional[Position] = None
+    ) -> "Plan":
+        if starting_position:
+            current = starting_position
+        else:
+            current = Position((0, 0))
         dug_cells = [current]
         loop_positions = [current]
         max_x = 0
         max_y = 0
+        min_x = math.inf
+        min_y = math.inf
         for order in dig_plan:
             for i in range(order.length):
                 current = current.next(order.direction)
-                if current.x < 0:
-                    raise RuntimeError("Wasn't expecting an x < 0")
-                if current.y < 0:
-                    raise RuntimeError("Wasn't expecting a y < 0")
                 dug_cells.append(current)
+
+                if current.x < min_x:
+                    min_x = current.x
 
                 if current.x > max_x:
                     max_x = current.x
+
+                if current.y < min_y:
+                    min_y = current.y
 
                 if current.y > max_y:
                     max_y = current.y
             loop_positions.append(current)
 
-        return Plan(
-            dug_cells=dug_cells,
-            loop_positions=loop_positions,
-            max_x=max_x,
-            max_y=max_y,
-        )
+        if min_x < 0 or min_y < 0:
+            x: int = max(-min_x, 0)  # type: ignore
+            y: int = max(-min_y, 0)  # type: ignore
+            return Plan.from_dig_plan(
+                dig_plan, starting_position=Position((x, y))
+            )
+        else:
+            return Plan(
+                dug_cells=dug_cells,
+                loop_positions=loop_positions,
+                min_x=min_x,
+                max_x=max_x,
+                min_y=min_y,
+                max_y=max_y,
+            )
 
     def compute_fully_dug_plan(self) -> "Plan":
         additional_dug_cells = []
@@ -135,7 +158,9 @@ class Plan:
         return Plan(
             dug_cells=total_dug_cells,
             loop_positions=self.loop_positions,
+            min_x=self.min_x,
             max_x=self.max_x,
+            min_y=self.min_y,
             max_y=self.max_y,
         )
 
