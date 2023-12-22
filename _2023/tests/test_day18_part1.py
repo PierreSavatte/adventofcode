@@ -14,6 +14,18 @@ EXPECTED_PLAN = """#######
 .######"""
 
 
+EXPECTED_FULLY_DUG_PLAN = """#######
+#######
+#######
+..#####
+..#####
+#######
+#####..
+#######
+.######
+.######"""
+
+
 @pytest.fixture
 def dig_plan(get_data) -> DigPlan:
     data = get_data("test_file_day18")
@@ -48,3 +60,8 @@ def test_plan_can_be_computed(plan):
 
 def test_plan_can_be_output_as_string(plan):
     assert plan.as_string() == EXPECTED_PLAN
+
+
+def test_enclosing_plan_can_be_computed(plan):
+    fully_dug_plan = plan.compute_fully_dug_plan()
+    assert fully_dug_plan.as_string() == EXPECTED_FULLY_DUG_PLAN

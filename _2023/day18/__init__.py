@@ -102,3 +102,48 @@ class Plan:
                     max_y = current.y
 
         return Plan(dug_cells=dug_cells, max_x=max_x, max_y=max_y)
+
+    def compute_fully_dug_plan(self) -> "Plan":
+        additional_dug_cells = []
+        for x in range(self.max_x + 1):
+            for y in range(self.max_y + 1):
+                position = Position((x, y))
+                if is_position_enclosed_by_loop_using_ray_casting(
+                    position=position,
+                    loop_positions=self.dug_cells,
+                ):
+                    additional_dug_cells.append(position)
+
+        total_dug_cells = [*self.dug_cells, *additional_dug_cells]
+        return Plan(
+            dug_cells=total_dug_cells, max_x=self.max_x, max_y=self.max_y
+        )
+
+
+def is_position_enclosed_by_loop_using_ray_casting(
+    position: Position, loop_positions: list[Position]
+) -> bool:
+    # Tracing a ray from position to (+infinity, position[1])
+    # and count how many edges it crosses
+
+    x, y = position
+    count = 0
+    for i in range(len(loop_positions) - 1):
+        edge_a = loop_positions[i]
+        edge_b = loop_positions[i + 1]
+
+        x_a, y_a = edge_a
+        x_b, y_b = edge_b
+
+        if min(y_a, y_b) < y <= max(y_a, y_b):
+            # Proceed only if infinite_ray cross the edge
+
+            if x <= max(x_a, x_b):
+                # Proceed only if start of infinite ray if before the edge
+
+                x_intersection = (y - y_a) * (x_b - x_a) / (y_b - y_a) + x_a
+
+                if x_a == x_b or x <= x_intersection:
+                    count += 1
+
+    return count % 2 != 0
