@@ -68,7 +68,8 @@ def a_star(map: Map) -> list[Node]:
             if tentative_g_score < g_score.get(neighbor, math.inf):
                 if additional_came_from:
                     came_from.update(additional_came_from)
-                came_from[neighbor] = current
+                else:
+                    came_from[neighbor] = current
                 g_score[neighbor] = tentative_g_score
                 f_score[neighbor] = tentative_g_score + map.h(neighbor)
                 if neighbor not in open_set:
