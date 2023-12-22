@@ -1,6 +1,7 @@
 import pytest
 
 from _2023.day18 import DigPlan, Order, Direction, Plan
+from _2023.day18.part1 import compute_solution
 
 EXPECTED_PLAN = """#######
 #.....#
@@ -65,3 +66,7 @@ def test_plan_can_be_output_as_string(plan):
 def test_enclosing_plan_can_be_computed(plan):
     fully_dug_plan = plan.compute_fully_dug_plan()
     assert fully_dug_plan.as_string() == EXPECTED_FULLY_DUG_PLAN
+
+
+def test_solution_can_be_computed(get_data):
+    assert compute_solution(get_data("test_file_day18")) == 62
