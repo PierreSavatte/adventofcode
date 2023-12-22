@@ -2,6 +2,16 @@ import pytest
 
 from _2023.day18 import DigPlan, Order, Direction, Plan
 
+EXPECTED_PLAN = """#######
+#.....#
+###...#
+..#...#
+..#...#
+###.###
+#...#..
+##..###
+.#....#
+.######"""
 
 
 @pytest.fixture
@@ -35,3 +45,6 @@ def test_plan_can_be_computed(plan):
         (6, 1),
     ]
 
+
+def test_plan_can_be_output_as_string(plan):
+    assert plan.as_string() == EXPECTED_PLAN
