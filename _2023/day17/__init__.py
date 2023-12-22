@@ -246,25 +246,7 @@ class UltraMap(Map):
     def build_additional_came_from(
         self, a: Position, b: Position, previous: Node, same_direction: bool
     ) -> tuple[dict[Node, Node], Optional[Node]]:
-        x_a, y_a = a
-        x_b, y_b = b
-        if x_a == x_b:
-            if y_b < y_a:
-                raise RuntimeError(
-                    "This is not an expected situation: y_b < y_a"
-                )
-            else:
-                positions = [(x_a, y) for y in range(y_a + 1, y_b)]
-
-        elif y_a == y_b:
-            if x_b < x_a:
-                raise RuntimeError(
-                    "This is not an expected situation: x_b < x_a"
-                )
-            else:
-                positions = [(x, y_a) for x in range(x_a + 1, x_b)]
-        else:
-            raise RuntimeError("This is not an expected situation.")
+        positions = build_positions_list(a, b)
 
         streak = previous.direction_streak if same_direction else 0
         came_from = {}
@@ -316,6 +298,25 @@ class UltraMap(Map):
             immediate_neighbors.append((neighbor, additional_came_from))
 
         return immediate_neighbors
+
+
+def build_positions_list(a: Position, b: Position) -> list[Position]:
+    x_a, y_a = a
+    x_b, y_b = b
+    if x_a == x_b:
+        if y_b < y_a:
+            y_range = range(y_a - 1, y_b, -1)
+        else:
+            y_range = range(y_a + 1, y_b)
+        return [(x_a, y) for y in y_range]
+    elif y_a == y_b:
+        if x_b < x_a:
+            x_range = range(x_a - 1, x_b, -1)
+        else:
+            x_range = range(x_a + 1, x_b)
+        return [(x, y_a) for x in x_range]
+    else:
+        raise RuntimeError("This is not an expected situation.")
 
 
 def build_solution_tiles(

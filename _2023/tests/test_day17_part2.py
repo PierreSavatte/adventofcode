@@ -1,8 +1,12 @@
-import time
-
 import pytest
 
-from _2023.day17 import Map, build_solution_tiles, CrucibleType, Direction
+from _2023.day17 import (
+    Map,
+    build_solution_tiles,
+    CrucibleType,
+    Direction,
+    build_positions_list,
+)
 from _2023.day17.part2 import compute_solution
 from _2023.day17.pathfinding import a_star
 
@@ -40,6 +44,49 @@ def test_direction_can_give_all_except_one(
     input_direction, expected_directions
 ):
     assert Direction.all_except(input_direction) == expected_directions
+
+
+@pytest.mark.parametrize(
+    "start, end, expected_positions",
+    [
+        (
+            (0, 0),
+            (3, 0),
+            [
+                (1, 0),
+                (2, 0),
+            ],
+        ),
+        (
+            (0, 0),
+            (0, 3),
+            [
+                (0, 1),
+                (0, 2),
+            ],
+        ),
+        (
+            (3, 0),
+            (0, 0),
+            [
+                (2, 0),
+                (1, 0),
+            ],
+        ),
+        (
+            (0, 3),
+            (0, 0),
+            [
+                (0, 2),
+                (0, 1),
+            ],
+        ),
+    ],
+)
+def test_position_list_can_be_computed_from_start_and_end_positions(
+    start, end, expected_positions
+):
+    assert build_positions_list(start, end) == expected_positions
 
 
 @pytest.mark.parametrize(
