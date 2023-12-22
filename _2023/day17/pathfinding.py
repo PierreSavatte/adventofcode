@@ -70,7 +70,11 @@ def a_star(map: Map, display_progress_bar: bool = False) -> list[Node]:
             additional_score,
             additional_came_from,
         ) in map.get_neighbors(current):
-            tentative_g_score = g_score[current] + additional_score
+            tentative_g_score = (
+                g_score[current]
+                + additional_score
+                + neighbor.distance_to_enter
+            )
             if tentative_g_score < g_score.get(neighbor, math.inf):
                 if additional_came_from:
                     came_from.update(additional_came_from)
