@@ -9,6 +9,20 @@ class Direction(Enum):
     UP = "U"
 
 
+class Position(tuple[int, int]):
+    def next(self, direction: Direction) -> "Position":
+        x, y = self
+        if direction == Direction.RIGHT:
+            x += 1
+        elif direction == Direction.LEFT:
+            x -= 1
+        elif direction == Direction.DOWN:
+            y += 1
+        elif direction == Direction.UP:
+            y -= 1
+        return Position((x, y))
+
+
 @dataclass
 class Order:
     direction: Direction
@@ -33,3 +47,18 @@ class DigPlan(list[Order]):
                 )
             )
         return DigPlan(orders)
+
+
+class Plan:
+    def __init__(self, dug_cells: list[Position]):
+        self.dug_cells = dug_cells
+
+    @classmethod
+    def from_dig_plan(cls, dig_plan: DigPlan) -> "Plan":
+        current = Position((0, 0))
+        dug_cells = [current]
+        for order in dig_plan:
+            for i in range(order.length):
+                current = current.next(order.direction)
+                dug_cells.append(current)
+        return Plan(dug_cells=dug_cells)
