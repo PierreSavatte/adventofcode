@@ -79,7 +79,6 @@ class Plan:
             tiles.append(tiles_line)
 
         for dug_cell in self.dug_cells:
-            print(dug_cell)
             tiles[dug_cell.y][dug_cell.x] = "#"
 
         return Tiles(tiles)
