@@ -40,9 +40,9 @@ def plan(dig_plan) -> Plan:
 
 def test_input_can_be_parsed(dig_plan):
     assert dig_plan[:3] == [
-        Order(direction=Direction.RIGHT, length=6, color="#70c710"),
-        Order(direction=Direction.DOWN, length=5, color="#0dc571"),
-        Order(direction=Direction.LEFT, length=2, color="#5713f0"),
+        Order(direction=Direction.RIGHT, length=6),
+        Order(direction=Direction.DOWN, length=5),
+        Order(direction=Direction.LEFT, length=2),
     ]
 
 
