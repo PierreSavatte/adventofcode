@@ -10,5 +10,4 @@ def compute_solution(data: str) -> int:
 
 
 if __name__ == "__main__":
-    # solution < 13620
     print(compute_solution(load_input(18)))
