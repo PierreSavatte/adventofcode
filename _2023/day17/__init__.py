@@ -88,7 +88,9 @@ class Node:
     direction_streak: int = 1
 
     def __hash__(self) -> int:
-        return hash((self.position, self.enter_direction))
+        return hash(
+            (self.position, self.enter_direction, self.direction_streak)
+        )
 
 
 @dataclass
