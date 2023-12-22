@@ -13,6 +13,23 @@ class Direction(Enum):
     UP = "U"
 
 
+HEXA_DIRECTION_MAPPING = {
+    0: Direction.RIGHT,
+    1: Direction.DOWN,
+    2: Direction.LEFT,
+    3: Direction.UP,
+}
+
+
+def parse_hexadecimal(hexadecimal: str) -> tuple[Direction, int]:
+    hexa_direction = hexadecimal[-1]
+    hexa_length = hexadecimal[:6]
+
+    direction = HEXA_DIRECTION_MAPPING[int(hexa_direction)]
+    length = int(hexa_length.strip("#"), 16)
+    return direction, length
+
+
 class Position(tuple[int, int]):
     def next(self, direction: Direction) -> "Position":
         x, y = self
@@ -43,15 +60,20 @@ class Order:
 
 class DigPlan(list[Order]):
     @classmethod
-    def from_data(cls, data: str) -> "DigPlan":
+    def from_data(cls, data: str, large_lagoon: bool = False) -> "DigPlan":
         orders = []
         for line in data.splitlines():
             direction_raw, length_raw, color_raw = line.split(" ")
-            orders.append(
-                Order(
-                    direction=Direction(direction_raw), length=int(length_raw)
-                )
-            )
+
+            color_raw = color_raw.strip("()")
+
+            if large_lagoon:
+                direction, length = parse_hexadecimal(color_raw)
+            else:
+                direction = Direction(direction_raw)
+                length = int(length_raw)
+
+            orders.append(Order(direction=direction, length=length))
         return DigPlan(orders)
 
 
@@ -99,6 +121,7 @@ class Plan:
         max_y = 0
         min_x = math.inf
         min_y = math.inf
+        progress_bar = tqdm(desc="Loading dig plan", total=len(dig_plan))
         for order in dig_plan:
             for i in range(order.length):
                 current = current.next(order.direction)
@@ -116,6 +139,9 @@ class Plan:
                 if current.y > max_y:
                     max_y = current.y
             loop_positions.append(current)
+            progress_bar.update(1)
+
+        progress_bar.close()
 
         if min_x < 0 or min_y < 0:
             x: int = max(-min_x, 0)  # type: ignore
@@ -135,7 +161,9 @@ class Plan:
 
     def compute_fully_dug_plan(self) -> "Plan":
         additional_dug_cells = []
-        progress_bar = tqdm(total=self.max_x * self.max_y)
+        progress_bar = tqdm(
+            desc="Compute fully dig plan", total=self.max_x * self.max_y
+        )
         for x in range(self.max_x + 1):
             for y in range(self.max_y + 1):
                 position = Position((x, y))
@@ -147,6 +175,7 @@ class Plan:
                     loop_positions=self.loop_positions,
                 ):
                     additional_dug_cells.append(position)
+        progress_bar.close()
 
         total_dug_cells = list({*self.dug_cells, *additional_dug_cells})
         return Plan(
