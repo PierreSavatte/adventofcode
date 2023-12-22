@@ -1,3 +1,4 @@
+import math
 from dataclasses import dataclass
 from enum import Enum, auto
 from functools import cached_property
@@ -63,6 +64,9 @@ class Direction(Enum):
                 "Cannot compute direction for points that are not close-by"
             )
 
+    def new_position(self, start: Position, diff: int = 1) -> Position:
+        return NEW_POSITION_FUNCTION_MAPPING[self](*start, diff=diff)
+
 
 OPPOSITE_MAPPING = {
     Direction.UP: Direction.DOWN,
@@ -73,10 +77,10 @@ OPPOSITE_MAPPING = {
 
 
 NEW_POSITION_FUNCTION_MAPPING = {
-    Direction.RIGHT: lambda x, y: (x + 1, y),
-    Direction.DOWN: lambda x, y: (x, y + 1),
-    Direction.LEFT: lambda x, y: (x - 1, y),
-    Direction.UP: lambda x, y: (x, y - 1),
+    Direction.RIGHT: lambda x, y, diff: (x + diff, y),
+    Direction.DOWN: lambda x, y, diff: (x, y + diff),
+    Direction.LEFT: lambda x, y, diff: (x - diff, y),
+    Direction.UP: lambda x, y, diff: (x, y - diff),
 }
 
 
@@ -201,68 +205,115 @@ class Map:
 
 
 class UltraMap(Map):
-    def get_neighbors(self, node: Node) -> list[tuple[Node, dict[Node, Node]]]:
+    def get_next_node_data(
+        self, node: Node
+    ) -> list[tuple[Position, Direction, Streak]]:
         x, y = node.position
-        immediate_neighbors = []
-        additional_came_from: dict[Node, Node] = {}
 
-        accepted_positions = [
-            ((x, y + 1), Direction.DOWN),
-            ((x + 1, y), Direction.RIGHT),
-            ((x - 1, y), Direction.LEFT),
-            ((x, y - 1), Direction.UP),
-        ]
+        accepted_positions = {
+            Direction.UP: [(x, y - 4), 4],
+            Direction.DOWN: [(x, y + 4), 4],
+            Direction.RIGHT: [(x + 4, y), 4],
+            Direction.LEFT: [(x - 4, y), 4],
+        }
+
         if node.enter_direction:
-            if node.direction_streak < 4:
-                new_position_function = NEW_POSITION_FUNCTION_MAPPING[
-                    node.enter_direction
-                ]
-                new_position = new_position_function(*node.position)
-                accepted_positions = [(new_position, node.enter_direction)]
-            elif node.direction_streak >= 10:
-                accepted_directions = Direction.all_except(
-                    node.enter_direction
+            # Cannot move in the opposite direction
+            accepted_positions.pop(node.enter_direction.opposite)
+
+            # Update streak for node.enter_direction
+            accepted_positions[node.enter_direction][1] = (
+                node.direction_streak + 4
+            )
+
+            if node.direction_streak < 10:
+                new_position = node.enter_direction.new_position(
+                    node.position, diff=1
                 )
-                accepted_positions = []
-                for direction in accepted_directions:
-                    new_position_function = NEW_POSITION_FUNCTION_MAPPING[
-                        direction
-                    ]
-                    accepted_positions.append(
-                        (new_position_function(*node.position), direction)
-                    )
+                accepted_positions[node.enter_direction] = (
+                    new_position,
+                    node.direction_streak + 1,
+                )
+            elif node.direction_streak >= 10:
+                accepted_positions.pop(node.enter_direction)
 
-        for connected_position, direction in accepted_positions:
-            if not self.is_valid_position(connected_position):
-                continue
+        return [
+            (position, direction, streak)
+            for direction, (position, streak) in accepted_positions.items()
+            if self.is_valid_position(position)
+        ]
 
-            if (
-                node.enter_direction
-                and direction == node.enter_direction.opposite
-            ):
-                continue
-
-            if direction == node.enter_direction:
-                streak = node.direction_streak + 1
+    def build_additional_came_from(
+        self, a: Position, b: Position, previous: Node, same_direction: bool
+    ) -> tuple[dict[Node, Node], Optional[Node]]:
+        x_a, y_a = a
+        x_b, y_b = b
+        if x_a == x_b:
+            if y_b < y_a:
+                raise RuntimeError(
+                    "This is not an expected situation: y_b < y_a"
+                )
             else:
-                streak = 1
+                positions = [(x_a, y) for y in range(y_a + 1, y_b)]
 
+        elif y_a == y_b:
+            if x_b < x_a:
+                raise RuntimeError(
+                    "This is not an expected situation: x_b < x_a"
+                )
+            else:
+                positions = [(x, y_a) for x in range(x_a + 1, x_b)]
+        else:
+            raise RuntimeError("This is not an expected situation.")
+
+        streak = previous.direction_streak if same_direction else 0
+        came_from = {}
+        next = None
+        for position in positions:
+            streak += 1
+            direction = Direction.from_two_points(
+                start=previous.position, end=position
+            )
+
+            next = Node(
+                position=position,
+                distance_to_enter=self.get_distance_on(position),
+                enter_direction=direction,
+                direction_streak=streak,
+            )
+            came_from[next] = previous
+            previous = next
+
+        return came_from, next
+
+    def get_neighbors(self, node: Node) -> list[tuple[Node, dict[Node, Node]]]:
+        immediate_neighbors = []
+
+        for connected_position, direction, streak in self.get_next_node_data(
+            node=node
+        ):
             distance_to_enter = self.get_distance_on(connected_position)
 
-            if connected_position == self.end_position and streak < 4:
-                continue
+            same_direction = node.enter_direction == direction
 
-            immediate_neighbors.append(
-                (
-                    Node(
-                        position=connected_position,
-                        distance_to_enter=distance_to_enter,
-                        enter_direction=direction,
-                        direction_streak=streak,
-                    ),
-                    additional_came_from,
-                )
+            additional_came_from, last_node = self.build_additional_came_from(
+                a=node.position,
+                b=connected_position,
+                previous=node,
+                same_direction=same_direction,
             )
+
+            neighbor = Node(
+                position=connected_position,
+                distance_to_enter=distance_to_enter,
+                enter_direction=direction,
+                direction_streak=streak,
+            )
+
+            if last_node:
+                additional_came_from[neighbor] = last_node
+
+            immediate_neighbors.append((neighbor, additional_came_from))
 
         return immediate_neighbors
 
