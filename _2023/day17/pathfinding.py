@@ -40,14 +40,16 @@ def display_best_path(map: Map, came_from: dict[Node], current: Node):
     print(tiles)
 
 
-def a_star(map: Map) -> list[Node]:
+def a_star(map: Map, display_progress_bar: bool = False) -> list[Node]:
     open_set = {map.start_node}
     came_from = {}
 
     g_score = {map.start_node: 0}
     f_score = {map.start_node: map.h(map.start_node)}
 
-    progress_bar = tqdm(total=map.max_x + map.max_y)
+    progress_bar = tqdm(
+        total=map.max_x + map.max_y, disable=not display_progress_bar
+    )
     progress = 0
     while open_set:
         current = get_node_in_open_set_with_lowest_f_score(
