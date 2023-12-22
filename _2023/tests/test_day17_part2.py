@@ -67,4 +67,3 @@ def test_shortest_path_can_be_computed(get_data, data_filename, expected_path):
 )
 def test_solution_can_be_computed(get_data, data_filename, expected_result):
     assert compute_solution(get_data(data_filename)) == expected_result
-
