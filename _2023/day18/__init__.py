@@ -65,6 +65,7 @@ class Tiles(list[list[str]]):
 @dataclass
 class Plan:
     dug_cells: list[Position]
+    loop_positions: list[Position]
     max_x: int
     max_y: int
 
@@ -89,6 +90,7 @@ class Plan:
     def from_dig_plan(cls, dig_plan: DigPlan) -> "Plan":
         current = Position((0, 0))
         dug_cells = [current]
+        loop_positions = [current]
         max_x = 0
         max_y = 0
         for order in dig_plan:
@@ -101,8 +103,14 @@ class Plan:
 
                 if current.y > max_y:
                     max_y = current.y
+            loop_positions.append(current)
 
-        return Plan(dug_cells=dug_cells, max_x=max_x, max_y=max_y)
+        return Plan(
+            dug_cells=dug_cells,
+            loop_positions=loop_positions,
+            max_x=max_x,
+            max_y=max_y,
+        )
 
     def compute_fully_dug_plan(self) -> "Plan":
         additional_dug_cells = []
@@ -115,20 +123,23 @@ class Plan:
                     continue
                 if is_position_enclosed_by_loop_using_ray_casting(
                     position=position,
-                    loop_positions=self.dug_cells,
+                    loop_positions=self.loop_positions,
                 ):
                     additional_dug_cells.append(position)
 
         total_dug_cells = list({*self.dug_cells, *additional_dug_cells})
         return Plan(
-            dug_cells=total_dug_cells, max_x=self.max_x, max_y=self.max_y
+            dug_cells=total_dug_cells,
+            loop_positions=self.loop_positions,
+            max_x=self.max_x,
+            max_y=self.max_y,
         )
 
 
 def is_position_enclosed_by_loop_using_ray_casting(
     position: Position, loop_positions: list[Position]
 ) -> bool:
-    # Tracing a ray from position to (+infinity, position[1])
+    # Tracing a ray from position to (+infinity, position.y)
     # and count how many edges it crosses
 
     x, y = position
