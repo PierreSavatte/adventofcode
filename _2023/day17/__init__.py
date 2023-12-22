@@ -159,7 +159,9 @@ class Map:
         x, y = position
         return 0 <= x <= self.max_x and 0 <= y <= self.max_y
 
-    def get_neighbors(self, node: Node) -> list[tuple[Node, dict[Node, Node]]]:
+    def get_neighbors(
+        self, node: Node
+    ) -> list[tuple[Node, int, dict[Node, Node]]]:
         x, y = node.position
         immediate_neighbors = []
         for connected_position, direction in [
@@ -189,6 +191,8 @@ class Map:
 
             additional_came_from: dict[Node, Node] = {}
 
+            additional_score = 0
+
             immediate_neighbors.append(
                 (
                     Node(
@@ -197,6 +201,7 @@ class Map:
                         enter_direction=direction,
                         direction_streak=streak,
                     ),
+                    additional_score,
                     additional_came_from,
                 )
             )
@@ -268,7 +273,9 @@ class UltraMap(Map):
 
         return came_from, next
 
-    def get_neighbors(self, node: Node) -> list[tuple[Node, dict[Node, Node]]]:
+    def get_neighbors(
+        self, node: Node
+    ) -> list[tuple[Node, int, dict[Node, Node]]]:
         immediate_neighbors = []
 
         for connected_position, direction, streak in self.get_next_node_data(
@@ -285,6 +292,10 @@ class UltraMap(Map):
                 same_direction=same_direction,
             )
 
+            additional_score = 0
+            for neighbor_node in additional_came_from:
+                additional_score += neighbor_node.distance_to_enter
+
             neighbor = Node(
                 position=connected_position,
                 distance_to_enter=distance_to_enter,
@@ -295,7 +306,9 @@ class UltraMap(Map):
             if last_node:
                 additional_came_from[neighbor] = last_node
 
-            immediate_neighbors.append((neighbor, additional_came_from))
+            immediate_neighbors.append(
+                (neighbor, additional_score, additional_came_from)
+            )
 
         return immediate_neighbors
 

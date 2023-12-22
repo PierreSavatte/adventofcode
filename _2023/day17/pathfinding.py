@@ -63,8 +63,12 @@ def a_star(map: Map) -> list[Node]:
             return reconstruct_path(came_from, current)
 
         open_set.remove(current)
-        for neighbor, additional_came_from in map.get_neighbors(current):
-            tentative_g_score = g_score[current] + neighbor.distance_to_enter
+        for (
+            neighbor,
+            additional_score,
+            additional_came_from,
+        ) in map.get_neighbors(current):
+            tentative_g_score = g_score[current] + additional_score
             if tentative_g_score < g_score.get(neighbor, math.inf):
                 if additional_came_from:
                     came_from.update(additional_came_from)
