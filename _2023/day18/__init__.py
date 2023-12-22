@@ -119,7 +119,7 @@ class Plan:
                 ):
                     additional_dug_cells.append(position)
 
-        total_dug_cells = [*self.dug_cells, *additional_dug_cells]
+        total_dug_cells = list({*self.dug_cells, *additional_dug_cells})
         return Plan(
             dug_cells=total_dug_cells, max_x=self.max_x, max_y=self.max_y
         )
