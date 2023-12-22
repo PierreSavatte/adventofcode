@@ -3,6 +3,7 @@ import math
 from tqdm import tqdm
 
 from _2023.day17 import Map, Node
+from _2023.day17 import build_solution_tiles
 
 
 def reconstruct_path(came_from: dict[Node], current: Node) -> list[Node]:
@@ -25,6 +26,18 @@ def get_node_in_open_set_with_lowest_f_score(
             min_score = score
             min_node = node
     return min_node
+
+
+def display_best_path(map: Map, came_from: dict[Node], current: Node):
+    if not came_from:
+        return
+    shortest_route = reconstruct_path(came_from, current)
+    tiles = build_solution_tiles(
+        map=map, shortest_route=shortest_route, colorized=True
+    )
+    print()
+    print(f"{current=}")
+    print(tiles)
 
 
 def a_star(map: Map) -> list[Node]:
