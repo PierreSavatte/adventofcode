@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum
+from tqdm import tqdm
 
 
 class Direction(Enum):
@@ -105,9 +106,13 @@ class Plan:
 
     def compute_fully_dug_plan(self) -> "Plan":
         additional_dug_cells = []
+        progress_bar = tqdm(total=self.max_x * self.max_y)
         for x in range(self.max_x + 1):
             for y in range(self.max_y + 1):
                 position = Position((x, y))
+                progress_bar.update(1)
+                if position in self.dug_cells:
+                    continue
                 if is_position_enclosed_by_loop_using_ray_casting(
                     position=position,
                     loop_positions=self.dug_cells,
