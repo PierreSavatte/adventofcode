@@ -31,16 +31,16 @@ def parse_hexadecimal(hexadecimal: str) -> tuple[Direction, int]:
 
 
 class Position(tuple[int, int]):
-    def next(self, direction: Direction) -> "Position":
+    def next(self, direction: Direction, amount: int = 1) -> "Position":
         x, y = self
         if direction == Direction.RIGHT:
-            x += 1
+            x += amount
         elif direction == Direction.LEFT:
-            x -= 1
+            x -= amount
         elif direction == Direction.DOWN:
-            y += 1
+            y += amount
         elif direction == Direction.UP:
-            y -= 1
+            y -= amount
         return Position((x, y))
 
     @property
