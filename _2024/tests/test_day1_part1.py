@@ -1,9 +1,8 @@
 import pytest
 
-from _2024.day1 import (
-    parse_input,
+from _2024.day1 import parse_input, sort
+from _2024.day1.part1 import (
     get_distance_between_values,
-    sort,
     get_distance_between_lists,
 )
 
