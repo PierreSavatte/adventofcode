@@ -1,9 +1,8 @@
 import pytest
-
 from _2024.day1 import parse_input, sort
 from _2024.day1.part1 import (
-    get_distance_between_values,
     get_distance_between_lists,
+    get_distance_between_values,
 )
 
 TEST_INPUT = """3   4

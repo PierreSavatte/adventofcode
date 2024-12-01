@@ -16,4 +16,3 @@ def sort(l: list[int]) -> list[int]:
     l_ = l.copy()
     l_.sort()
     return l_
-

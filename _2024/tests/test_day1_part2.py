@@ -1,9 +1,5 @@
 import pytest
-
-from _2024.day1.part2 import (
-    get_similarity_increase,
-    compute_similarity_score,
-)
+from _2024.day1.part2 import compute_similarity_score, get_similarity_increase
 
 LIST_A = [3, 4, 2, 1, 3, 3]
 LIST_B = [4, 3, 5, 3, 9, 3]
