@@ -1,6 +1,14 @@
 import pytest
 
-from _2023.day18 import DigPlan, Order, Direction, Plan, parse_hexadecimal
+from _2023.day18 import (
+    DigPlan,
+    Order,
+    Direction,
+    Plan,
+    parse_hexadecimal,
+    Rectangle,
+    Position,
+)
 from _2023.day18.part2 import compute_solution
 
 
@@ -49,6 +57,49 @@ def test_input_can_be_parsed(dig_plan):
         Order(direction=Direction.DOWN, length=56407),
         Order(direction=Direction.RIGHT, length=356671),
     ]
+
+
+def test_minimal_rectangles_can_be_computed():
+    """
+    .#...#.
+    .......
+    ##...##
+    .......
+    #.#....
+    ..#...#
+
+    Rectangles:
+
+    - [(1, 0), (5, 1)]
+    - [(0, 2), (6, 4)]
+    - [(2, 5), (6, 5)]
+    """
+    dig_plan = DigPlan(
+        [
+            Order(direction=Direction.RIGHT, length=4),
+            Order(direction=Direction.DOWN, length=2),
+            Order(direction=Direction.RIGHT, length=1),
+            Order(direction=Direction.DOWN, length=3),
+            Order(direction=Direction.LEFT, length=4),
+            Order(direction=Direction.UP, length=1),
+            Order(direction=Direction.LEFT, length=2),
+            Order(direction=Direction.UP, length=2),
+            Order(direction=Direction.RIGHT, length=1),
+            Order(direction=Direction.UP, length=2),
+        ]
+    )
+
+    plan = Plan.from_dig_plan(dig_plan)
+
+    assert plan.compute_min_rectangles() == [
+        Rectangle(top_left=Position((1, 0)), bottom_right=Position((5, 1))),
+        Rectangle(top_left=Position((0, 2)), bottom_right=Position((6, 4))),
+        Rectangle(top_left=Position((2, 5)), bottom_right=Position((6, 5))),
+    ]
+
+
+def test_dug_area_can_be_computed(plan):
+    assert plan.compute_area() == 952408144115
 
 
 def test_solution_can_be_computed(get_data):

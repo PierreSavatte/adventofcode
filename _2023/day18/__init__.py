@@ -77,35 +77,19 @@ class DigPlan(list[Order]):
         return DigPlan(orders)
 
 
-class Tiles(list[list[str]]):
-    ...
+@dataclass
+class Rectangle:
+    top_left: Position
+    bottom_right: Position
 
 
 @dataclass
 class Plan:
-    dug_cells: list[Position]
     loop_positions: list[Position]
     max_x: int
     max_y: int
     min_x: int
     min_y: int
-
-    @property
-    def tiles(self) -> Tiles:
-        tiles = []
-        for y in range(self.max_y + 1):
-            tiles_line = []
-            for x in range(self.max_x + 1):
-                tiles_line.append(".")
-            tiles.append(tiles_line)
-
-        for dug_cell in self.dug_cells:
-            tiles[dug_cell.y][dug_cell.x] = "#"
-
-        return Tiles(tiles)
-
-    def as_string(self) -> str:
-        return "\n".join("".join(line) for line in self.tiles)
 
     @classmethod
     def from_dig_plan(
@@ -115,7 +99,6 @@ class Plan:
             current = starting_position
         else:
             current = Position((0, 0))
-        dug_cells = [current]
         loop_positions = [current]
         max_x = 0
         max_y = 0
@@ -123,21 +106,19 @@ class Plan:
         min_y = math.inf
         progress_bar = tqdm(desc="Loading dig plan", total=len(dig_plan))
         for order in dig_plan:
-            for i in range(order.length):
-                current = current.next(order.direction)
-                dug_cells.append(current)
+            current = current.next(order.direction, amount=order.length)
+            if current.x < min_x:
+                min_x = current.x
 
-                if current.x < min_x:
-                    min_x = current.x
+            if current.x > max_x:
+                max_x = current.x
 
-                if current.x > max_x:
-                    max_x = current.x
+            if current.y < min_y:
+                min_y = current.y
 
-                if current.y < min_y:
-                    min_y = current.y
+            if current.y > max_y:
+                max_y = current.y
 
-                if current.y > max_y:
-                    max_y = current.y
             loop_positions.append(current)
             progress_bar.update(1)
 
@@ -151,7 +132,6 @@ class Plan:
             )
         else:
             return Plan(
-                dug_cells=dug_cells,
                 loop_positions=loop_positions,
                 min_x=min_x,
                 max_x=max_x,
@@ -159,59 +139,11 @@ class Plan:
                 max_y=max_y,
             )
 
-    def compute_fully_dug_plan(self) -> "Plan":
-        additional_dug_cells = []
-        progress_bar = tqdm(
-            desc="Compute fully dig plan", total=self.max_x * self.max_y
-        )
-        for x in range(self.max_x + 1):
-            for y in range(self.max_y + 1):
-                position = Position((x, y))
-                progress_bar.update(1)
-                if position in self.dug_cells:
-                    continue
-                if is_position_enclosed_by_loop_using_ray_casting(
-                    position=position,
-                    loop_positions=self.loop_positions,
-                ):
-                    additional_dug_cells.append(position)
-        progress_bar.close()
+    def compute_min_rectangles(self):
+        ...
 
-        total_dug_cells = list({*self.dug_cells, *additional_dug_cells})
-        return Plan(
-            dug_cells=total_dug_cells,
-            loop_positions=self.loop_positions,
-            min_x=self.min_x,
-            max_x=self.max_x,
-            min_y=self.min_y,
-            max_y=self.max_y,
-        )
-
-
-def is_position_enclosed_by_loop_using_ray_casting(
-    position: Position, loop_positions: list[Position]
-) -> bool:
-    # Tracing a ray from position to (+infinity, position.y)
-    # and count how many edges it crosses
-
-    x, y = position
-    count = 0
-    for i in range(len(loop_positions) - 1):
-        edge_a = loop_positions[i]
-        edge_b = loop_positions[i + 1]
-
-        x_a, y_a = edge_a
-        x_b, y_b = edge_b
-
-        if min(y_a, y_b) < y <= max(y_a, y_b):
-            # Proceed only if infinite_ray cross the edge
-
-            if x <= max(x_a, x_b):
-                # Proceed only if start of infinite ray if before the edge
-
-                x_intersection = (y - y_a) * (x_b - x_a) / (y_b - y_a) + x_a
-
-                if x_a == x_b or x <= x_intersection:
-                    count += 1
-
-    return count % 2 != 0
+    def compute_area(self) -> int:
+        # TODO: from loop points, compute the min rectangles
+        #  https://www.reddit.com/r/GraphicsProgramming/comments/nwtw4j/comment/h1cj4ee/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
+        #  Then compute area of minimal rectangles
+        raise RuntimeError()
