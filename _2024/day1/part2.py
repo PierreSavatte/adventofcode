@@ -1,4 +1,4 @@
-from _2024.day1 import parse_input, sort
+from _2024.day1 import parse_input
 from _2024.load_input import load_input
 
 
