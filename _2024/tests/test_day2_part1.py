@@ -1,11 +1,11 @@
 import pytest
-from _2024.day2 import (
+from _2024.day2 import parse_input
+from _2024.day2.part1 import (
     are_adjacent_levels_safe,
     are_levels_strictly_monotonic,
+    count_safe_reports,
     is_safe,
-    parse_input,
 )
-from _2024.day2.part1 import count_safe_reports
 
 TEST_INPUT = """7 6 4 2 1
 1 2 7 8 9
