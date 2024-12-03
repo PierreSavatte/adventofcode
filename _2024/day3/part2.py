@@ -5,10 +5,16 @@ from _2024.load_input import load_input
 
 PART_TO_REMOVE_REGEX = r"don't\(\).*?do\(\)"
 
+END_OF_STRING_WITH_DONT = r"don't\(\).*?$"
+
 
 def remove_ignored_part_of_input(data: str) -> str:
     data = data.strip()
     split_data = re.split(PART_TO_REMOVE_REGEX, data)
+    new_data = "".join(split_data)
+
+    split_data = re.split(END_OF_STRING_WITH_DONT, new_data)
+
     return "".join(split_data)
 
 
