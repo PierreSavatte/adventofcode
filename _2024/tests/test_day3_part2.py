@@ -22,8 +22,8 @@ from _2024.day3.part2 import remove_ignored_part_of_input
             "xmul(2,4)&mul[3,7]!^_+mul(32,64](mul(11,8)un?mul(8,5)",
         ),
         (
-            "mul(1,1)don't()mul(1,1)do()mul(1,1)do()don't()mul(1,1)don't()mul(1,1)do()mul(1,1)don't()mul(1,1)",
-            "mul(1,1)mul(1,1)do()mul(1,1)",
+            "mul(1,1)don't()mul(2,2)do()mul(3,3)do()don't()mul(4,4)don't()mul(5,5)do()mul(6,6)don't()mul(7,7)",
+            "mul(1,1)mul(3,3)do()mul(6,6)",
         ),
     ],
 )
