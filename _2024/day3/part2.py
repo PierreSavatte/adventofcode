@@ -3,7 +3,7 @@ import re
 from _2024.day3 import compute_solution, parse_input
 from _2024.load_input import load_input
 
-PART_TO_REMOVE_REGEX = r"don't\(\).*do\(\)"
+PART_TO_REMOVE_REGEX = r"don't\(\).*?do\(\)"
 
 
 def remove_ignored_part_of_input(data: str) -> str:
