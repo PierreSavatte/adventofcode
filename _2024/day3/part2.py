@@ -9,17 +9,16 @@ END_OF_STRING_WITH_DONT = r"don't\(\)(?!.*don't\(\)).*\Z"
 
 
 def remove_ignored_part_of_input(data: str) -> str:
-    data = data.strip()
+    while "don't()" in data:
+        start_i = data.find("don't()")
 
-    # First remove the last don't()
-    match = re.search(END_OF_STRING_WITH_DONT, data)
-    if match:
-        end_with_dont = match.group()
-        if not "do()" in end_with_dont:
-            data = re.sub(END_OF_STRING_WITH_DONT, "", data)
+        do_position = data[start_i:].find("do()")
+        if do_position == -1:
+            data = data[:start_i]
+        else:
+            end_i = data[start_i:].find("do()") + 4 + start_i
+            data = data[:start_i] + data[end_i:]
 
-    # Next, remove the don't()...do()
-    data = re.sub(PART_TO_REMOVE_REGEX, "", data)
     return data
 
 
