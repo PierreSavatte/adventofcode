@@ -1,10 +1,9 @@
 import pytest
-from _2024.day4 import (
+from _2024.day4 import get_windows, parse_input
+from _2024.day4.part1 import (
     compute_solution,
     compute_xmax_number_in_diagonals,
     compute_xmax_number_in_rows,
-    get_windows,
-    parse_input,
     transpose,
 )
 
