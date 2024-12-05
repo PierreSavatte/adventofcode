@@ -1,3 +1,6 @@
+from functools import cmp_to_key
+
+
 class OrderingRule:
     def __init__(self, before: int, after: int):
         self.before = before
@@ -16,6 +19,9 @@ class OrderingRules(list[OrderingRule]):
                 return False
         return False
 
+    def is_lower_than(self, a: int, b: int) -> bool:
+        return self.is_greater_than(b, a)
+
 
 class Update(list[int]):
     def validate_order(self, ordering_rules: OrderingRules) -> bool:
@@ -28,6 +34,17 @@ class Update(list[int]):
 
     def get_middle_page(self) -> int:
         return self[len(self) // 2]
+
+    def sorted(self, ordering_rules: OrderingRules) -> "Update":
+        def sorting_function(a: int, b: int) -> int:
+            result = ordering_rules.is_lower_than(a, b)
+            if result:
+                return 1
+            else:
+                return -1
+
+        new_list = sorted(self, key=cmp_to_key(sorting_function))
+        return Update(new_list)
 
 
 class PrintQueue:
