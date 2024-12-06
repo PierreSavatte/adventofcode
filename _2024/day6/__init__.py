@@ -1,9 +1,8 @@
 from enum import Enum
 from itertools import product
-from typing import Generator
+from typing import Generator, Optional
 
 POSITION = tuple[int, int]
-LINE = tuple[POSITION, POSITION]
 
 
 class Direction(Enum):
@@ -59,6 +58,53 @@ def generate_line(
         yield next_position
 
 
+class Line:
+    def __init__(self, start: POSITION, end: POSITION):
+        self.start = start
+        self.end = end
+
+    def compute_positions(self) -> set[POSITION]:
+        x_start, y_start = self.start
+        x_end, y_end = self.end
+        if x_start != x_end and y_start != y_end:
+            raise ValueError("The positions must be in a line.")
+
+        if x_start == x_end:
+            x = x_start
+            min_y = min(y_start, y_end)
+            max_y = max(y_start, y_end)
+            return {(x, y) for y in range(min_y, max_y + 1)}
+        if y_start == y_end:
+            y = y_start
+            min_x = min(x_start, x_end)
+            max_x = max(x_start, x_end)
+            return {(x, y) for x in range(min_x, max_x + 1)}
+
+    def get_intersection_point(self, other: "Line") -> Optional[POSITION]:
+        # https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection#Given_two_points_on_each_line
+        x1, y1 = self.start
+        x2, y2 = self.end
+
+        x3, y3 = other.start
+        x4, y4 = other.end
+
+        denominator = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
+        if denominator == 0:
+            return None
+
+        x_intersection = (
+            (x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4)
+        ) / denominator
+        y_intersection = (
+            (x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (x3 * y4 - y3 * x4)
+        ) / denominator
+
+        return (int(x_intersection), int(y_intersection))
+
+    def __eq__(self, other: "Line") -> bool:
+        return self.start == other.start and self.end == other.end
+
+
 class Map:
     def __init__(
         self,
@@ -96,7 +142,7 @@ class Map:
 
         raise StopIteration("No obstacle in the path of the guard.")
 
-    def get_traveling_lines(self) -> list[LINE]:
+    def get_traveling_lines(self) -> list[Line]:
         guard_direction = Direction.UP
         guard_position = self.guard_starting_position
 
@@ -109,7 +155,7 @@ class Map:
                 next_guard_position = guard_direction.get_previous_position(
                     obstacle
                 )
-                lines.append((guard_position, next_guard_position))
+                lines.append(Line(guard_position, next_guard_position))
 
                 guard_position = next_guard_position
                 guard_direction = guard_direction.turn_90_degrees()
@@ -120,28 +166,8 @@ class Map:
                 )
             )
             last_position = last_line[-1]
-            lines.append((guard_position, last_position))
+            lines.append(Line(guard_position, last_position))
             return lines
-
-
-def compute_positions_in_a_line(
-    start: POSITION, end: POSITION
-) -> set[POSITION]:
-    x_start, y_start = start
-    x_end, y_end = end
-    if x_start != x_end and y_start != y_end:
-        raise ValueError("The positions must be in a line.")
-
-    if x_start == x_end:
-        x = x_start
-        min_y = min(y_start, y_end)
-        max_y = max(y_start, y_end)
-        return {(x, y) for y in range(min_y, max_y + 1)}
-    if y_start == y_end:
-        y = y_start
-        min_x = min(x_start, x_end)
-        max_x = max(x_start, x_end)
-        return {(x, y) for x in range(min_x, max_x + 1)}
 
 
 def parse_input(data: str) -> Map:

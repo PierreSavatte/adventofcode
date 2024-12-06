@@ -1,5 +1,5 @@
 import pytest
-from _2024.day6 import Direction, Map, compute_positions_in_a_line, parse_input
+from _2024.day6 import Direction, Line, Map, parse_input
 from _2024.day6.part1 import compute_solution
 
 TEST_INPUT = """....#.....
@@ -45,13 +45,14 @@ def test_input_can_be_parsed():
     ],
 )
 def test_positions_can_be_computed_in_a_line(start, end, expected_positions):
-    assert compute_positions_in_a_line(start, end) == expected_positions
+    assert Line(start, end).compute_positions() == expected_positions
 
 
 @pytest.mark.parametrize("start, end", [((0, 0), (1, 1)), ((1, 1), (0, 0))])
 def test_error_is_raised_when_positions_are_not_in_a_line(start, end):
+    line = Line(start, end)
     with pytest.raises(ValueError):
-        compute_positions_in_a_line(start, end)
+        line.compute_positions()
 
 
 @pytest.mark.parametrize(
@@ -118,17 +119,17 @@ def test_map_can_evaluate_next_obstacle_of_guard(
 
 def test_map_can_compute_lines_that_guard_will_travel():
     assert MAP.get_traveling_lines() == [
-        ((4, 6), (4, 1)),
-        ((4, 1), (8, 1)),
-        ((8, 1), (8, 6)),
-        ((8, 6), (2, 6)),
-        ((2, 6), (2, 4)),
-        ((2, 4), (6, 4)),
-        ((6, 4), (6, 8)),
-        ((6, 8), (1, 8)),
-        ((1, 8), (1, 7)),
-        ((1, 7), (7, 7)),
-        ((7, 7), (7, 9)),  # Leaves the map line
+        Line((4, 6), (4, 1)),
+        Line((4, 1), (8, 1)),
+        Line((8, 1), (8, 6)),
+        Line((8, 6), (2, 6)),
+        Line((2, 6), (2, 4)),
+        Line((2, 4), (6, 4)),
+        Line((6, 4), (6, 8)),
+        Line((6, 8), (1, 8)),
+        Line((1, 8), (1, 7)),
+        Line((1, 7), (7, 7)),
+        Line((7, 7), (7, 9)),  # Leaves the map line
     ]
 
 
