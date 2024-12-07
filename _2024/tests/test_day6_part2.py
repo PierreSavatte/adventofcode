@@ -55,30 +55,44 @@ def test_ray_can_compute_its_end(ray, end):
 
 
 @pytest.mark.parametrize(
-    "line_a, line_b, intersection_point",
+    "line, ray, intersection_point",
     [
         (
-            Line((0, 0), (10, 0), Direction.UP),
-            Line((0, 0), (0, 10), Direction.UP),
-            (0, 0),
+            Line((8, 6), (2, 6), direction=Direction.LEFT),  # 4th
+            Ray((4, 1), direction=Direction.DOWN),  # 1st
+            (4, 6),
         ),
         (
-            Line((0, 0), (10, 0), Direction.UP),
-            Line((5, 0), (5, 10), Direction.UP),
-            (5, 0),
+            Line((6, 4), (6, 8), direction=Direction.DOWN),  # 7th
+            Ray((2, 6), direction=Direction.RIGHT),  # 4th
+            (6, 6),
         ),
         (
-            Line((0, 0), (10, 0), Direction.UP),
-            Line((1, 1), (1, 10), Direction.UP),
-            (1, 0),
+            Line((1, 7), (7, 7), direction=Direction.RIGHT),  # 10th
+            Ray((6, 8), direction=Direction.UP),  # 7th
+            (6, 7),
+        ),
+        (
+            Line((6, 8), (1, 8), direction=Direction.LEFT),  # 8th
+            Ray((2, 4), direction=Direction.DOWN),  # 5th
+            (2, 8),
+        ),
+        (
+            Line((6, 8), (1, 8), direction=Direction.LEFT),  # 8th
+            Ray((4, 1), direction=Direction.DOWN),  # 1st
+            (4, 8),
+        ),
+        (
+            Line((7, 7), (7, 9), direction=Direction.DOWN),  # 11th
+            Ray((1, 8), direction=Direction.RIGHT),  # 8th
+            (7, 8),
         ),
     ],
 )
-def test_intersection_can_be_evaluated_between_two_lines(
-    line_a, line_b, intersection_point
+def test_intersection_can_be_evaluated_between_a_line_and_a_ray(
+    line, ray, intersection_point
 ):
-    assert line_a.get_intersection_point(line_b) == intersection_point
-    assert line_b.get_intersection_point(line_a) == intersection_point
+    assert line.get_intersection_point(ray, map_size=10) == intersection_point
 
 
 @pytest.mark.parametrize(

@@ -132,13 +132,15 @@ class Line:
             max_x = max(x_start, x_end)
             return {(x, y) for x in range(min_x, max_x + 1)}
 
-    def get_intersection_point(self, other: "Line") -> Optional[POSITION]:
+    def get_intersection_point(
+        self, ray: "Ray", map_size: int
+    ) -> Optional[POSITION]:
         # https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection#Given_two_points_on_each_line_segment
         x1, y1 = self.start
         x2, y2 = self.end
 
-        x3, y3 = other.start
-        x4, y4 = other.end
+        x3, y3 = ray.start
+        x4, y4 = ray.compute_end(map_size)
 
         denominator = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
         if denominator == 0:
