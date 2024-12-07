@@ -1,5 +1,20 @@
 import pytest
-from _2024.day6 import Direction, Line, Map
+from _2024.day6 import Direction, Line, Map, Ray
+
+MAP = Map(
+    size=10,
+    guard_starting_position=(4, 6),
+    obstacles=[
+        (4, 0),
+        (9, 1),
+        (2, 3),
+        (7, 4),
+        (1, 6),
+        (8, 7),
+        (0, 8),
+        (6, 9),
+    ],
+)
 
 
 def test_direction_can_return_all_members():
@@ -96,38 +111,139 @@ def test_intersection_can_be_evaluated_between_a_line_and_a_ray(
 
 
 @pytest.mark.parametrize(
-    "line_a, line_b",
+    "line, ray",
     [
         (
-            Line((0, 0), (10, 0), Direction.UP),
-            Line((0, 1), (10, 1), Direction.UP),
+            Line(start=(8, 1), end=(8, 6), direction=Direction.DOWN),
+            Ray(start=(4, 1), direction=Direction.DOWN),
         ),
         (
-            Line((0, 0), (0, 10), Direction.UP),
-            Line((1, 0), (1, 10), Direction.UP),
+            Line(start=(8, 6), end=(2, 6), direction=Direction.LEFT),
+            Ray(start=(8, 1), direction=Direction.LEFT),
+        ),
+        (
+            Line(start=(2, 6), end=(2, 4), direction=Direction.UP),
+            Ray(start=(4, 1), direction=Direction.DOWN),
+        ),
+        (
+            Line(start=(2, 6), end=(2, 4), direction=Direction.UP),
+            Ray(start=(8, 1), direction=Direction.LEFT),
+        ),
+        (
+            Line(start=(2, 6), end=(2, 4), direction=Direction.UP),
+            Ray(start=(8, 6), direction=Direction.UP),
+        ),
+        (
+            Line(start=(2, 4), end=(6, 4), direction=Direction.RIGHT),
+            Ray(start=(4, 1), direction=Direction.DOWN),
+        ),
+        (
+            Line(start=(2, 4), end=(6, 4), direction=Direction.RIGHT),
+            Ray(start=(8, 1), direction=Direction.LEFT),
+        ),
+        (
+            Line(start=(2, 4), end=(6, 4), direction=Direction.RIGHT),
+            Ray(start=(8, 6), direction=Direction.UP),
+        ),
+        (
+            Line(start=(2, 4), end=(6, 4), direction=Direction.RIGHT),
+            Ray(start=(2, 6), direction=Direction.RIGHT),
+        ),
+        (
+            Line(start=(6, 4), end=(6, 8), direction=Direction.DOWN),
+            Ray(start=(4, 1), direction=Direction.DOWN),
+        ),
+        (
+            Line(start=(6, 4), end=(6, 8), direction=Direction.DOWN),
+            Ray(start=(8, 1), direction=Direction.LEFT),
+        ),
+        (
+            Line(start=(6, 4), end=(6, 8), direction=Direction.DOWN),
+            Ray(start=(8, 6), direction=Direction.UP),
+        ),
+        (
+            Line(start=(6, 4), end=(6, 8), direction=Direction.DOWN),
+            Ray(start=(2, 4), direction=Direction.DOWN),
+        ),
+        (
+            Line(start=(6, 8), end=(1, 8), direction=Direction.LEFT),
+            Ray(start=(8, 1), direction=Direction.LEFT),
+        ),
+        (
+            Line(start=(6, 8), end=(1, 8), direction=Direction.LEFT),
+            Ray(start=(8, 6), direction=Direction.UP),
+        ),
+        (
+            Line(start=(6, 8), end=(1, 8), direction=Direction.LEFT),
+            Ray(start=(2, 6), direction=Direction.RIGHT),
+        ),
+        (
+            Line(start=(6, 8), end=(1, 8), direction=Direction.LEFT),
+            Ray(start=(6, 4), direction=Direction.LEFT),
+        ),
+        (
+            Line(start=(1, 8), end=(1, 7), direction=Direction.UP),
+            Ray(start=(4, 1), direction=Direction.DOWN),
+        ),
+        (
+            Line(start=(1, 8), end=(1, 7), direction=Direction.UP),
+            Ray(start=(8, 1), direction=Direction.LEFT),
+        ),
+        (
+            Line(start=(1, 8), end=(1, 7), direction=Direction.UP),
+            Ray(start=(8, 6), direction=Direction.UP),
+        ),
+        (
+            Line(start=(1, 8), end=(1, 7), direction=Direction.UP),
+            Ray(start=(2, 6), direction=Direction.RIGHT),
+        ),
+        (
+            Line(start=(1, 8), end=(1, 7), direction=Direction.UP),
+            Ray(start=(2, 4), direction=Direction.DOWN),
+        ),
+        (
+            Line(start=(1, 8), end=(1, 7), direction=Direction.UP),
+            Ray(start=(6, 4), direction=Direction.LEFT),
+        ),
+        (
+            Line(start=(1, 8), end=(1, 7), direction=Direction.UP),
+            Ray(start=(6, 8), direction=Direction.UP),
+        ),
+        (
+            Line(start=(1, 7), end=(7, 7), direction=Direction.RIGHT),
+            Ray(start=(4, 1), direction=Direction.DOWN),
+        ),
+        (
+            Line(start=(1, 7), end=(7, 7), direction=Direction.RIGHT),
+            Ray(start=(8, 1), direction=Direction.LEFT),
+        ),
+        (
+            Line(start=(1, 7), end=(7, 7), direction=Direction.RIGHT),
+            Ray(start=(8, 6), direction=Direction.UP),
+        ),
+        (
+            Line(start=(1, 7), end=(7, 7), direction=Direction.RIGHT),
+            Ray(start=(2, 6), direction=Direction.RIGHT),
+        ),
+        (
+            Line(start=(1, 7), end=(7, 7), direction=Direction.RIGHT),
+            Ray(start=(2, 4), direction=Direction.DOWN),
+        ),
+        (
+            Line(start=(1, 7), end=(7, 7), direction=Direction.RIGHT),
+            Ray(start=(6, 4), direction=Direction.LEFT),
+        ),
+        (
+            Line(start=(1, 7), end=(7, 7), direction=Direction.RIGHT),
+            Ray(start=(1, 8), direction=Direction.RIGHT),
         ),
     ],
 )
-def test_none_is_evaluated_when_no_intersection_exists_between_two_lines(
-    line_a, line_b
+def test_intersection_cannot_be_found_on_cases_where_there_there_shouldnt_be_any(  # noqa: E501
+    line, ray
 ):
-    assert line_a.get_intersection_point(line_b) is None
-    assert line_b.get_intersection_point(line_a) is None
+    assert line.get_intersection_point(ray, map_size=10) is None
 
 
 def test_loop_numbers_can_be_computed():
-    map = Map(
-        size=10,
-        guard_starting_position=(4, 6),
-        obstacles=[
-            (4, 0),
-            (9, 1),
-            (2, 3),
-            (7, 4),
-            (1, 6),
-            (8, 7),
-            (0, 8),
-            (6, 9),
-        ],
-    )
-    assert map.compute_loop_numbers() == 6
+    assert MAP.compute_loop_numbers() == 6

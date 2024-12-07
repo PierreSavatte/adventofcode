@@ -135,6 +135,9 @@ class Line:
     def get_intersection_point(
         self, ray: "Ray", map_size: int
     ) -> Optional[POSITION]:
+        if self.direction.turn_90_degrees() != ray.direction.opposite:
+            return None
+
         # https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection#Given_two_points_on_each_line_segment
         x1, y1 = self.start
         x2, y2 = self.end
