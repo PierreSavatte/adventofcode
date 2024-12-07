@@ -49,6 +49,21 @@ class Direction(Enum):
         x, y = position
         return (x + delta_x, y + delta_y)
 
+    def get_next_position(self, position: POSITION) -> POSITION:
+        delta_x = 0
+        delta_y = 0
+        if self == Direction.UP:
+            delta_y = -1
+        elif self == Direction.RIGHT:
+            delta_x = 1
+        elif self == Direction.DOWN:
+            delta_y = 1
+        else:  # self == Direction.LEFT
+            delta_x = -1
+
+        x, y = position
+        return (x + delta_x, y + delta_y)
+
 
 def generate_line(
     position: POSITION, direction: Direction, map_size: int
@@ -246,8 +261,29 @@ class Map:
             lines.append(Line(guard_position, last_position, guard_direction))
             return lines
 
-    def compute_loop_numbers(self):
-        ...
+    def compute_new_obstacles_positions_to_form_loops(self) -> set[POSITION]:
+        traveling_lines = self.get_traveling_lines()
+        lines_that_can_be_part_of_a_loop = traveling_lines[:-1]
+
+        new_obstacles_positions = []
+        for i in range(len(traveling_lines)):
+            line = traveling_lines[i]
+
+            previous_lines = lines_that_can_be_part_of_a_loop[:i]
+
+            for j, other_line in enumerate(previous_lines):
+                ray = other_line.get_ray()
+
+                intersection_point = line.get_intersection_point(
+                    ray, self.size
+                )
+                if intersection_point:
+                    new_obstacle = line.direction.get_next_position(
+                        intersection_point
+                    )
+                    new_obstacles_positions.append(new_obstacle)
+
+        return set(new_obstacles_positions)
 
 
 def parse_input(data: str) -> Map:

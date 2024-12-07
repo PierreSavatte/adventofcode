@@ -245,5 +245,15 @@ def test_intersection_cannot_be_found_on_cases_where_there_there_shouldnt_be_any
     assert line.get_intersection_point(ray, map_size=10) is None
 
 
-def test_loop_numbers_can_be_computed():
-    assert MAP.compute_loop_numbers() == 6
+def test_new_obstacles_positions_to_form_loops_can_be_computed():
+    expected_positions = {
+        (3, 6),
+        (6, 7),
+        (7, 7),
+        (1, 8),
+        (3, 8),
+        (7, 9),
+    }
+    computed_positions = MAP.compute_new_obstacles_positions_to_form_loops()
+
+    assert computed_positions == expected_positions
