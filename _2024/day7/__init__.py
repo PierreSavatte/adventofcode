@@ -1,13 +1,4 @@
-def mul(args):
-    from operator import mul
-
-    return mul(*args)
-
-
-operators = [
-    sum,
-    mul,
-]
+from typing import Callable
 
 
 class Operation:
@@ -21,7 +12,7 @@ class Operation:
     def __eq__(self, other: "Operation") -> bool:
         return self.result == other.result and self.operands == other.operands
 
-    def can_be_made_true(self) -> bool:
+    def can_be_made_true(self, operators: list[Callable]) -> bool:
         if len(self.operands) == 1:
             return self.operands[0] == self.result
 
@@ -33,7 +24,7 @@ class Operation:
             new_operation = Operation(
                 result=self.result, operands=new_operands
             )
-            if new_operation.can_be_made_true():
+            if new_operation.can_be_made_true(operators):
                 return True
 
         return False

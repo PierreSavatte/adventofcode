@@ -1,6 +1,6 @@
 import pytest
 from _2024.day7 import Operation, parse_input
-from _2024.day7.part1 import compute_solution
+from _2024.day7.part1 import compute_solution, operators
 
 TEST_INPUT = """190: 10 19
 3267: 81 40 27
@@ -45,7 +45,7 @@ def test_input_can_be_parsed():
 def test_operation_can_be_evaluated_if_can_be_made_true(
     operation, can_be_made_true
 ):
-    assert operation.can_be_made_true() == can_be_made_true
+    assert operation.can_be_made_true(operators) == can_be_made_true
 
 
 def test_solution_can_be_computed():
