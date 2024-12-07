@@ -87,7 +87,7 @@ class Line:
             return {(x, y) for x in range(min_x, max_x + 1)}
 
     def get_intersection_point(self, other: "Line") -> Optional[POSITION]:
-        # https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection#Given_two_points_on_each_line
+        # https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection#Given_two_points_on_each_line_segment
         x1, y1 = self.start
         x2, y2 = self.end
 
@@ -98,14 +98,20 @@ class Line:
         if denominator == 0:
             return None
 
-        x_intersection = (
-            (x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4)
-        ) / denominator
-        y_intersection = (
-            (x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (x3 * y4 - y3 * x4)
-        ) / denominator
+        t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / denominator
+        u = ((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / denominator
 
-        return (int(x_intersection), int(y_intersection))
+        if not (0 <= abs(t) <= 1 and 0 <= abs(u) <= 1):
+            return None
+
+        if 0 <= abs(t) <= 1:
+            x_intersection = x1 + t * (x2 - x1)
+            y_intersection = y1 + t * (y2 - y1)
+        else:
+            x_intersection = x3 + u * (x4 - x3)
+            y_intersection = y3 + u * (y4 - y3)
+
+        return int(x_intersection), int(y_intersection)
 
     def __eq__(self, other: "Line") -> bool:
         return (
