@@ -42,6 +42,19 @@ def test_line_can_compute_its_ray(line, ray):
 
 
 @pytest.mark.parametrize(
+    "ray, end",
+    [
+        (Ray(start=(1, 1), direction=Direction.UP), (1, 0)),
+        (Ray(start=(1, 1), direction=Direction.DOWN), (1, 9)),
+        (Ray(start=(1, 1), direction=Direction.LEFT), (0, 1)),
+        (Ray(start=(1, 1), direction=Direction.RIGHT), (9, 1)),
+    ],
+)
+def test_ray_can_compute_its_end(ray, end):
+    assert ray.compute_end(map_size=10) == end
+
+
+@pytest.mark.parametrize(
     "line_a, line_b, intersection_point",
     [
         (

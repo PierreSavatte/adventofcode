@@ -81,6 +81,19 @@ class Ray:
         self.start = start
         self.direction = direction
 
+    def compute_end(self, map_size: int) -> POSITION:
+        x, y = self.start
+        if self.direction == Direction.UP:
+            y = 0
+        elif self.direction == Direction.DOWN:
+            y = map_size - 1
+        elif self.direction == Direction.LEFT:
+            x = 0
+        else:
+            x = map_size - 1
+
+        return x, y
+
     def __eq__(self, other: "Ray") -> bool:
         return self.start == other.start and self.direction == other.direction
 
