@@ -1,5 +1,5 @@
 import pytest
-from _2024.day6 import Line
+from _2024.day6 import Direction, Line, Map
 
 
 @pytest.mark.parametrize(
@@ -47,3 +47,21 @@ def test_none_is_evaluated_when_no_intersection_exists_between_two_lines(
 ):
     assert line_a.get_intersection_point(line_b) is None
     assert line_b.get_intersection_point(line_a) is None
+
+
+def test_loop_numbers_can_be_computed():
+    map = Map(
+        size=10,
+        guard_starting_position=(4, 6),
+        obstacles=[
+            (4, 0),
+            (9, 1),
+            (2, 3),
+            (7, 4),
+            (1, 6),
+            (8, 7),
+            (0, 8),
+            (6, 9),
+        ],
+    )
+    assert map.compute_loop_numbers() == 6

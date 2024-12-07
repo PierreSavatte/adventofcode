@@ -195,6 +195,9 @@ class Map:
             lines.append(Line(guard_position, last_position, guard_direction))
             return lines
 
+    def compute_loop_numbers(self):
+        ...
+
 
 def parse_input(data: str) -> Map:
     data = data.strip("\n")
