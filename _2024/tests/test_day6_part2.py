@@ -2,6 +2,28 @@ import pytest
 from _2024.day6 import Direction, Line, Map
 
 
+def test_direction_can_return_all_members():
+    assert Direction.all() == {
+        Direction.UP,
+        Direction.DOWN,
+        Direction.LEFT,
+        Direction.RIGHT,
+    }
+
+
+@pytest.mark.parametrize(
+    "direction, opposite",
+    [
+        (Direction.UP, Direction.DOWN),
+        (Direction.DOWN, Direction.UP),
+        (Direction.LEFT, Direction.RIGHT),
+        (Direction.RIGHT, Direction.LEFT),
+    ],
+)
+def test_direction_can_return_its_opposite(direction, opposite):
+    assert direction.opposite == opposite
+
+
 @pytest.mark.parametrize(
     "line_a, line_b, intersection_point",
     [

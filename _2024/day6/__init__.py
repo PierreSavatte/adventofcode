@@ -11,6 +11,20 @@ class Direction(Enum):
     LEFT = "LEFT"
     RIGHT = "RIGHT"
 
+    @classmethod
+    def all(cls) -> set["Direction"]:
+        return {direction for direction in cls}
+
+    @property
+    def opposite(self) -> "Direction":
+        mapping_opposite = {
+            Direction.UP: Direction.DOWN,
+            Direction.RIGHT: Direction.LEFT,
+            Direction.DOWN: Direction.UP,
+            Direction.LEFT: Direction.RIGHT,
+        }
+        return mapping_opposite[self]
+
     def turn_90_degrees(self) -> "Direction":
         mapping_90_degrees = {
             Direction.UP: Direction.RIGHT,
