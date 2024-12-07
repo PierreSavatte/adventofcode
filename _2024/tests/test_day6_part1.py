@@ -122,17 +122,19 @@ def test_map_can_evaluate_next_obstacle_of_guard(
 
 def test_map_can_compute_lines_that_guard_will_travel():
     assert MAP.get_traveling_lines() == [
-        Line((4, 6), (4, 1), direction=Direction.UP),
-        Line((4, 1), (8, 1), direction=Direction.RIGHT),
-        Line((8, 1), (8, 6), direction=Direction.DOWN),
-        Line((8, 6), (2, 6), direction=Direction.LEFT),
-        Line((2, 6), (2, 4), direction=Direction.UP),
-        Line((2, 4), (6, 4), direction=Direction.RIGHT),
-        Line((6, 4), (6, 8), direction=Direction.DOWN),
-        Line((6, 8), (1, 8), direction=Direction.LEFT),
-        Line((1, 8), (1, 7), direction=Direction.UP),
-        Line((1, 7), (7, 7), direction=Direction.RIGHT),
-        Line((7, 7), (7, 9), direction=Direction.DOWN),  # Leaves the map line
+        Line((4, 6), (4, 1), direction=Direction.UP),  # 1st
+        Line((4, 1), (8, 1), direction=Direction.RIGHT),  # 2nd
+        Line((8, 1), (8, 6), direction=Direction.DOWN),  # 3rd
+        Line((8, 6), (2, 6), direction=Direction.LEFT),  # 4th
+        Line((2, 6), (2, 4), direction=Direction.UP),  # 5th
+        Line((2, 4), (6, 4), direction=Direction.RIGHT),  # 6th
+        Line((6, 4), (6, 8), direction=Direction.DOWN),  # 7th
+        Line((6, 8), (1, 8), direction=Direction.LEFT),  # 8th
+        Line((1, 8), (1, 7), direction=Direction.UP),  # 9th
+        Line((1, 7), (7, 7), direction=Direction.RIGHT),  # 10th
+        Line(  # 11 = Leaves the map line
+            (7, 7), (7, 9), direction=Direction.DOWN
+        ),
     ]
 
 
