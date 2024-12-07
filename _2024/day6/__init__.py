@@ -72,6 +72,22 @@ def generate_line(
         yield next_position
 
 
+class Ray:
+    def __init__(
+        self,
+        start: POSITION,
+        direction: Direction,
+    ):
+        self.start = start
+        self.direction = direction
+
+    def __eq__(self, other: "Ray") -> bool:
+        return self.start == other.start and self.direction == other.direction
+
+    def __repr__(self) -> str:
+        return f"<Ray start={self.start} direction={self.direction}>"
+
+
 class Line:
     def __init__(
         self,
@@ -82,6 +98,9 @@ class Line:
         self.start = start
         self.end = end
         self.direction = direction
+
+    def get_ray(self) -> Ray:
+        return Ray(start=self.end, direction=self.direction.opposite)
 
     def compute_positions(self) -> set[POSITION]:
         x_start, y_start = self.start

@@ -25,6 +25,23 @@ def test_direction_can_return_its_opposite(direction, opposite):
 
 
 @pytest.mark.parametrize(
+    "line, ray",
+    [
+        (
+            Line((4, 6), (4, 1), direction=Direction.UP),
+            Ray(start=(4, 1), direction=Direction.DOWN),
+        ),
+        (
+            Line((4, 1), (8, 1), direction=Direction.RIGHT),
+            Ray(start=(8, 1), direction=Direction.LEFT),
+        ),
+    ],
+)
+def test_line_can_compute_its_ray(line, ray):
+    assert line.get_ray() == ray
+
+
+@pytest.mark.parametrize(
     "line_a, line_b, intersection_point",
     [
         (
