@@ -45,12 +45,15 @@ def test_input_can_be_parsed():
     ],
 )
 def test_positions_can_be_computed_in_a_line(start, end, expected_positions):
-    assert Line(start, end).compute_positions() == expected_positions
+    assert (
+        Line(start, end, Direction.UP).compute_positions()
+        == expected_positions
+    )
 
 
 @pytest.mark.parametrize("start, end", [((0, 0), (1, 1)), ((1, 1), (0, 0))])
 def test_error_is_raised_when_positions_are_not_in_a_line(start, end):
-    line = Line(start, end)
+    line = Line(start, end, Direction.UP)
     with pytest.raises(ValueError):
         line.compute_positions()
 
@@ -119,17 +122,17 @@ def test_map_can_evaluate_next_obstacle_of_guard(
 
 def test_map_can_compute_lines_that_guard_will_travel():
     assert MAP.get_traveling_lines() == [
-        Line((4, 6), (4, 1)),
-        Line((4, 1), (8, 1)),
-        Line((8, 1), (8, 6)),
-        Line((8, 6), (2, 6)),
-        Line((2, 6), (2, 4)),
-        Line((2, 4), (6, 4)),
-        Line((6, 4), (6, 8)),
-        Line((6, 8), (1, 8)),
-        Line((1, 8), (1, 7)),
-        Line((1, 7), (7, 7)),
-        Line((7, 7), (7, 9)),  # Leaves the map line
+        Line((4, 6), (4, 1), direction=Direction.UP),
+        Line((4, 1), (8, 1), direction=Direction.RIGHT),
+        Line((8, 1), (8, 6), direction=Direction.DOWN),
+        Line((8, 6), (2, 6), direction=Direction.LEFT),
+        Line((2, 6), (2, 4), direction=Direction.UP),
+        Line((2, 4), (6, 4), direction=Direction.RIGHT),
+        Line((6, 4), (6, 8), direction=Direction.DOWN),
+        Line((6, 8), (1, 8), direction=Direction.LEFT),
+        Line((1, 8), (1, 7), direction=Direction.UP),
+        Line((1, 7), (7, 7), direction=Direction.RIGHT),
+        Line((7, 7), (7, 9), direction=Direction.DOWN),  # Leaves the map line
     ]
 
 

@@ -59,9 +59,15 @@ def generate_line(
 
 
 class Line:
-    def __init__(self, start: POSITION, end: POSITION):
+    def __init__(
+        self,
+        start: POSITION,
+        end: POSITION,
+        direction: Direction,
+    ):
         self.start = start
         self.end = end
+        self.direction = direction
 
     def compute_positions(self) -> set[POSITION]:
         x_start, y_start = self.start
@@ -102,7 +108,19 @@ class Line:
         return (int(x_intersection), int(y_intersection))
 
     def __eq__(self, other: "Line") -> bool:
-        return self.start == other.start and self.end == other.end
+        return (
+            self.start == other.start
+            and self.end == other.end
+            and self.direction == other.direction
+        )
+
+    def __repr__(self) -> str:
+        return (
+            "<Line "
+            f"start={self.start} "
+            f"end={self.end} "
+            f"direction={self.direction}>"
+        )
 
 
 class Map:
@@ -155,7 +173,9 @@ class Map:
                 next_guard_position = guard_direction.get_previous_position(
                     obstacle
                 )
-                lines.append(Line(guard_position, next_guard_position))
+                lines.append(
+                    Line(guard_position, next_guard_position, guard_direction)
+                )
 
                 guard_position = next_guard_position
                 guard_direction = guard_direction.turn_90_degrees()
@@ -166,7 +186,7 @@ class Map:
                 )
             )
             last_position = last_line[-1]
-            lines.append(Line(guard_position, last_position))
+            lines.append(Line(guard_position, last_position, guard_direction))
             return lines
 
 
