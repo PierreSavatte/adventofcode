@@ -2,7 +2,13 @@ from enum import Enum
 from itertools import product
 from typing import Generator, Optional
 
+from tqdm import tqdm
+
 POSITION = tuple[int, int]
+
+
+class LoopDetected(Exception):
+    ...
 
 
 class Direction(Enum):
@@ -245,9 +251,13 @@ class Map:
                 next_guard_position = guard_direction.get_previous_position(
                     obstacle
                 )
-                lines.append(
-                    Line(guard_position, next_guard_position, guard_direction)
+                new_line = Line(
+                    guard_position, next_guard_position, guard_direction
                 )
+                if new_line not in lines:
+                    lines.append(new_line)
+                else:
+                    raise LoopDetected()
 
                 guard_position = next_guard_position
                 guard_direction = guard_direction.turn_90_degrees()
@@ -263,25 +273,32 @@ class Map:
 
     def compute_new_obstacles_positions_to_form_loops(self) -> set[POSITION]:
         traveling_lines = self.get_traveling_lines()
-        lines_that_can_be_part_of_a_loop = traveling_lines[:-1]
 
         new_obstacles_positions = []
-        for i in range(len(traveling_lines)):
-            line = traveling_lines[i]
+        lines_positions = [
+            line.compute_positions() for line in traveling_lines
+        ]
 
-            previous_lines = lines_that_can_be_part_of_a_loop[:i]
-
-            for j, other_line in enumerate(previous_lines):
-                ray = other_line.get_ray()
-
-                intersection_point = line.get_intersection_point(
-                    ray, self.size
+        progress_bar = tqdm(
+            total=sum(
+                [len(line_positions) for line_positions in lines_positions]
+            )
+        )
+        for line_positions in lines_positions:
+            for position in line_positions:
+                new_obstacle = position
+                new_map = Map(
+                    size=self.size,
+                    guard_starting_position=self.guard_starting_position,
+                    obstacles=[new_obstacle, *self.obstacles],
                 )
-                if intersection_point:
-                    new_obstacle = line.direction.get_next_position(
-                        intersection_point
-                    )
+                try:
+                    new_map.get_traveling_lines()
+                except LoopDetected:
                     new_obstacles_positions.append(new_obstacle)
+
+                progress_bar.update(1)
+        progress_bar.close()
 
         return set(new_obstacles_positions)
 
