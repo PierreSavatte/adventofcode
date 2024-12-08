@@ -52,6 +52,36 @@ class Map:
             antinodes[antenna_type] = sorted(antinodes_for_this_type)
         return antinodes
 
+    def compute_antinodes_with_resonance(self) -> dict[str, set[Point]]:
+        antinodes = defaultdict(set)
+        for antenna_type, antennas in self.antennas.items():
+            antinodes_for_this_type = []
+            for a, b in combinations(antennas, 2):
+
+                # First direction
+                reflection = a.reflection_from(b)
+                last = b
+                while self.in_map(reflection):
+                    antinodes_for_this_type.append(reflection)
+                    new_reflection = last.reflection_from(reflection)
+
+                    last = reflection
+                    reflection = new_reflection
+
+                # Second direction
+                reflection = b.reflection_from(a)
+                previous = a
+                while self.in_map(reflection):
+                    antinodes_for_this_type.append(reflection)
+                    new_reflection = previous.reflection_from(reflection)
+
+                    previous = reflection
+                    reflection = new_reflection
+
+            antinodes[antenna_type] = set(antinodes_for_this_type)
+            antinodes[antenna_type].update(antennas)
+        return dict(antinodes)
+
 
 def parse_input(data: str) -> Map:
     data = data.strip("\n")
