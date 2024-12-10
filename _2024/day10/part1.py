@@ -25,9 +25,7 @@ def compute_hiking_trails(map: MAP) -> list[HikingTrail]:
                 )
             except RuntimeError:
                 continue
-            hiking_trails.append(
-                HikingTrail(positions=[trailhead, *hiking_trail])
-            )
+            hiking_trails.append(HikingTrail(positions=hiking_trail))
 
     return hiking_trails
 

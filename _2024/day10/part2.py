@@ -13,7 +13,7 @@ from _2024.load_input import load_input
 
 def find_paths(map, start_position, end_position):
     if start_position == end_position:
-        return [end_position]
+        return [[end_position]]
 
     paths = []
     for neighbors in get_neighbors(map, start_position):
@@ -41,7 +41,7 @@ def compute_all_hiking_trails(map: MAP) -> list[HikingTrail]:
             except RuntimeError:
                 continue
             for path in paths:
-                hiking_trails.append(HikingTrail(positions=[trailhead, *path]))
+                hiking_trails.append(HikingTrail(positions=path))
 
     return hiking_trails
 

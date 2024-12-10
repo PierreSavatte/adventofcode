@@ -57,7 +57,7 @@ def a_star(
         )
 
         if current == end_position:
-            return reconstruct_path(came_from, current)
+            return [start_position, *reconstruct_path(came_from, current)]
 
         open_set.remove(current)
 
