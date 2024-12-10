@@ -1,7 +1,9 @@
 import math
-from typing import Callable, Union
+from typing import Callable
 
 from _2024.day10 import MAP, POSITION
+
+PATH = list[POSITION]
 
 
 def reconstruct_path(
@@ -34,15 +36,12 @@ def euclidean_distance(a: POSITION, b: POSITION) -> int:
     return abs(x_b - x_a) + abs(y_b - y_a)
 
 
-PATH = list[POSITION]
-
 def a_star(
     map: MAP,
     get_neighbors: Callable,
     start_position: POSITION,
     end_position: POSITION,
-    all_paths: bool = False,
-) -> Union[PATH, list[PATH]]:
+) -> PATH:
     open_set = {start_position}
     came_from: dict[POSITION] = {}
 
@@ -52,34 +51,24 @@ def a_star(
     g_score = {start_position: 0}
     f_score = {start_position: get_f_score(start_position)}
 
-    paths = []
     while open_set:
         current = get_node_in_open_set_with_lowest_f_score(
             open_set=open_set, f_score=f_score
         )
 
         if current == end_position:
-            path = reconstruct_path(came_from, current)
-            if all_paths:
-                paths.append(path)
-            else:
-                return path
+            return reconstruct_path(came_from, current)
 
         open_set.remove(current)
 
         neighbors = get_neighbors(map, current)
         for neighbor in neighbors:
             tentative_g_score = g_score[current]
-            if all_paths or tentative_g_score < g_score.get(
-                neighbor, math.inf
-            ):
+            if tentative_g_score < g_score.get(neighbor, math.inf):
                 came_from[neighbor] = current
                 g_score[neighbor] = tentative_g_score
                 f_score[neighbor] = tentative_g_score + get_f_score(neighbor)
                 if neighbor not in open_set:
                     open_set.add(neighbor)
 
-    if len(paths) == 0:
-        raise RuntimeError("Was not able to find a path")
-    else:
-        return paths
+    raise RuntimeError("Was not able to find a path")
