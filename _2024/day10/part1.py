@@ -1,11 +1,46 @@
 from _2024.day10 import (
     MAP,
-    compute_hiking_trails,
-    get_trailhead_score,
+    POSITION,
+    HikingTrail,
+    get_neighbors,
+    get_trail_destinations,
     get_trailheads,
     parse_input,
 )
 from _2024.load_input import load_input
+
+
+def compute_hiking_trails(map: MAP) -> list[HikingTrail]:
+    from _2024.day10.a_star import a_star
+
+    hiking_trails = []
+
+    trail_destinations = get_trail_destinations(map)
+    trailheads = get_trailheads(map)
+    for trailhead in trailheads:
+        for trail_destination in trail_destinations:
+            try:
+                hiking_trail = a_star(
+                    map, get_neighbors, trailhead, trail_destination
+                )
+            except RuntimeError:
+                continue
+            hiking_trails.append(
+                HikingTrail(positions=[trailhead, *hiking_trail])
+            )
+
+    return hiking_trails
+
+
+def get_trailhead_score(
+    trailhead: POSITION, hiking_trails: list[HikingTrail]
+) -> int:
+    score = 0
+    for hiking_trail in hiking_trails:
+        trailhead_of_hiking_trail = hiking_trail.positions[0]
+        if trailhead_of_hiking_trail == trailhead:
+            score += 1
+    return score
 
 
 def compute_solution(map: MAP) -> int:

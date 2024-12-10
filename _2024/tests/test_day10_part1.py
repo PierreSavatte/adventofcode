@@ -1,14 +1,16 @@
 import pytest
 from _2024.day10 import (
     HikingTrail,
-    compute_hiking_trails,
     get_neighbors,
     get_trail_destinations,
-    get_trailhead_score,
     get_trailheads,
     parse_input,
 )
-from _2024.day10.part1 import compute_solution
+from _2024.day10.part1 import (
+    compute_hiking_trails,
+    compute_solution,
+    get_trailhead_score,
+)
 
 MAP_1 = [
     [1, 1, 1, 0, 1, 1, 1],

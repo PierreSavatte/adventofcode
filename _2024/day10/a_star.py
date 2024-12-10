@@ -1,7 +1,7 @@
 import math
 from typing import Callable
 
-from _2024.day10 import MAP, POSITION, get_value
+from _2024.day10 import MAP, POSITION
 
 
 def reconstruct_path(
