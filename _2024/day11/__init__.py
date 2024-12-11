@@ -19,11 +19,7 @@ def change_stone(stone: int) -> list[int]:
 
 
 def change(stones: list[int]) -> list[int]:
-    i = 0
-    while i < len(stones):
-        stone = stones.pop(i)
-        new_stones = change_stone(stone)
-        for j, new_stone in enumerate(new_stones):
-            stones.insert(i + j, new_stone)
-        i += len(new_stones)
-    return stones
+    new_stones = []
+    for stone in stones:
+        new_stones.extend(change_stone(stone))
+    return new_stones
