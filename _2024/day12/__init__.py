@@ -235,7 +235,6 @@ def parse_input(data: str) -> MAP:
 
 
 def compute_regions(map: MAP) -> list[Region]:
-    i = 0
     regions = RegionList(map=map)
     for y, line in enumerate(map):
         for x, character in enumerate(line):
