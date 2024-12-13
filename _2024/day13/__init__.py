@@ -22,6 +22,8 @@ class Machine:
 
         max_nb_press_b = min(x // delta_x_b, y // delta_y_b)
 
+        max_nb_press_b = min(max_nb_press_b, 100)
+
         for nb_press_b in range(max_nb_press_b, 0, -1):
 
             rest_x = x - nb_press_b * delta_x_b
@@ -32,7 +34,7 @@ class Machine:
 
             if nb_press_a_to_solve_x != nb_press_a_to_solve_y:
                 continue
-            nb_press_a = nb_press_a_to_solve_x
+            nb_press_a = min(nb_press_a_to_solve_x, 100)
 
             rest_x = rest_x - nb_press_a * delta_x_a
             rest_y = rest_y - nb_press_a * delta_y_a
