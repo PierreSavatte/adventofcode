@@ -4,3 +4,4 @@ click==8.0.2
 tqdm==4.66.1
 colorama==0.4.6
 isort==5.13.2
+pillow==11.0.0

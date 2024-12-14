@@ -1,5 +1,3 @@
-from operator import mul
-
 from _2024.day14 import Simulation, parse_input
 from _2024.load_input import load_input
 

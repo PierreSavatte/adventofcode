@@ -44,6 +44,10 @@ class Simulation:
     robots: list[Robot]
     simulation_time: int = 100
 
+    @property
+    def robot_positions(self) -> list[POSITION]:
+        return [robot.position for robot in self.robots]
+
     def count_robots_in_quadrants(self) -> dict[Quadrant, int]:
         robots_in_quadrants = {
             Quadrant.I: 0,
@@ -56,9 +60,7 @@ class Simulation:
         half_width = width // 2
         half_height = height // 2
 
-        for robot in self.robots:
-            x, y = robot.position
-
+        for x, y in self.robot_positions:
             quadrant = None
             if 0 <= x < half_width:
                 if 0 <= y < half_height:
