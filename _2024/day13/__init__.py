@@ -10,40 +10,56 @@ class Unsolvable(Exception):
 
 
 @dataclass
+class Matrix_2_2:
+    # |-   -|
+    # | a b |
+    # | c d |
+    # |-   -|
+    a: float
+    b: float
+    c: float
+    d: float
+
+    @property
+    def determinant(self) -> float:
+        return self.a * self.d - self.c * self.b
+
+
+@dataclass
 class Machine:
     prize: POSITION
     button_a: DELTA_POSITION
     button_b: DELTA_POSITION
 
-    def get_prize(self) -> NB_PRESS:
+    def get_prize(self, correction_applied: bool = False) -> NB_PRESS:
+        # https://en.wikipedia.org/wiki/System_of_linear_equations#Matrix_solution
+
         x, y = self.prize
+        if correction_applied:
+            x += 10000000000000
+            y += 10000000000000
+
         delta_x_a, delta_y_a = self.button_a
         delta_x_b, delta_y_b = self.button_b
 
-        max_nb_press_b = min(x // delta_x_b, y // delta_y_b)
+        matrix_a = Matrix_2_2(
+            a=delta_x_a, b=delta_x_b, c=delta_y_a, d=delta_y_b
+        )
 
-        max_nb_press_b = min(max_nb_press_b, 100)
+        nb_pressed_a = int(
+            (matrix_a.d * x - matrix_a.b * y) / matrix_a.determinant
+        )
+        nb_pressed_b = int(
+            (-matrix_a.c * x + matrix_a.a * y) / matrix_a.determinant
+        )
 
-        for nb_press_b in range(max_nb_press_b, 0, -1):
+        # Verification
+        landing_x = delta_x_a * nb_pressed_a + delta_x_b * nb_pressed_b
+        landing_y = delta_y_a * nb_pressed_a + delta_y_b * nb_pressed_b
+        if landing_x != x or landing_y != y:
+            raise Unsolvable()
 
-            rest_x = x - nb_press_b * delta_x_b
-            rest_y = y - nb_press_b * delta_y_b
-
-            nb_press_a_to_solve_x = rest_x // delta_x_a
-            nb_press_a_to_solve_y = rest_y // delta_y_a
-
-            if nb_press_a_to_solve_x != nb_press_a_to_solve_y:
-                continue
-            nb_press_a = min(nb_press_a_to_solve_x, 100)
-
-            rest_x = rest_x - nb_press_a * delta_x_a
-            rest_y = rest_y - nb_press_a * delta_y_a
-
-            if rest_x != 0 or rest_y != 0:
-                continue
-            return nb_press_a_to_solve_x, nb_press_b
-
-        raise Unsolvable(self)
+        return int(nb_pressed_a), int(nb_pressed_b)
 
 
 def parse_line_data(
