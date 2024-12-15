@@ -1,5 +1,5 @@
 import pytest
-from _2024.day15 import Direction, Warehouse, parse_input, to_gps
+from _2024.day15 import Box, Direction, Warehouse, parse_input, to_gps
 from _2024.day15.part1 import compute_solution
 
 TEST_INPUT = """########
@@ -71,7 +71,14 @@ WAREHOUSE = Warehouse(
         (6, 7),
         (7, 7),
     ],
-    boxes=[(3, 1), (5, 1), (4, 2), (4, 3), (4, 4), (4, 5)],
+    boxes=[
+        Box((3, 1)),
+        Box((5, 1)),
+        Box((4, 2)),
+        Box((4, 3)),
+        Box((4, 4)),
+        Box((4, 5)),
+    ],
     robot=(2, 2),
     robot_moves=[
         Direction.LEFT,

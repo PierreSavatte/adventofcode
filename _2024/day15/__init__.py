@@ -28,11 +28,47 @@ class Direction(Enum):
         return mapping[self]
 
 
+def get_next_position(position: POSITION, direction: Direction) -> POSITION:
+    delta_x, delta_y = direction.delta
+
+    x, y = position
+    return x + delta_x, y + delta_y
+
+
+class Box:
+    def __init__(self, *positions: POSITION):
+        self.positions: list[POSITION] = list(positions)
+
+    def get_neighbors_positions(self, direction: Direction) -> list[POSITION]:
+        return [
+            get_next_position(position=position, direction=direction)
+            for position in self.positions
+        ]
+
+    def move(self, direction: Direction):
+        self.positions = [
+            get_next_position(position, direction)
+            for position in self.positions
+        ]
+
+    def __eq__(self, other: "Box") -> bool:
+        if not isinstance(other, Box):
+            raise NotImplementedError()
+        return self.positions == other.positions
+
+    def __repr__(self) -> str:
+        return f"Box({self.positions})"
+
+    @property
+    def gps_position(self) -> POSITION:
+        return min(self.positions)
+
+
 @dataclass
 class Warehouse:
     size: MAP_SIZE
     walls: list[POSITION]
-    boxes: list[POSITION]
+    boxes: list[Box]
     robot: POSITION
     robot_moves: list[Direction]
 
@@ -44,6 +80,15 @@ class Warehouse:
     def size_y(self) -> int:
         return self.size[1]
 
+    def get_box_at(self, position: POSITION):
+        for box in self.boxes:
+            if position in box.positions:
+                return box
+
+    def in_map(self, position: POSITION) -> bool:
+        x, y = position
+        return 0 <= x < self.size_x and 0 <= y < self.size_y
+
     def to_str(self) -> str:
         map = [""]
         for y in range(self.size_y):
@@ -51,10 +96,12 @@ class Warehouse:
             for x in range(self.size_x):
                 position = (x, y)
 
+                box = self.get_box_at(position)
+
                 character = "."
                 if position == self.robot:
                     character = "@"
-                elif position in self.boxes:
+                elif box:
                     character = "O"
                 elif position in self.walls:
                     character = "#"
@@ -63,38 +110,39 @@ class Warehouse:
             map.append("".join(line))
         return "\n".join(map)
 
-    def _get_boxes_to_move(self, direction: Direction) -> list[POSITION]:
+    def _get_all_boxes(self, box: Box, direction: Direction) -> list[Box]:
+        next_boxes = []
+        for position in box.get_neighbors_positions(direction=direction):
+            if not self.in_map(position):
+                continue
+
+            if position in self.walls:
+                raise CannotMove(f"Blocked by {position}")
+
+            next_box = self.get_box_at(position)
+            if next_box is not None:
+                next_boxes.append(next_box)
+
+        all_boxes = [box]
+        for next_box in next_boxes:
+            all_boxes.extend(self._get_all_boxes(next_box, direction))
+        return all_boxes
+
+    def _get_boxes_to_move(self, direction: Direction) -> list[Box]:
         delta_x, delta_y = direction.delta
 
         start_x = self.robot[0] + delta_x
         start_y = self.robot[1] + delta_y
+        next_position = start_x, start_y
 
-        if direction == direction.UP:
-            x_range = range(start_x, start_x + 1)
-            y_range = range(start_y, -1, delta_y)
-        elif direction == direction.DOWN:
-            x_range = range(start_x, start_x + 1)
-            y_range = range(start_y, self.size_y, delta_y)
-        elif direction == direction.RIGHT:
-            x_range = range(start_x, self.size_x, delta_x)
-            y_range = range(start_y, start_y + 1)
-        else:
-            x_range = range(start_x, -1, delta_x)
-            y_range = range(start_y, start_y + 1)
+        if next_position in self.walls:
+            raise CannotMove(f"Blocked by {next_position}")
 
-        positions = []
-        for x in x_range:
-            for y in y_range:
-                position = (x, y)
+        box = self.get_box_at(next_position)
+        if box is not None:
+            return self._get_all_boxes(box, direction)
 
-                if position in self.walls:
-                    raise CannotMove(f"Blocked by {position}")
-                elif position in self.boxes:
-                    positions.append(position)
-                else:
-                    return positions
-
-        return positions
+        return []
 
     def run(self) -> Generator[None, None, None]:
         for robot_move in self.robot_moves:
@@ -110,9 +158,7 @@ class Warehouse:
                 self.robot = x + delta_x, y + delta_y
 
                 for box_to_move in boxes_to_move:
-                    i = self.boxes.index(box_to_move)
-                    x, y = box_to_move
-                    self.boxes[i] = x + delta_x, y + delta_y
+                    box_to_move.move(robot_move)
             yield
 
 
@@ -132,7 +178,7 @@ def parse_input(data: str) -> Warehouse:
             if character == "#":
                 walls.append((x, y))
             if character == "O":
-                boxes.append((x, y))
+                boxes.append(Box((x, y)))
             if character == "@":
                 robot = (x, y)
 

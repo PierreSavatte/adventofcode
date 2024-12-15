@@ -5,7 +5,7 @@ from _2024.load_input import load_input
 def compute_solution(warehouse: Warehouse) -> int:
     for _ in warehouse.run():
         ...
-    return sum([to_gps(box) for box in warehouse.boxes])
+    return sum([to_gps(box.gps_position) for box in warehouse.boxes])
 
 
 def main():
