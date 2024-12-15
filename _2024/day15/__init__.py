@@ -4,6 +4,7 @@ from typing import Generator
 
 POSITION = tuple[int, int]
 DELTA_POSITION = tuple[int, int]
+MAP_SIZE = tuple[int, int]
 
 
 class CannotMove(Exception):
@@ -29,17 +30,25 @@ class Direction(Enum):
 
 @dataclass
 class Warehouse:
-    size: int
+    size: MAP_SIZE
     walls: list[POSITION]
     boxes: list[POSITION]
     robot: POSITION
     robot_moves: list[Direction]
 
+    @property
+    def size_x(self) -> int:
+        return self.size[0]
+
+    @property
+    def size_y(self) -> int:
+        return self.size[1]
+
     def to_str(self) -> str:
         map = [""]
-        for y in range(self.size):
+        for y in range(self.size_y):
             line = []
-            for x in range(self.size):
+            for x in range(self.size_x):
                 position = (x, y)
 
                 character = "."
@@ -65,9 +74,9 @@ class Warehouse:
             y_range = range(start_y, -1, delta_y)
         elif direction == direction.DOWN:
             x_range = range(start_x, start_x + 1)
-            y_range = range(start_y, self.size, delta_y)
+            y_range = range(start_y, self.size_y, delta_y)
         elif direction == direction.RIGHT:
-            x_range = range(start_x, self.size, delta_x)
+            x_range = range(start_x, self.size_x, delta_x)
             y_range = range(start_y, start_y + 1)
         else:
             x_range = range(start_x, -1, delta_x)
@@ -116,7 +125,8 @@ def parse_input(data: str) -> Warehouse:
     boxes = []
     robot = None
     lines = map.split("\n")
-    map_size = len(lines)
+    size_x = len(lines)
+    size_y = len(lines[0])
     for y, line in enumerate(lines):
         for x, character in enumerate(line):
             if character == "#":
@@ -134,7 +144,7 @@ def parse_input(data: str) -> Warehouse:
     robot_moves = [Direction(move) for move in moves if move != "\n"]
 
     return Warehouse(
-        size=map_size,
+        size=(size_x, size_y),
         walls=walls,
         boxes=boxes,
         robot=robot,

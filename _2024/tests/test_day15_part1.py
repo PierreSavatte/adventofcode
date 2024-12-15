@@ -38,7 +38,7 @@ v^^>>><<^^<>>^v^<v^vv<>v^<<>^<^v^v><^<<<><<^<v><v<>vv>>v><v^<vv<>v^<<^
 """
 
 WAREHOUSE = Warehouse(
-    size=8,
+    size=(8, 8),
     walls=[
         (0, 0),
         (1, 0),
