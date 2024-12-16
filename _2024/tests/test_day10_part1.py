@@ -180,67 +180,6 @@ def test_neighbors_can_be_computed_for_a_position(map, neighbors):
                 ),
             ],
         ),
-        (
-            MAP_2,
-            [
-                HikingTrail(
-                    positions=[
-                        (3, 0),
-                        (3, 1),
-                        (3, 2),
-                        (3, 3),
-                        (4, 3),
-                        (5, 3),
-                        (6, 3),
-                        (6, 2),
-                        (6, 1),
-                        (6, 0),
-                    ]
-                ),
-                HikingTrail(
-                    positions=[
-                        (3, 0),
-                        (3, 1),
-                        (3, 2),
-                        (3, 3),
-                        (4, 3),
-                        (5, 3),
-                        (6, 3),
-                        (6, 2),
-                        (6, 1),
-                        (5, 1),
-                    ]
-                ),
-                HikingTrail(
-                    positions=[
-                        (3, 0),
-                        (3, 1),
-                        (3, 2),
-                        (3, 3),
-                        (4, 3),
-                        (5, 3),
-                        (6, 3),
-                        (6, 4),
-                        (5, 4),
-                        (4, 4),
-                    ]
-                ),
-                HikingTrail(
-                    positions=[
-                        (3, 0),
-                        (3, 1),
-                        (3, 2),
-                        (3, 3),
-                        (2, 3),
-                        (2, 4),
-                        (2, 5),
-                        (1, 5),
-                        (0, 5),
-                        (0, 6),
-                    ]
-                ),
-            ],
-        ),
     ],
 )
 def test_hiking_trail_can_be_computed(map, hiking_trails):

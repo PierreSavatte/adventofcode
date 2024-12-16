@@ -81,7 +81,6 @@ class Map:
             get_neighbors=self.get_neighbors,
             start_position=self.start,
             end_position=self.end,
-            f_function=self.f_function,
             distance_function=compute_distance,
         )
 
