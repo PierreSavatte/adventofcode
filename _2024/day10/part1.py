@@ -13,6 +13,9 @@ from _2024.load_input import load_input
 def compute_hiking_trails(map: MAP) -> list[HikingTrail]:
     from _2024.day10.a_star import a_star
 
+    def distance_function(*args, **kwargs) -> int:
+        return 0
+
     hiking_trails = []
 
     trail_destinations = get_trail_destinations(map)
@@ -21,7 +24,11 @@ def compute_hiking_trails(map: MAP) -> list[HikingTrail]:
         for trail_destination in trail_destinations:
             try:
                 hiking_trail = a_star(
-                    map, get_neighbors, trailhead, trail_destination
+                    map=map,
+                    get_neighbors=get_neighbors,
+                    start_position=trailhead,
+                    end_position=trail_destination,
+                    distance_function=distance_function,
                 )
             except RuntimeError:
                 continue

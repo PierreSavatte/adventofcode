@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 
+from _2024.day10.a_star import Direction
+
 MAP = list[list[int]]
 POSITION = tuple[int, int]
 
@@ -34,13 +36,16 @@ def get_value(map: MAP, position: POSITION) -> int:
     return map[y][x]
 
 
-def get_neighbors(map: MAP, position: POSITION) -> list[POSITION]:
+def get_neighbors(
+    map: MAP,
+    current: POSITION,
+    direction: Direction = Direction.RIGHT,  # Not relevant for this problem
+) -> list[POSITION]:
     map_size = len(map)
-    x, y = position
+    x, y = current
 
     neighbors = []
     for delta_x, delta_y in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
-        x, y = position
         new_x = x + delta_x
         new_y = y + delta_y
         if not (0 <= new_x < map_size and 0 <= new_y < map_size):
@@ -48,7 +53,7 @@ def get_neighbors(map: MAP, position: POSITION) -> list[POSITION]:
             continue
 
         new_position = (new_x, new_y)
-        if get_value(map, new_position) == get_value(map, position) + 1:
+        if get_value(map, new_position) == get_value(map, current) + 1:
             neighbors.append(new_position)
     return neighbors
 
@@ -56,4 +61,3 @@ def get_neighbors(map: MAP, position: POSITION) -> list[POSITION]:
 @dataclass
 class HikingTrail:
     positions: list[POSITION]
-
