@@ -1,7 +1,7 @@
 import math
 from enum import Enum
 from queue import PriorityQueue
-from typing import Any, Optional, Protocol
+from typing import Any, Optional, Protocol, Union
 
 POSITION = tuple[int, int]
 PATH = list[POSITION]
@@ -90,33 +90,41 @@ def a_star(
     start_position: POSITION,
     end_position: POSITION,
     distance_function: GetDistance,
-) -> PATH:
+    multiple_optimal_paths: bool = False,
+) -> Union[PATH, list[PATH]]:
     open_set = PriorityQueue()
     open_set.put(item=(0, start_position, Direction.RIGHT, [start_position]))
 
     g_score = {(start_position, Direction.RIGHT): 0}
+    paths = []
+    optimal_distance = None
 
     while not open_set.empty():
         distance, current, direction, path = open_set.get()
 
         if current == end_position:
-            return path
+            if multiple_optimal_paths:
+                if optimal_distance is None:
+                    optimal_distance = distance
+                if distance == optimal_distance:
+                    paths.append(path)
+            else:
+                return path
 
         neighbors = get_neighbors(
             map=map, current=current, direction=direction
         )
         for neighbor in neighbors:
-            score = g_score[(current, direction)]
+            next_direction = Direction.from_two_points(current, neighbor)
             distance_current_neighbor = distance_function(
                 current=current, current_direction=direction, neighbor=neighbor
             )
-            next_direction = Direction.from_two_points(current, neighbor)
+            tentative_g_score = distance + distance_current_neighbor
 
-            tentative_g_score = score + distance_current_neighbor
             already_existing_g_score = g_score.get(
                 (neighbor, next_direction), math.inf
             )
-            if tentative_g_score < already_existing_g_score:
+            if tentative_g_score <= already_existing_g_score:
                 g_score[(neighbor, next_direction)] = tentative_g_score
                 open_set.put(
                     item=(
@@ -126,5 +134,7 @@ def a_star(
                         [*path, neighbor],
                     )
                 )
-
-    raise RuntimeError("Was not able to find a path")
+    if multiple_optimal_paths:
+        return paths
+    else:
+        raise RuntimeError("Was not able to find a path")

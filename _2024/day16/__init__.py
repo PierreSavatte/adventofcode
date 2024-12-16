@@ -84,6 +84,16 @@ class Map:
             distance_function=compute_distance,
         )
 
+    def get_all_optimal_paths(self) -> list[list[POSITION]]:
+        return a_star(
+            map=self.map,
+            get_neighbors=self.get_neighbors,
+            start_position=self.start,
+            end_position=self.end,
+            distance_function=compute_distance,
+            multiple_optimal_paths=True,
+        )
+
     def plot_path_in_map(self, path: list[POSITION]) -> str:
         map = []
         for line in self.map:
