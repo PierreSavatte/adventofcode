@@ -62,7 +62,6 @@ class Map:
         self, map: Any, current: POSITION, direction: Direction
     ) -> list[POSITION]:
         x, y = current
-        same_direction_neighbors = None
         neighbors = []
         for delta_x, delta_y in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
             new_x = x + delta_x
@@ -72,16 +71,7 @@ class Map:
             new_position = new_x, new_y
 
             if self.in_map(new_position) and character != "#":
-                new_direction = Direction.from_two_points(
-                    current, new_position
-                )
-                if new_direction == direction:
-                    same_direction_neighbors = new_position
-                else:
-                    neighbors.append(new_position)
-
-        if same_direction_neighbors:
-            neighbors = [same_direction_neighbors, *neighbors]
+                neighbors.append(new_position)
 
         return neighbors
 
