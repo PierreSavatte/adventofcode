@@ -24,6 +24,20 @@ class Computer:
         self.instruction_pointer = 0
         self.length_program = len(program)
 
+        self.program_string = self.get_program_to_string(program)
+
+    def copy(self) -> "Computer":
+        return Computer(
+            register_a=self.register_a,
+            register_b=self.register_b,
+            register_c=self.register_c,
+            program=self.program[:],
+        )
+
+    @staticmethod
+    def get_program_to_string(program: list[int]) -> str:
+        return ",".join(map(str, program))
+
     def read(self) -> int:
         if self.instruction_pointer >= self.length_program:
             raise HaltingProgram()
@@ -118,7 +132,7 @@ class Computer:
 
             if value is not None:
                 result.append(value)
-        return ",".join(map(str, result))
+        return self.get_program_to_string(result)
 
     def __repr__(self):
         return (
