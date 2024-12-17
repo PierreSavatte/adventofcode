@@ -272,7 +272,7 @@ def test_computer_can_run_program_1():
 
     output = computer.run()
 
-    assert output == []
+    assert output == ""
     assert computer.register_b == 1
 
 
@@ -286,7 +286,7 @@ def test_computer_can_run_program_2():
 
     output = computer.run()
 
-    assert output == [0, 1, 2]
+    assert output == "0,1,2"
 
 
 def test_computer_can_run_program_3():
@@ -299,7 +299,7 @@ def test_computer_can_run_program_3():
 
     output = computer.run()
 
-    assert output == [4, 2, 5, 6, 7, 7, 7, 7, 3, 1, 0]
+    assert output == "4,2,5,6,7,7,7,7,3,1,0"
     assert computer.register_a == 0
 
 
@@ -313,7 +313,7 @@ def test_computer_can_run_program_4():
 
     output = computer.run()
 
-    assert output == []
+    assert output == ""
     assert computer.register_b == 26
 
 
@@ -327,7 +327,7 @@ def test_computer_can_run_program_5():
 
     output = computer.run()
 
-    assert output == []
+    assert output == ""
     assert computer.register_b == 44354
 
 
@@ -341,4 +341,4 @@ def test_computer_can_run_example_program():
 
     output = computer.run()
 
-    assert output == [4, 6, 3, 5, 6, 3, 5, 2, 1, 0]
+    assert output == "4,6,3,5,6,3,5,2,1,0"

@@ -3,8 +3,7 @@ from _2024.load_input import load_input
 
 
 def compute_solution(computer: Computer) -> str:
-    result = computer.run()
-    return ",".join(map(str, result))
+    return computer.run()
 
 
 def main():

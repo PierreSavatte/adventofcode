@@ -106,7 +106,7 @@ class Computer:
         instruction = self.to_instruction(opcode)
         return instruction()
 
-    def run(self) -> list[int]:
+    def run(self) -> str:
         result = []
         halt = False
         while not halt:
@@ -118,7 +118,7 @@ class Computer:
 
             if value is not None:
                 result.append(value)
-        return result
+        return ",".join(map(str, result))
 
     def __repr__(self):
         return (
