@@ -13,14 +13,23 @@ class Direction(Enum):
     DOWN = 2
     RIGHT = 3
 
+    def opposite(self) -> "Direction":
+        mapping = {
+            Direction.UP: Direction.DOWN,
+            Direction.LEFT: Direction.RIGHT,
+            Direction.DOWN: Direction.UP,
+            Direction.RIGHT: Direction.LEFT,
+        }
+        return mapping[self]
+
     def to_str(self) -> str:
-        map = {
+        mapping = {
             Direction.UP: "^",
             Direction.LEFT: "<",
             Direction.DOWN: "v",
             Direction.RIGHT: ">",
         }
-        return map[self]
+        return mapping[self]
 
     @classmethod
     def from_two_points(
@@ -61,9 +70,13 @@ class Direction(Enum):
         return self.to_delta_position() <= other.to_delta_position()
 
 
-def euclidean_distance(a: POSITION, b: POSITION) -> int:
-    x_a, y_a = a
-    x_b, y_b = b
+def euclidean_distance(
+    current: POSITION,
+    neighbor: POSITION,
+    current_direction: Optional[Direction] = None,
+) -> int:
+    x_a, y_a = current
+    x_b, y_b = neighbor
     return abs(x_b - x_a) + abs(y_b - y_a)
 
 
@@ -78,8 +91,8 @@ class GetDistance(Protocol):
     def __call__(
         self,
         current: POSITION,
-        current_direction: Direction,
         neighbor: POSITION,
+        current_direction: Optional[Direction] = None,
     ) -> int:
         raise NotImplementedError()
 
