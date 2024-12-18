@@ -8,18 +8,17 @@ LIST_OF_OBSTACLES = list[POSITION]
 PATH = list[POSITION]
 
 
+class NoPathFound(Exception):
+    ...
+
+
 class Map:
-    def __init__(
-        self,
-        map_size: int,
-        obstacles: LIST_OF_OBSTACLES,
-        current_fallen_bytes_number: int,
-    ):
+    def __init__(self, map_size: int, obstacles: LIST_OF_OBSTACLES):
         self.map_size = map_size
         self.start_position = (0, 0)
         self.end_position = (map_size, map_size)
         self.obstacles = obstacles
-        self.current_fallen_bytes_number = current_fallen_bytes_number
+        self.current_fallen_bytes_number = 0
 
     def in_map(self, position: POSITION) -> bool:
         x, y = position
@@ -77,7 +76,7 @@ class Map:
                                 [*path, neighbor],
                             )
                         )
-        raise RuntimeError("Was not able to find a path")
+        raise NoPathFound()
 
     def plot(self) -> str:
         map = []
@@ -109,15 +108,9 @@ class Map:
         )
 
 
-def parse_input(
-    data: str, map_size: int, current_fallen_bytes_number: int
-) -> Map:
+def parse_input(data: str, map_size: int) -> Map:
     data = data.strip("\n")
     obstacles: list[POSITION] = [  # type:ignore
         tuple(map(int, line.split(","))) for line in data.split("\n")
     ]
-    return Map(
-        map_size=map_size,
-        current_fallen_bytes_number=current_fallen_bytes_number,
-        obstacles=obstacles,
-    )
+    return Map(map_size=map_size, obstacles=obstacles)

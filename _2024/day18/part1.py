@@ -9,11 +9,8 @@ def compute_solution(map: Map) -> int:
 
 def main():
     input_data = load_input(18)
-    map = parse_input(
-        input_data,
-        map_size=70,
-        current_fallen_bytes_number=1024,
-    )
+    map = parse_input(input_data, map_size=70)
+    map.current_fallen_bytes_number = 1024
     print(compute_solution(map))
 
 

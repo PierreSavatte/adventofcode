@@ -30,7 +30,6 @@ TEST_INPUT = """5,4
 
 MAP = Map(
     map_size=6,
-    current_fallen_bytes_number=12,
     obstacles=[
         (5, 4),
         (4, 2),
@@ -59,13 +58,13 @@ MAP = Map(
         (2, 0),
     ],
 )
+MAP.current_fallen_bytes_number = 12
 
 
 def test_input_can_be_parsed():
-    assert (
-        parse_input(TEST_INPUT, map_size=6, current_fallen_bytes_number=12)
-        == MAP
-    )
+    map = parse_input(TEST_INPUT, map_size=6)
+    map.current_fallen_bytes_number = 12
+    assert map == MAP
 
 
 def test_map_can_be_plotted():
