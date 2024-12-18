@@ -10,7 +10,7 @@ def get_min_register_a_for_auto_replication(computer: Computer):
             expected_program_result
         )
         register *= 8
-        for j in range(100000):
+        for j in range(8):
             result = computer.my_program(register + j)
             if result == expected_result:
                 register += j
