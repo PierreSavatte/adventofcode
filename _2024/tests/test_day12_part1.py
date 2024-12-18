@@ -1,5 +1,5 @@
 import pytest
-from _2024.day12 import Region, RegionList, Side, compute_regions, parse_input
+from _2024.day12 import Region, RegionList, compute_regions, parse_input
 from _2024.day12.part1 import compute_solution
 
 TEST_INPUT = """AAAA
@@ -77,10 +77,6 @@ def test_new_position_can_be_added_to_region():
         positions=[(0, 0)],
         area=1,
         perimeter=3,
-        sides=[
-            Side(x_range=[0, 1], y_range=[0]),
-            Side(x_range=[0], y_range=[0, 1]),
-        ],
     )
 
     region.add_new_position((1, 0))
@@ -91,11 +87,6 @@ def test_new_position_can_be_added_to_region():
         positions=[(0, 0), (1, 0)],
         area=2,
         perimeter=5,
-        sides=[
-            Side(x_range=[0], y_range=[0, 1]),
-            Side(x_range=[0, 2], y_range=[0]),
-            Side(x_range=[1, 2], y_range=[1]),
-        ],
     )
 
 
@@ -115,12 +106,6 @@ def test_new_position_can_be_added_to_region():
                     area=4,
                     perimeter=10,
                     map=MAP,
-                    sides=[
-                        Side(x_range=[0], y_range=[0, 1]),
-                        Side(x_range=[0, 4], y_range=[0]),
-                        Side(x_range=[0, 4], y_range=[1]),
-                        Side(x_range=[4], y_range=[0, 1]),
-                    ],
                 ),
                 Region(
                     character="B",
@@ -128,12 +113,6 @@ def test_new_position_can_be_added_to_region():
                     area=4,
                     perimeter=8,
                     map=MAP,
-                    sides=[
-                        Side(x_range=[0, 2], y_range=[1]),
-                        Side(x_range=[0], y_range=[1, 3]),
-                        Side(x_range=[0, 2], y_range=[3]),
-                        Side(x_range=[2], y_range=[1, 3]),
-                    ],
                 ),
                 Region(
                     character="C",
@@ -141,16 +120,6 @@ def test_new_position_can_be_added_to_region():
                     area=4,
                     perimeter=10,
                     map=MAP,
-                    sides=[
-                        Side(x_range=[2, 3], y_range=[1]),
-                        Side(x_range=[3], y_range=[1, 2]),
-                        Side(x_range=[2], y_range=[1, 3]),
-                        Side(x_range=[2, 3], y_range=[3]),
-                        Side(x_range=[3, 4], y_range=[2]),
-                        Side(x_range=[3], y_range=[3, 4]),
-                        Side(x_range=[3, 4], y_range=[4]),
-                        Side(x_range=[4], y_range=[2, 4]),
-                    ],
                 ),
                 Region(
                     character="D",
@@ -158,12 +127,6 @@ def test_new_position_can_be_added_to_region():
                     area=1,
                     perimeter=4,
                     map=MAP,
-                    sides=[
-                        Side(x_range=[3, 4], y_range=[1]),
-                        Side(x_range=[3], y_range=[1, 2]),
-                        Side(x_range=[3, 4], y_range=[2]),
-                        Side(x_range=[4], y_range=[1, 2]),
-                    ],
                 ),
                 Region(
                     character="E",
@@ -171,12 +134,6 @@ def test_new_position_can_be_added_to_region():
                     area=3,
                     perimeter=8,
                     map=MAP,
-                    sides=[
-                        Side(x_range=[0], y_range=[3, 4]),
-                        Side(x_range=[0, 3], y_range=[3]),
-                        Side(x_range=[0, 3], y_range=[4]),
-                        Side(x_range=[3], y_range=[3, 4]),
-                    ],
                 ),
             ],
         ),
@@ -211,28 +168,6 @@ def test_new_position_can_be_added_to_region():
                         (3, 4),
                         (4, 4),
                     ],
-                    sides=[
-                        Side(x_range=[1, 2], y_range=[1]),
-                        Side(x_range=[3, 4], y_range=[1]),
-                        Side(x_range=[0, 5], y_range=[0]),
-                        Side(x_range=[1], y_range=[1, 2]),
-                        Side(x_range=[2], y_range=[1, 2]),
-                        Side(x_range=[3], y_range=[1, 2]),
-                        Side(x_range=[4], y_range=[1, 2]),
-                        Side(x_range=[1, 2], y_range=[2]),
-                        Side(x_range=[1, 2], y_range=[3]),
-                        Side(x_range=[3, 4], y_range=[2]),
-                        Side(x_range=[3, 4], y_range=[3]),
-                        Side(x_range=[1], y_range=[3, 4]),
-                        Side(x_range=[2], y_range=[3, 4]),
-                        Side(x_range=[3], y_range=[3, 4]),
-                        Side(x_range=[4], y_range=[3, 4]),
-                        Side(x_range=[0], y_range=[0, 5]),
-                        Side(x_range=[1, 2], y_range=[4]),
-                        Side(x_range=[3, 4], y_range=[4]),
-                        Side(x_range=[0, 5], y_range=[5]),
-                        Side(x_range=[5], y_range=[0, 5]),
-                    ],
                 ),
                 Region(
                     character="X",
@@ -240,12 +175,6 @@ def test_new_position_can_be_added_to_region():
                     perimeter=4,
                     map=MAP_2,
                     positions=[(1, 1)],
-                    sides=[
-                        Side(x_range=[1, 2], y_range=[1]),
-                        Side(x_range=[1], y_range=[1, 2]),
-                        Side(x_range=[1, 2], y_range=[2]),
-                        Side(x_range=[2], y_range=[1, 2]),
-                    ],
                 ),
                 Region(
                     character="X",
@@ -253,12 +182,6 @@ def test_new_position_can_be_added_to_region():
                     perimeter=4,
                     map=MAP_2,
                     positions=[(3, 1)],
-                    sides=[
-                        Side(x_range=[3, 4], y_range=[1]),
-                        Side(x_range=[3], y_range=[1, 2]),
-                        Side(x_range=[3, 4], y_range=[2]),
-                        Side(x_range=[4], y_range=[1, 2]),
-                    ],
                 ),
                 Region(
                     character="X",
@@ -266,12 +189,6 @@ def test_new_position_can_be_added_to_region():
                     perimeter=4,
                     map=MAP_2,
                     positions=[(1, 3)],
-                    sides=[
-                        Side(x_range=[1, 2], y_range=[3]),
-                        Side(x_range=[1], y_range=[3, 4]),
-                        Side(x_range=[1, 2], y_range=[4]),
-                        Side(x_range=[2], y_range=[3, 4]),
-                    ],
                 ),
                 Region(
                     character="X",
@@ -279,12 +196,6 @@ def test_new_position_can_be_added_to_region():
                     perimeter=4,
                     map=MAP_2,
                     positions=[(3, 3)],
-                    sides=[
-                        Side(x_range=[3, 4], y_range=[3]),
-                        Side(x_range=[3], y_range=[3, 4]),
-                        Side(x_range=[3, 4], y_range=[4]),
-                        Side(x_range=[4], y_range=[3, 4]),
-                    ],
                 ),
             ],
         ),
@@ -312,30 +223,6 @@ def test_new_position_can_be_added_to_region():
                         (5, 6),
                     ],
                     map=MAP_3,
-                    sides=[
-                        Side(x_range=[6, 8], y_range=[0]),
-                        Side(x_range=[8], y_range=[0, 1]),
-                        Side(x_range=[6], y_range=[0, 2]),
-                        Side(x_range=[8, 9], y_range=[1]),
-                        Side(x_range=[7, 9], y_range=[2]),
-                        Side(x_range=[9], y_range=[1, 2]),
-                        Side(x_range=[5, 6], y_range=[2]),
-                        Side(x_range=[5], y_range=[2, 3]),
-                        Side(x_range=[6, 7], y_range=[3]),
-                        Side(x_range=[7], y_range=[2, 3]),
-                        Side(x_range=[3], y_range=[3, 4]),
-                        Side(x_range=[3, 4], y_range=[4]),
-                        Side(x_range=[3, 5], y_range=[3]),
-                        Side(x_range=[5, 6], y_range=[4]),
-                        Side(x_range=[6], y_range=[3, 4]),
-                        Side(x_range=[5], y_range=[4, 5]),
-                        Side(x_range=[4], y_range=[4, 6]),
-                        Side(x_range=[4, 5], y_range=[6]),
-                        Side(x_range=[5, 6], y_range=[5]),
-                        Side(x_range=[5], y_range=[6, 7]),
-                        Side(x_range=[5, 6], y_range=[7]),
-                        Side(x_range=[6], y_range=[5, 7]),
-                    ],
                 ),
                 Region(
                     character="C",
@@ -343,12 +230,6 @@ def test_new_position_can_be_added_to_region():
                     perimeter=4,
                     positions=[(7, 4)],
                     map=MAP_3,
-                    sides=[
-                        Side(x_range=[7, 8], y_range=[4]),
-                        Side(x_range=[7], y_range=[4, 5]),
-                        Side(x_range=[7, 8], y_range=[5]),
-                        Side(x_range=[8], y_range=[4, 5]),
-                    ],
                 ),
                 Region(
                     character="E",
@@ -370,16 +251,6 @@ def test_new_position_can_be_added_to_region():
                         (9, 9),
                     ],
                     map=MAP_3,
-                    sides=[
-                        Side(x_range=[9, 10], y_range=[4]),
-                        Side(x_range=[9], y_range=[4, 5]),
-                        Side(x_range=[8, 9], y_range=[5]),
-                        Side(x_range=[8], y_range=[5, 8]),
-                        Side(x_range=[7, 8], y_range=[8]),
-                        Side(x_range=[7], y_range=[8, 10]),
-                        Side(x_range=[7, 10], y_range=[10]),
-                        Side(x_range=[10], y_range=[4, 10]),
-                    ],
                 ),
                 Region(
                     character="F",
@@ -398,20 +269,6 @@ def test_new_position_can_be_added_to_region():
                         (8, 4),
                     ],
                     map=MAP_3,
-                    sides=[
-                        Side(x_range=[8], y_range=[0, 1]),
-                        Side(x_range=[8, 9], y_range=[1]),
-                        Side(x_range=[8, 10], y_range=[0]),
-                        Side(x_range=[9], y_range=[1, 2]),
-                        Side(x_range=[7, 9], y_range=[2]),
-                        Side(x_range=[7], y_range=[2, 4]),
-                        Side(x_range=[7, 8], y_range=[4]),
-                        Side(x_range=[9, 10], y_range=[4]),
-                        Side(x_range=[10], y_range=[0, 4]),
-                        Side(x_range=[8], y_range=[4, 5]),
-                        Side(x_range=[8, 9], y_range=[5]),
-                        Side(x_range=[9], y_range=[4, 5]),
-                    ],
                 ),
                 Region(
                     character="I",
@@ -419,12 +276,6 @@ def test_new_position_can_be_added_to_region():
                     perimeter=8,
                     positions=[(4, 0), (5, 0), (4, 1), (5, 1)],
                     map=MAP_3,
-                    sides=[
-                        Side(x_range=[4, 6], y_range=[0]),
-                        Side(x_range=[4], y_range=[0, 2]),
-                        Side(x_range=[4, 6], y_range=[2]),
-                        Side(x_range=[6], y_range=[0, 2]),
-                    ],
                 ),
                 Region(
                     character="I",
@@ -447,24 +298,6 @@ def test_new_position_can_be_added_to_region():
                         (3, 9),
                     ],
                     map=MAP_3,
-                    sides=[
-                        Side(x_range=[2, 3], y_range=[5]),
-                        Side(x_range=[3], y_range=[5, 6]),
-                        Side(x_range=[2], y_range=[5, 7]),
-                        Side(x_range=[3, 5], y_range=[6]),
-                        Side(x_range=[5], y_range=[6, 7]),
-                        Side(x_range=[1, 2], y_range=[7]),
-                        Side(x_range=[4, 5], y_range=[8]),
-                        Side(x_range=[5, 6], y_range=[7]),
-                        Side(x_range=[1], y_range=[7, 9]),
-                        Side(x_range=[1, 3], y_range=[9]),
-                        Side(x_range=[5], y_range=[8, 9]),
-                        Side(x_range=[5, 6], y_range=[9]),
-                        Side(x_range=[6], y_range=[7, 9]),
-                        Side(x_range=[3], y_range=[9, 10]),
-                        Side(x_range=[3, 4], y_range=[10]),
-                        Side(x_range=[4], y_range=[8, 10]),
-                    ],
                 ),
                 Region(
                     character="J",
@@ -484,20 +317,6 @@ def test_new_position_can_be_added_to_region():
                         (6, 9),
                     ],
                     map=MAP_3,
-                    sides=[
-                        Side(x_range=[6, 7], y_range=[3]),
-                        Side(x_range=[6], y_range=[3, 4]),
-                        Side(x_range=[5, 6], y_range=[4]),
-                        Side(x_range=[5], y_range=[4, 5]),
-                        Side(x_range=[5, 6], y_range=[5]),
-                        Side(x_range=[7], y_range=[3, 5]),
-                        Side(x_range=[7, 8], y_range=[5]),
-                        Side(x_range=[7, 8], y_range=[8]),
-                        Side(x_range=[8], y_range=[5, 8]),
-                        Side(x_range=[6], y_range=[5, 10]),
-                        Side(x_range=[6, 7], y_range=[10]),
-                        Side(x_range=[7], y_range=[8, 10]),
-                    ],
                 ),
                 Region(
                     character="M",
@@ -505,14 +324,6 @@ def test_new_position_can_be_added_to_region():
                     perimeter=12,
                     positions=[(0, 7), (0, 8), (0, 9), (1, 9), (2, 9)],
                     map=MAP_3,
-                    sides=[
-                        Side(x_range=[0, 1], y_range=[7]),
-                        Side(x_range=[1], y_range=[7, 9]),
-                        Side(x_range=[0], y_range=[7, 10]),
-                        Side(x_range=[1, 3], y_range=[9]),
-                        Side(x_range=[0, 3], y_range=[10]),
-                        Side(x_range=[3], y_range=[9, 10]),
-                    ],
                 ),
                 Region(
                     character="R",
@@ -533,18 +344,6 @@ def test_new_position_can_be_added_to_region():
                         (2, 3),
                     ],
                     map=MAP_3,
-                    sides=[
-                        Side(x_range=[0, 4], y_range=[0]),
-                        Side(x_range=[0], y_range=[0, 2]),
-                        Side(x_range=[0, 2], y_range=[2]),
-                        Side(x_range=[4], y_range=[0, 2]),
-                        Side(x_range=[4, 5], y_range=[2]),
-                        Side(x_range=[3, 5], y_range=[3]),
-                        Side(x_range=[5], y_range=[2, 3]),
-                        Side(x_range=[2], y_range=[2, 4]),
-                        Side(x_range=[2, 3], y_range=[4]),
-                        Side(x_range=[3], y_range=[3, 4]),
-                    ],
                 ),
                 Region(
                     character="S",
@@ -552,14 +351,6 @@ def test_new_position_can_be_added_to_region():
                     perimeter=8,
                     positions=[(4, 8), (4, 9), (5, 9)],
                     map=MAP_3,
-                    sides=[
-                        Side(x_range=[4, 5], y_range=[8]),
-                        Side(x_range=[5], y_range=[8, 9]),
-                        Side(x_range=[4], y_range=[8, 10]),
-                        Side(x_range=[5, 6], y_range=[9]),
-                        Side(x_range=[4, 6], y_range=[10]),
-                        Side(x_range=[6], y_range=[9, 10]),
-                    ],
                 ),
                 Region(
                     character="V",
@@ -581,18 +372,6 @@ def test_new_position_can_be_added_to_region():
                         (1, 6),
                     ],
                     map=MAP_3,
-                    sides=[
-                        Side(x_range=[0, 2], y_range=[2]),
-                        Side(x_range=[2], y_range=[2, 4]),
-                        Side(x_range=[2, 3], y_range=[5]),
-                        Side(x_range=[2, 4], y_range=[4]),
-                        Side(x_range=[3], y_range=[5, 6]),
-                        Side(x_range=[3, 4], y_range=[6]),
-                        Side(x_range=[4], y_range=[4, 6]),
-                        Side(x_range=[0], y_range=[2, 7]),
-                        Side(x_range=[0, 2], y_range=[7]),
-                        Side(x_range=[2], y_range=[5, 7]),
-                    ],
                 ),
             ],
         ),

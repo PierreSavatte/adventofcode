@@ -1,5 +1,5 @@
 import pytest
-from _2024.day12 import Region, Side, compute_regions, merge_sides
+from _2024.day12 import Region, compute_regions
 from _2024.day12.part2 import compute_solution
 
 MAP = [
@@ -40,81 +40,6 @@ MAP_4 = [
 ]
 
 
-def test_horizontal_sides_can_be_merged():
-    """
-    - -
-    A A A A
-
-    B B C D
-
-    B B C C
-    """
-    side_a = Side(x_range=[0, 1], y_range=[0])
-    side_b = Side(x_range=[1, 2], y_range=[0])
-
-    assert merge_sides(side_a, side_b) == Side(x_range=[0, 2], y_range=[0])
-
-
-def test_different_horizontal_sides_cannot_be_merged():
-    """
-    -
-    A A A A
-    -
-    B B C D
-
-    B B C C
-    """
-    side_a = Side(x_range=[0, 1], y_range=[0])
-    side_b = Side(x_range=[0, 1], y_range=[1])
-
-    assert merge_sides(side_a, side_b) is None
-
-
-def test_vertical_sides_can_be_merged():
-    """
-
-     A A A A
-
-    |B B C D
-
-    |B B C C
-    """
-    side_a = Side(x_range=[0], y_range=[1, 2])
-    side_b = Side(x_range=[0], y_range=[2, 3])
-
-    assert merge_sides(side_a, side_b) == Side(x_range=[0], y_range=[1, 3])
-
-
-def test_different_vertical_sides_cannot_be_merged():
-    """
-
-     A A A A
-
-    |B B C D
-
-     B B|C C
-    """
-    side_a = Side(x_range=[0], y_range=[0, 1])
-    side_b = Side(x_range=[2], y_range=[1, 2])
-
-    assert merge_sides(side_a, side_b) is None
-
-
-def test_vertical_and_horizontal_sides_are_not_merged():
-    """
-     -
-    |A A A A
-
-     B B C D
-
-     B B C C
-    """
-    side_a = Side(x_range=[0, 1], y_range=[0])
-    side_b = Side(x_range=[0], y_range=[0, 1])
-
-    assert merge_sides(side_a, side_b) is None
-
-
 def test_region_can_have_its_sides_computed():
     region = Region(
         character="A",
@@ -129,225 +54,27 @@ def test_region_can_have_its_sides_computed():
     region.add_new_position((2, 0))
     region.add_new_position((3, 0))
 
-    assert region.sides == [
-        Side(x_range=[0], y_range=[0, 1]),
-        Side(x_range=[0, 4], y_range=[0]),
-        Side(x_range=[0, 4], y_range=[1]),
-        Side(x_range=[4], y_range=[0, 1]),
-    ]
+    assert region.sides == 4
 
 
 @pytest.mark.parametrize(
     "map, character_sides",
     [
-        (
-            MAP_2,
-            [
-                (
-                    "A",
-                    [
-                        Side(x_range=[3, 5], y_range=[1]),
-                        Side(x_range=[0, 6], y_range=[0]),
-                        Side(x_range=[1, 3], y_range=[3]),
-                        Side(x_range=[3], y_range=[1, 3]),
-                        Side(x_range=[5], y_range=[1, 3]),
-                        Side(x_range=[1, 5], y_range=[3]),
-                        Side(x_range=[1], y_range=[3, 5]),
-                        Side(x_range=[3], y_range=[1, 5]),
-                        Side(x_range=[0], y_range=[0, 6]),
-                        Side(x_range=[1, 3], y_range=[5]),
-                        Side(x_range=[0, 6], y_range=[6]),
-                        Side(x_range=[6], y_range=[0, 6]),
-                    ],
-                ),
-                (
-                    "B",
-                    [
-                        Side(x_range=[3, 5], y_range=[1]),
-                        Side(x_range=[3], y_range=[1, 3]),
-                        Side(x_range=[3, 5], y_range=[3]),
-                        Side(x_range=[5], y_range=[1, 3]),
-                    ],
-                ),
-                (
-                    "B",
-                    [
-                        Side(x_range=[1, 3], y_range=[3]),
-                        Side(x_range=[1], y_range=[3, 5]),
-                        Side(x_range=[1, 3], y_range=[5]),
-                        Side(x_range=[3], y_range=[3, 5]),
-                    ],
-                ),
-            ],
-        ),
+        (MAP_2, [("A", 12), ("B", 4), ("B", 4)]),
         (
             MAP_3,
             [
-                (
-                    "C",
-                    [
-                        Side(x_range=[6, 8], y_range=[0]),
-                        Side(x_range=[8], y_range=[0, 1]),
-                        Side(x_range=[6], y_range=[0, 2]),
-                        Side(x_range=[8, 9], y_range=[1]),
-                        Side(x_range=[7, 9], y_range=[2]),
-                        Side(x_range=[9], y_range=[1, 2]),
-                        Side(x_range=[5, 6], y_range=[2]),
-                        Side(x_range=[5], y_range=[2, 3]),
-                        Side(x_range=[6, 7], y_range=[3]),
-                        Side(x_range=[7], y_range=[2, 3]),
-                        Side(x_range=[3], y_range=[3, 4]),
-                        Side(x_range=[3, 4], y_range=[4]),
-                        Side(x_range=[3, 5], y_range=[3]),
-                        Side(x_range=[5, 6], y_range=[4]),
-                        Side(x_range=[6], y_range=[3, 4]),
-                        Side(x_range=[5], y_range=[4, 5]),
-                        Side(x_range=[4], y_range=[4, 6]),
-                        Side(x_range=[4, 5], y_range=[6]),
-                        Side(x_range=[5, 6], y_range=[5]),
-                        Side(x_range=[5], y_range=[6, 7]),
-                        Side(x_range=[5, 6], y_range=[7]),
-                        Side(x_range=[6], y_range=[5, 7]),
-                    ],
-                ),
-                (
-                    "C",
-                    [
-                        Side(x_range=[7, 8], y_range=[4]),
-                        Side(x_range=[7], y_range=[4, 5]),
-                        Side(x_range=[7, 8], y_range=[5]),
-                        Side(x_range=[8], y_range=[4, 5]),
-                    ],
-                ),
-                (
-                    "E",
-                    [
-                        Side(x_range=[9, 10], y_range=[4]),
-                        Side(x_range=[9], y_range=[4, 5]),
-                        Side(x_range=[8, 9], y_range=[5]),
-                        Side(x_range=[8], y_range=[5, 8]),
-                        Side(x_range=[7, 8], y_range=[8]),
-                        Side(x_range=[7], y_range=[8, 10]),
-                        Side(x_range=[7, 10], y_range=[10]),
-                        Side(x_range=[10], y_range=[4, 10]),
-                    ],
-                ),
-                (
-                    "F",
-                    [
-                        Side(x_range=[8], y_range=[0, 1]),
-                        Side(x_range=[8, 9], y_range=[1]),
-                        Side(x_range=[8, 10], y_range=[0]),
-                        Side(x_range=[9], y_range=[1, 2]),
-                        Side(x_range=[7, 9], y_range=[2]),
-                        Side(x_range=[7], y_range=[2, 4]),
-                        Side(x_range=[7, 8], y_range=[4]),
-                        Side(x_range=[9, 10], y_range=[4]),
-                        Side(x_range=[10], y_range=[0, 4]),
-                        Side(x_range=[8], y_range=[4, 5]),
-                        Side(x_range=[8, 9], y_range=[5]),
-                        Side(x_range=[9], y_range=[4, 5]),
-                    ],
-                ),
-                (
-                    "I",
-                    [
-                        Side(x_range=[4, 6], y_range=[0]),
-                        Side(x_range=[4], y_range=[0, 2]),
-                        Side(x_range=[4, 6], y_range=[2]),
-                        Side(x_range=[6], y_range=[0, 2]),
-                    ],
-                ),
-                (
-                    "I",
-                    [
-                        Side(x_range=[2, 3], y_range=[5]),
-                        Side(x_range=[3], y_range=[5, 6]),
-                        Side(x_range=[2], y_range=[5, 7]),
-                        Side(x_range=[3, 5], y_range=[6]),
-                        Side(x_range=[5], y_range=[6, 7]),
-                        Side(x_range=[1, 2], y_range=[7]),
-                        Side(x_range=[4, 5], y_range=[8]),
-                        Side(x_range=[5, 6], y_range=[7]),
-                        Side(x_range=[1], y_range=[7, 9]),
-                        Side(x_range=[1, 3], y_range=[9]),
-                        Side(x_range=[5], y_range=[8, 9]),
-                        Side(x_range=[5, 6], y_range=[9]),
-                        Side(x_range=[6], y_range=[7, 9]),
-                        Side(x_range=[3], y_range=[9, 10]),
-                        Side(x_range=[3, 4], y_range=[10]),
-                        Side(x_range=[4], y_range=[8, 10]),
-                    ],
-                ),
-                (
-                    "J",
-                    [
-                        Side(x_range=[6, 7], y_range=[3]),
-                        Side(x_range=[6], y_range=[3, 4]),
-                        Side(x_range=[5, 6], y_range=[4]),
-                        Side(x_range=[5], y_range=[4, 5]),
-                        Side(x_range=[5, 6], y_range=[5]),
-                        Side(x_range=[7], y_range=[3, 5]),
-                        Side(x_range=[7, 8], y_range=[5]),
-                        Side(x_range=[7, 8], y_range=[8]),
-                        Side(x_range=[8], y_range=[5, 8]),
-                        Side(x_range=[6], y_range=[5, 10]),
-                        Side(x_range=[6, 7], y_range=[10]),
-                        Side(x_range=[7], y_range=[8, 10]),
-                    ],
-                ),
-                (
-                    "M",
-                    [
-                        Side(x_range=[0, 1], y_range=[7]),
-                        Side(x_range=[1], y_range=[7, 9]),
-                        Side(x_range=[0], y_range=[7, 10]),
-                        Side(x_range=[1, 3], y_range=[9]),
-                        Side(x_range=[0, 3], y_range=[10]),
-                        Side(x_range=[3], y_range=[9, 10]),
-                    ],
-                ),
-                (
-                    "R",
-                    [
-                        Side(x_range=[0, 4], y_range=[0]),
-                        Side(x_range=[0], y_range=[0, 2]),
-                        Side(x_range=[0, 2], y_range=[2]),
-                        Side(x_range=[4], y_range=[0, 2]),
-                        Side(x_range=[4, 5], y_range=[2]),
-                        Side(x_range=[3, 5], y_range=[3]),
-                        Side(x_range=[5], y_range=[2, 3]),
-                        Side(x_range=[2], y_range=[2, 4]),
-                        Side(x_range=[2, 3], y_range=[4]),
-                        Side(x_range=[3], y_range=[3, 4]),
-                    ],
-                ),
-                (
-                    "S",
-                    [
-                        Side(x_range=[4, 5], y_range=[8]),
-                        Side(x_range=[5], y_range=[8, 9]),
-                        Side(x_range=[4], y_range=[8, 10]),
-                        Side(x_range=[5, 6], y_range=[9]),
-                        Side(x_range=[4, 6], y_range=[10]),
-                        Side(x_range=[6], y_range=[9, 10]),
-                    ],
-                ),
-                (
-                    "V",
-                    [
-                        Side(x_range=[0, 2], y_range=[2]),
-                        Side(x_range=[2], y_range=[2, 4]),
-                        Side(x_range=[2, 3], y_range=[5]),
-                        Side(x_range=[2, 4], y_range=[4]),
-                        Side(x_range=[3], y_range=[5, 6]),
-                        Side(x_range=[3, 4], y_range=[6]),
-                        Side(x_range=[4], y_range=[4, 6]),
-                        Side(x_range=[0], y_range=[2, 7]),
-                        Side(x_range=[0, 2], y_range=[7]),
-                        Side(x_range=[2], y_range=[5, 7]),
-                    ],
-                ),
+                ("C", 22),
+                ("C", 4),
+                ("E", 8),
+                ("F", 12),
+                ("I", 4),
+                ("I", 16),
+                ("J", 12),
+                ("M", 6),
+                ("R", 10),
+                ("S", 6),
+                ("V", 10),
             ],
         ),
     ],

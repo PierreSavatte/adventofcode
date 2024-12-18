@@ -1,4 +1,5 @@
 import random
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 from _2024.day12 import POSITION, Region, compute_regions, parse_input
@@ -18,8 +19,8 @@ def generate_random_color() -> COLOR:
     return random.random(), random.random(), random.random()
 
 
-def generate_image(map, regions, save=True):
-    fig, ax = plt.subplots(figsize=(200, 200))
+def generate_image(map, regions, save=True, filename="input.png"):
+    fig, ax = plt.subplots(figsize=(30, 30))
     map_size = len(map)
 
     # Draw the sides on the grid
@@ -35,12 +36,24 @@ def generate_image(map, regions, save=True):
                 # Vertical line
                 x = x_range[0]
                 y_min, y_max = min(y_range), max(y_range)
-                ax.plot([x, x], [y_min, y_max], "k-", linewidth=5, color=color)
+                ax.plot(
+                    [x, x],
+                    [y_min, y_max],
+                    "k-",
+                    linewidth=5,
+                    color=generate_random_color(),
+                )
             elif len(y_range) == 1:
                 # Horizontal line
                 y = y_range[0]
                 x_min, x_max = min(x_range), max(x_range)
-                ax.plot([x_min, x_max], [y, y], "k-", linewidth=5, color=color)
+                ax.plot(
+                    [x_min, x_max],
+                    [y, y],
+                    "k-",
+                    linewidth=5,
+                    color=generate_random_color(),
+                )
 
         progress_bar.update(1)
     progress_bar.close()
@@ -63,7 +76,7 @@ def generate_image(map, regions, save=True):
                 letter,
                 ha="center",
                 va="center",
-                fontsize=30,
+                fontsize=5,
             )
 
     # Set the grid with the flipped y-axis
@@ -75,7 +88,7 @@ def generate_image(map, regions, save=True):
     ax.set_aspect("equal")
 
     if save:
-        plt.savefig("input.png")
+        plt.savefig(filename)
     else:
         plt.show()
 
