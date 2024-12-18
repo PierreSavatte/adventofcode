@@ -1,4 +1,4 @@
-from typing import Callable, Optional
+from typing import Callable, Generator, Optional
 
 
 class ReservedValue(Exception):
@@ -102,6 +102,35 @@ class Computer:
         value = self._dv()
         self.register_c = value
 
+    def my_program(self, value: int) -> str:
+        # Specific to my input
+
+        # jnz
+        result = []
+        while value != 0:
+            # bst
+            register_b = value % 8
+
+            # bxl
+            register_b = register_b ^ 7
+
+            # cdv
+            register_c = value // (2 ** register_b)
+
+            # bxl
+            register_b = register_b ^ 7
+
+            # bxc
+            register_b = register_b ^ register_c
+
+            # adv
+            value = value // 8
+
+            # out
+            result.append(register_b % 8)
+
+        return self.get_program_to_string(result)
+
     def to_instruction(self, opcode: int) -> Callable[[], Optional[int]]:
         opcode_instruction_mapping = {
             0: self.adv,
@@ -115,23 +144,37 @@ class Computer:
         }
         return opcode_instruction_mapping[opcode]
 
-    def step(self) -> Optional[int]:
+    def step(self, debug: bool = False) -> Optional[int]:
         opcode = self.read()
         instruction = self.to_instruction(opcode)
+        if debug:
+            print(f"Running {instruction.__name__} ({opcode=})")
         return instruction()
 
-    def run(self) -> str:
+    def print_state(self):
+        print(
+            f"register_a={self.register_a}, "
+            f"register_b= {self.register_b}, "
+            f"register_c= {self.register_c}"
+        )
+
+    def run(self, debug: bool = False) -> str:
         result = []
         halt = False
         while not halt:
+            if debug:
+                self.print_state()
             try:
-                value = self.step()
+                value = self.step(debug=debug)
             except HaltingProgram:
                 halt = True
                 value = None
 
             if value is not None:
                 result.append(value)
+
+        if debug:
+            self.print_state()
         return self.get_program_to_string(result)
 
     def __repr__(self):

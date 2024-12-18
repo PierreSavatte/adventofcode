@@ -1,24 +1,21 @@
 from _2024.day17 import Computer, parse_input
 from _2024.load_input import load_input
-from tqdm import tqdm
 
 
 def get_min_register_a_for_auto_replication(computer: Computer):
-    program_string = computer.program_string
-    register_a = -1
-    output = ""
-    progress_bar = tqdm(total=1_000_000_000)
-    while output != program_string:
-        register_a += 1
-
-        new_computer = computer.copy()
-        new_computer.register_a = register_a
-
-        output = new_computer.run()
-        progress_bar.update(1)
-    progress_bar.close()
-
-    return register_a
+    register = 0
+    for i in range(1, len(computer.program) + 1):
+        expected_program_result = computer.program[-i:]
+        expected_result = computer.get_program_to_string(
+            expected_program_result
+        )
+        register *= 8
+        for j in range(100000):
+            result = computer.my_program(register + j)
+            if result == expected_result:
+                register += j
+                break
+    return register
 
 
 def compute_solution(computer: Computer) -> int:
