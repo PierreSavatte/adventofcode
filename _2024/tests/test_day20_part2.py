@@ -1,22 +1,6 @@
-from _2024.day20 import Map, compute_shortcuts, parse_input
-from _2024.day20.part1 import compute_solution
-
-TEST_INPUT = """###############
-#...#...#.....#
-#.#.#.#.#.###.#
-#S#...#.#.#...#
-#######.#.#.###
-#######.#.#...#
-#######.#.###.#
-###..E#...#...#
-###.#######.###
-#...###...#...#
-#.#####.#.###.#
-#.#...#.#.#...#
-#.#.#.#.#.#.###
-#...#...#...###
-###############
-"""
+import pytest
+from _2024.day20 import Map, compute_shortcuts, get_intermediary_positions
+from _2024.day20.part2 import compute_solution
 
 MAP = Map(
     start=(1, 3),
@@ -39,7 +23,6 @@ MAP = Map(
         "###############",
     ],
 )
-
 PATH = [
     (1, 3),
     (1, 2),
@@ -129,32 +112,44 @@ PATH = [
 ]
 
 
-def test_input_can_be_parsed():
-    assert parse_input(TEST_INPUT) == MAP
-
-
-def test_path_can_be_computed():
-    assert MAP.compute_path() == PATH
+@pytest.mark.parametrize(
+    "a, b, intermediary_positions",
+    [
+        ((0, 0), (0, 0), []),
+        ((0, 0), (3, 3), [(1, 0), (2, 0), (3, 0), (3, 1), (3, 2)]),
+        ((3, 3), (0, 0), [(2, 3), (1, 3), (0, 3), (0, 2), (0, 1)]),
+        ((3, 0), (0, 3), [(2, 0), (1, 0), (0, 0), (0, 1), (0, 2)]),
+        ((1, 3), (3, 3), [(2, 3)]),
+    ],
+)
+def test_intermediary_positions_can_be_computed(a, b, intermediary_positions):
+    assert get_intermediary_positions(a, b) == intermediary_positions
 
 
 def test_shortcuts_can_be_computed():
-    shortcuts = compute_shortcuts(PATH, min_time_saved=2, max_shortcut_size=2)
-    expected_sortcuts = {
-        2: 14,
-        4: 14,
-        6: 2,
-        8: 4,
-        10: 2,
-        12: 3,
-        20: 1,
-        36: 1,
-        38: 1,
-        40: 1,
-        64: 1,
+    shortcuts = compute_shortcuts(
+        PATH, min_time_saved=50, max_shortcut_size=20
+    )
+
+    expected_over_50_shortcuts = {
+        50: 32,
+        52: 31,
+        54: 29,
+        56: 39,
+        58: 25,
+        60: 23,
+        62: 20,
+        64: 19,
+        66: 12,
+        68: 14,
+        70: 12,
+        72: 22,
+        74: 4,
+        76: 3,
     }
-    assert sum(shortcuts.values()) == sum(expected_sortcuts.values())
-    assert shortcuts == expected_sortcuts
+    assert sum(shortcuts.values()) == sum(expected_over_50_shortcuts.values())
+    assert shortcuts == expected_over_50_shortcuts
 
 
 def test_solution_can_be_computed():
-    assert compute_solution(MAP, min_save=64) == 1
+    assert compute_solution(MAP, min_save=70) == 41

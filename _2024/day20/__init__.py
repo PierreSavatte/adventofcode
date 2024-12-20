@@ -1,8 +1,9 @@
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any
 
 from _2024.day10.a_star import Direction, a_star, euclidean_distance
+from tqdm import tqdm
 
 POSITION = tuple[int, int]
 
@@ -48,22 +49,45 @@ TIME_SAVED = int
 NB_SHORTCUTS = int
 
 
-def compute_shortcuts(path: list[POSITION]) -> dict[TIME_SAVED, NB_SHORTCUTS]:
+def get_intermediary_positions(a: POSITION, b: POSITION) -> list[POSITION]:
+    x_a, y_a = a
+    x_b, y_b = b
+
+    if x_b >= x_a:
+        x_delta = 1
+    else:
+        x_delta = -1
+
+    if y_b >= y_a:
+        y_delta = 1
+    else:
+        y_delta = -1
+
+    positions = []
+    for i in range(x_a + x_delta, x_b, x_delta):
+        positions.append((i, y_a))
+    for j in range(y_a, y_b, y_delta):
+        positions.append((x_b, j))
+    return positions
+
+
+def compute_shortcuts(
+    path: list[POSITION], min_time_saved: int, max_shortcut_size: int
+) -> dict[TIME_SAVED, NB_SHORTCUTS]:
     shortcuts = defaultdict(int)
+    progress_bar = tqdm(total=len(path))
     for i, position in enumerate(path):
-        rest_of_the_path = path[i + 1 :]
-        x, y = position
-        for direction in Direction:
-            delta_x, delta_y = direction.to_delta_position()
-            new_position = x + 2 * delta_x, y + 2 * delta_y
-            intermediary_position = (x + delta_x, y + delta_y)
-            if (
-                new_position in rest_of_the_path
-                and intermediary_position not in rest_of_the_path
-            ):
-                new_index = path.index(new_position)
-                time_saved = new_index - i - 2
+        rest_of_the_path = path[i + min_time_saved + 1 :]
+        for new_position in rest_of_the_path:
+            distance = euclidean_distance(position, new_position)
+            if distance > max_shortcut_size:
+                continue
+            j = path.index(new_position)
+            time_saved = j - i - distance
+            if time_saved >= min_time_saved:
                 shortcuts[time_saved] += 1
+        progress_bar.update()
+    progress_bar.close()
     return dict(shortcuts)
 
 

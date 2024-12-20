@@ -5,7 +5,7 @@ from _2024.load_input import load_input
 def compute_solution(map: Map, min_save: int) -> int:
     path = map.compute_path()
     shortcuts = compute_shortcuts(
-        path, min_time_saved=min_save, max_shortcut_size=2
+        path, min_time_saved=min_save, max_shortcut_size=20
     )
     solution = 0
     for time_saved, nb_shortcuts in shortcuts.items():
