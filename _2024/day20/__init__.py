@@ -49,28 +49,6 @@ TIME_SAVED = int
 NB_SHORTCUTS = int
 
 
-def get_intermediary_positions(a: POSITION, b: POSITION) -> list[POSITION]:
-    x_a, y_a = a
-    x_b, y_b = b
-
-    if x_b >= x_a:
-        x_delta = 1
-    else:
-        x_delta = -1
-
-    if y_b >= y_a:
-        y_delta = 1
-    else:
-        y_delta = -1
-
-    positions = []
-    for i in range(x_a + x_delta, x_b, x_delta):
-        positions.append((i, y_a))
-    for j in range(y_a, y_b, y_delta):
-        positions.append((x_b, j))
-    return positions
-
-
 def compute_shortcuts(
     path: list[POSITION], min_time_saved: int, max_shortcut_size: int
 ) -> dict[TIME_SAVED, NB_SHORTCUTS]:

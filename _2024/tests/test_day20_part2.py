@@ -1,5 +1,5 @@
 import pytest
-from _2024.day20 import Map, compute_shortcuts, get_intermediary_positions
+from _2024.day20 import Map, compute_shortcuts
 from _2024.day20.part2 import compute_solution
 
 MAP = Map(
@@ -110,20 +110,6 @@ PATH = [
     (4, 7),
     (5, 7),
 ]
-
-
-@pytest.mark.parametrize(
-    "a, b, intermediary_positions",
-    [
-        ((0, 0), (0, 0), []),
-        ((0, 0), (3, 3), [(1, 0), (2, 0), (3, 0), (3, 1), (3, 2)]),
-        ((3, 3), (0, 0), [(2, 3), (1, 3), (0, 3), (0, 2), (0, 1)]),
-        ((3, 0), (0, 3), [(2, 0), (1, 0), (0, 0), (0, 1), (0, 2)]),
-        ((1, 3), (3, 3), [(2, 3)]),
-    ],
-)
-def test_intermediary_positions_can_be_computed(a, b, intermediary_positions):
-    assert get_intermediary_positions(a, b) == intermediary_positions
 
 
 def test_shortcuts_can_be_computed():
