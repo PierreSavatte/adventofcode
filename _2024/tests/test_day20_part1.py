@@ -157,4 +157,4 @@ def test_shortcuts_can_be_computed():
 
 
 def test_solution_can_be_computed():
-    assert compute_solution(MAP, min_save=64) == 1
+    assert compute_solution(MAP, min_time_saved=64) == 1
