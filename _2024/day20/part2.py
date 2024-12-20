@@ -7,11 +7,7 @@ def compute_solution(map: Map, min_save: int) -> int:
     shortcuts = compute_shortcuts(
         path, min_time_saved=min_save, max_shortcut_size=20
     )
-    solution = 0
-    for time_saved, nb_shortcuts in shortcuts.items():
-        if time_saved >= min_save:
-            solution += nb_shortcuts
-    return solution
+    return sum(shortcuts.values())
 
 
 def main():
