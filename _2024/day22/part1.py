@@ -1,5 +1,11 @@
-from _2024.day22 import get_nth_secret_number, parse_input
+from _2024.day22 import generate_next_secret_number, parse_input
 from _2024.load_input import load_input
+
+
+def get_nth_secret_number(secret_number: int, n: int) -> int:
+    for i in range(n):
+        secret_number = generate_next_secret_number(secret_number)
+    return secret_number
 
 
 def compute_solution(secret_numbers: list[int]) -> int:

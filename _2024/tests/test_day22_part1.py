@@ -1,11 +1,6 @@
 import pytest
-from _2024.day22 import (
-    generate_next_secret_number,
-    get_nth_secret_number,
-    mix,
-    prune,
-)
-from _2024.day22.part1 import compute_solution
+from _2024.day22 import generate_next_secret_number, mix, prune
+from _2024.day22.part1 import compute_solution, get_nth_secret_number
 
 
 def test_values_can_be_mixed():

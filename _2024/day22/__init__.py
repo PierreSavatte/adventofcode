@@ -14,11 +14,6 @@ def generate_next_secret_number(previous_secret_number: int) -> int:
     return prune(mix(secret_number, secret_number * 2048))
 
 
-def get_nth_secret_number(secret_number: int, n: int) -> int:
-    for i in range(n):
-        secret_number = generate_next_secret_number(secret_number)
-    return secret_number
-
 
 def parse_input(data: str) -> list[int]:
     data = data.strip("\n")
