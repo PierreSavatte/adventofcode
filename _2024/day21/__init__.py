@@ -1,8 +1,8 @@
 from abc import ABC
-from functools import cache
+from itertools import product
 from typing import Any
 
-from _2024.day10.a_star import Direction, a_star, euclidean_distance
+from _2024.day10.a_star import PATH, Direction, a_star, euclidean_distance
 from tqdm import tqdm
 
 POSITION = tuple[int, int]
@@ -10,21 +10,85 @@ BUTTON = str
 TYPING_SEQUENCE = str
 
 
-@cache
-def get_typing_sequence(path: tuple[POSITION]) -> tuple[str]:
+def get_typing_sequence(path: list[POSITION]) -> list[str]:
     typing_sequence = []
     for a, b in zip(path, path[1:]):
         typing_sequence.append(Direction.from_two_points(a, b).to_str())
-    return tuple(typing_sequence)
+    return typing_sequence
+
+
+def get_shortest(sequence: list) -> list:
+    if len(sequence) < 2:
+        return sequence
+    min_length = min([len(item) for item in sequence])
+    result = []
+    for item in sequence:
+        if len(item) == min_length:
+            result.append(item)
+    return result
+
+
+def is_zigzag(typing_sequence: TYPING_SEQUENCE) -> bool:
+    if len(typing_sequence) < 3:
+        return False
+
+    unique_characters = set(typing_sequence)
+    if len(unique_characters) < 2:
+        return False
+
+    current = typing_sequence[0]
+    already_seen_character = {current}
+    for character in typing_sequence:
+        if character != current:
+            if character in already_seen_character:
+                return True
+            current = character
+            already_seen_character.add(character)
+    return False
 
 
 class KeyPad(ABC):
     buttons: dict[BUTTON, POSITION]
 
     def __init__(self):
-        self.cached_paths = {}
         self.cached_neighbors = {}
         self.cached_typing_sequences = {}
+
+        self.build_shortest_typing_sequences()
+
+    def build_shortest_typing_sequences(self):
+        for start_button, start_position in self.buttons.items():
+            for end_button, end_position in self.buttons.items():
+                if start_button == end_button:
+                    self.cached_typing_sequences[
+                        (start_button, end_button)
+                    ] = [""]
+                    continue
+
+                paths: list[PATH] = a_star(
+                    map=None,
+                    get_neighbors=self.get_neighbors,
+                    start_position=start_position,
+                    end_position=end_position,
+                    distance_function=euclidean_distance,
+                    multiple_optimal_paths=True,
+                )
+
+                built_paths = list(
+                    map(lambda x: "".join(get_typing_sequence(x)), paths)
+                )
+
+                filtered_paths = []
+                for path in built_paths:
+                    if len(path) > 2:
+                        if is_zigzag(path):
+                            continue
+
+                    filtered_paths.append(path)
+
+                self.cached_typing_sequences[
+                    (start_button, end_button)
+                ] = get_shortest(filtered_paths)
 
     def get_neighbors(
         self, map: Any, current: POSITION, direction: Direction
@@ -43,65 +107,40 @@ class KeyPad(ABC):
 
         return neighbors
 
-    def get_paths(
-        self, start: POSITION, end: POSITION
-    ) -> list[list[POSITION]]:
-        if (start, end) in self.cached_paths:
-            return self.cached_paths[(start, end)]
-
-        paths = a_star(
-            map=None,
-            get_neighbors=self.get_neighbors,
-            start_position=start,
-            end_position=end,
-            distance_function=euclidean_distance,
-            multiple_optimal_paths=True,
-        )
-        self.cached_paths[(start, end)] = paths
-        return paths
-
     @property
     def start_position(self) -> POSITION:
         return self.buttons["A"]
 
     def _compute_shortest_typing_sequences(
-        self, buttons_to_press: str, pointer: POSITION
-    ) -> list[list[BUTTON]]:
-        if buttons_to_press == "":
-            return [[]]
+        self, current_button: str, rest_of_the_buttons: str
+    ) -> set[TYPING_SEQUENCE]:
+        if rest_of_the_buttons == "":
+            return set()
 
-        key = (pointer, buttons_to_press)
-        if key in self.cached_typing_sequences:
-            return self.cached_typing_sequences[key]
+        next_button = rest_of_the_buttons[0]
+        pre_sequences = self.cached_typing_sequences[
+            current_button, next_button
+        ]
 
-        button = buttons_to_press[0]
-        rest_of_the_buttons = buttons_to_press[1:]
-        next_position = self.buttons[button]
-        typing_sequences = []
-        for path in self.get_paths(pointer, next_position):
-            direction_list = list(get_typing_sequence(tuple(path)))
+        rest_of_the_buttons = rest_of_the_buttons[1:]
+        post_sequences = self._compute_shortest_typing_sequences(
+            next_button, rest_of_the_buttons
+        )
+        if len(post_sequences) == 0:
+            return {f"{pre}A" for pre in pre_sequences}
 
-            for sub_typing_sequence in self._compute_shortest_typing_sequences(
-                rest_of_the_buttons, next_position
-            ):
-                typing_sequences.append(
-                    [*direction_list, "A", *sub_typing_sequence]
-                )
-
-        self.cached_typing_sequences[key] = typing_sequences
-
-        return typing_sequences
+        typing_sequences = {
+            f"{pre}A{post}"
+            for pre, post in product(pre_sequences, post_sequences)
+        }
+        return set(get_shortest(list(typing_sequences)))
 
     def compute_shortest_typing_sequences(
         self, typing_sequence: str
     ) -> set[TYPING_SEQUENCE]:
-        pointer = self.start_position
-        typing_sequences = self._compute_shortest_typing_sequences(
-            typing_sequence, pointer
+        return self._compute_shortest_typing_sequences(
+            current_button="A", rest_of_the_buttons=typing_sequence
         )
-        return {
-            "".join(typing_sequence) for typing_sequence in typing_sequences
-        }
 
     def compute_typing_sequences_from_typing_sequences(
         self, typing_sequences: set[TYPING_SEQUENCE]
@@ -109,9 +148,10 @@ class KeyPad(ABC):
         new_typing_sequences = set()
         progress_bar = tqdm(total=len(typing_sequences))
         for typing_sequence in typing_sequences:
-            new_typing_sequences.update(
+            new_typing_sequences_for_current = (
                 self.compute_shortest_typing_sequences(typing_sequence)
             )
+            new_typing_sequences.update(new_typing_sequences_for_current)
             progress_bar.update()
         progress_bar.close()
         return new_typing_sequences
