@@ -1,9 +1,6 @@
 import pytest
-from _2025.day1 import (
-    compute_number_of_times_the_dial_points_to_value,
-    parse_instructions,
-    rotate,
-)
+from _2025.day1 import parse_instructions, rotate
+from _2025.day1.part1 import compute_number_of_times_the_dial_points_to_value
 
 TEST_INPUT = """L68
 L30
