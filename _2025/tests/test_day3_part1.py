@@ -1,5 +1,6 @@
 import pytest
-from _2025.day3 import get_max_joltage, get_total_joltage_output, parse_input
+from _2025.day3 import parse_input
+from _2025.day3.part1 import SimpleBanks
 
 TEST_INPUT = """987654321111111
 811111111111119
@@ -27,18 +28,10 @@ def test_input_can_be_parsed():
     ],
 )
 def test_largest_joltage_can_be_found(batteries, expected_result):
-    assert get_max_joltage(batteries) == expected_result
+    banks = SimpleBanks()
+    assert banks.get_bank_max_joltage(batteries) == expected_result
 
 
 def test_total_joltage_output_can_be_computed():
-    assert (
-        get_total_joltage_output(
-            [
-                "987654321111111",
-                "811111111111119",
-                "234234234234278",
-                "818181911112111",
-            ]
-        )
-        == 357
-    )
+    banks = SimpleBanks(TEST_INPUT)
+    assert banks.get_total_joltage_output() == 357
