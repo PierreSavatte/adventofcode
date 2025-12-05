@@ -9,13 +9,7 @@ class BaseBanks:
         ...
 
     def get_total_joltage_output(self) -> int:
-        accumulator = 0
-        progress_bar = tqdm(total=len(self.banks))
-        for bank in self.banks:
-            accumulator += self.get_bank_max_joltage(bank)
-            progress_bar.update()
-        progress_bar.close()
-        return accumulator
+        return sum(self.get_bank_max_joltage(bank) for bank in self.banks)
 
 
 def parse_input(input: str) -> list[str]:
