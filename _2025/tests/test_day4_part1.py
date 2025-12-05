@@ -37,26 +37,29 @@ def test_map_can_be_parsed():
     assert parse_map(INPUT) == MAP
 
 
-def test_neighbours_can_be_fetched():
+@pytest.mark.parametrize(
+    "position, expected_neighbours",
+    [
+        ((0, 0), [".", "@", "@"]),
+        ((1, 0), [".", "@", "@", "@", "@"]),
+        ((2, 0), [".", "@", "@"]),
+        ((0, 1), [".", ".", "@", "@", "@"]),
+        ((1, 1), [".", ".", "@", "@", "@", "@", "@", "@"]),
+        ((2, 1), [".", "@", "@", "@", "@"]),
+        ((0, 2), ["@", "@", "@"]),
+        ((1, 2), ["@", "@", "@", "@", "@"]),
+        ((2, 2), ["@", "@", "@"]),
+    ],
+)
+def test_neighbours_can_be_fetched(position, expected_neighbours):
     map = [
         [".", ".", "@"],
         ["@", "@", "@"],
         ["@", "@", "@"],
     ]
 
-    assert get_neighbours(map, x=0, y=0) == [".", "@", "@"]
-    assert get_neighbours(map, x=2, y=0) == [".", "@", "@"]
-    assert get_neighbours(map, x=1, y=1) == [
-        ".",
-        ".",
-        "@",
-        "@",
-        "@",
-        "@",
-        "@",
-        "@",
-    ]
-    assert get_neighbours(map, x=2, y=2) == ["@", "@", "@"]
+    x, y = position
+    assert get_neighbours(map, x, y) == expected_neighbours
 
 
 @pytest.mark.parametrize(
