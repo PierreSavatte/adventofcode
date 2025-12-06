@@ -74,7 +74,9 @@ def mark(map: MAP) -> list[str]:
 
 def compute_solution(map: MAP) -> int:
     neighbours_count = flatten_2d_map(compute_neighbour_count(map))
-    return sum(bool(count and count < 4) for count in neighbours_count)
+    return sum(
+        bool(count is not None and count < 4) for count in neighbours_count
+    )
 
 
 def main():
@@ -83,8 +85,4 @@ def main():
 
 
 if __name__ == "__main__":
-    # > 1390
-    # < 3699
-    # != 2311
-    # != 3471
     main()
