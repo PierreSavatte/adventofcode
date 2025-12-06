@@ -1,9 +1,9 @@
-from pprint import pprint
+from typing import Optional
 
 from _2025.load_input import load_input
 
 MAP = list[list[str]]
-NEIGHBOURS_COUNT = list[list[int]]
+NEIGHBOURS_COUNT = list[list[Optional[int]]]
 
 
 def parse_map(input: str) -> MAP:
@@ -39,9 +39,7 @@ def compute_neighbour_count(map: MAP) -> NEIGHBOURS_COUNT:
                 count = None
             else:
                 neighbours = get_neighbours(map, x, y)
-                count = sum(
-                    [1 for neighbour in neighbours if neighbour == "@"]
-                )
+                count = sum(neighbour == "@" for neighbour in neighbours)
             new_row.append(count)
         new_map.append(new_row)
     return new_map
@@ -76,7 +74,7 @@ def mark(map: MAP) -> list[str]:
 
 def compute_solution(map: MAP) -> int:
     neighbours_count = flatten_2d_map(compute_neighbour_count(map))
-    return sum(1 for count in neighbours_count if count and count < 4)
+    return sum(bool(count and count < 4) for count in neighbours_count)
 
 
 def main():
