@@ -1,88 +1,64 @@
-from typing import Optional
+from typing import Generator, Optional
 
-from _2025.load_input import load_input
-
-MAP = list[list[str]]
-NEIGHBOURS_COUNT = list[list[Optional[int]]]
+PARSED_MAP = list[list[str]]
+POSITION = tuple[int, int]
 
 
-def parse_map(input: str) -> MAP:
-    map = []
-    for row in input.strip().splitlines():
-        map.append(list(row))
-    return map
+class Map:
+    def __init__(self, input: str):
+        rows = input.strip().splitlines()
+        self.width = len(rows[0])
+        self.height = len(rows)
+        self.cells = []
+        for y, row in enumerate(rows):
+            new_row = []
+            for x, cell_value in enumerate(row):
+                is_roll = cell_value == "@"
+                cell = Cell(map=self, is_roll=is_roll, x=x, y=y)
+                new_row.append(cell)
+            self.cells.append(new_row)
 
-
-def get_neighbours(map: MAP, x: int, y: int) -> list[str]:
-    neighbours = []
-    for y_ in range(y - 1, y + 2):
-        if y_ < 0 or y_ >= len(map):
-            continue
-
-        for x_ in range(x - 1, x + 2):
-            if x_ < 0 or x_ >= len(map[0]):
+    def get_neighbour_positions(self, x: int, y: int) -> list[POSITION]:
+        neighbours = []
+        for y_ in range(y - 1, y + 2):
+            if y_ < 0 or y_ >= self.height:
                 continue
-            if x_ == x and y_ == y:
-                continue
 
-            neighbours.append(map[y_][x_])
+            for x_ in range(x - 1, x + 2):
+                if x_ < 0 or x_ >= self.width:
+                    continue
+                if x_ == x and y_ == y:
+                    continue
 
-    return neighbours
+                neighbours.append((x_, y_))
 
+        return neighbours
 
-def compute_neighbour_count(map: MAP) -> NEIGHBOURS_COUNT:
-    new_map = []
-    for y in range(len(map)):
-        new_row = []
-        for x in range(len(map[y])):
-            if map[y][x] == ".":
-                count = None
-            else:
-                neighbours = get_neighbours(map, x, y)
-                count = sum(neighbour == "@" for neighbour in neighbours)
-            new_row.append(count)
-        new_map.append(new_row)
-    return new_map
+    def get_cell(self, position: POSITION) -> "Cell":
+        x, y = position
+        return self.cells[y][x]
+
+    def iterate_over_cells(self) -> Generator["Cell", None, None]:
+        for row in self.cells:
+            for cell in row:
+                yield cell
 
 
-def flatten_2d_map(map: NEIGHBOURS_COUNT) -> list[int]:
-    flatten = []
-    for row in map:
-        flatten.extend(row)
-    return flatten
+class Cell:
+    def __init__(self, map: Map, is_roll: bool, x: int, y: int):
+        self.is_roll = is_roll
 
+        self.x = x
+        self.y = y
+        self.position = (x, y)
+        self.map = map
 
-def mark(map: MAP) -> list[str]:
-    neighbour_count = compute_neighbour_count(map)
-    new_map = []
-    for y in range(len(map)):
-        new_row = []
-        for x in range(len(map[y])):
-            nb_neighbours = neighbour_count[y][x]
-            if nb_neighbours is None:
-                cell = "."
-            else:
-                if nb_neighbours < 4:
-                    cell = "x"
-                else:
-                    cell = "@"
+        self.neighbour_positions = map.get_neighbour_positions(x, y)
 
-            new_row.append(cell)
-        new_map.append("".join(new_row) + "\n")
-    return new_map
-
-
-def compute_solution(map: MAP) -> int:
-    neighbours_count = flatten_2d_map(compute_neighbour_count(map))
-    return sum(
-        bool(count is not None and count < 4) for count in neighbours_count
-    )
-
-
-def main():
-    map = parse_map(load_input(4))
-    print(compute_solution(map))
-
-
-if __name__ == "__main__":
-    main()
+    def compute_nb_roll_neighbours(self) -> Optional[int]:
+        if not self.is_roll:
+            return None
+        return sum(
+            self.map.get_cell(neighbour_position).is_roll
+            for neighbour_position in self.neighbour_positions
+        )

@@ -1,11 +1,6 @@
 import pytest
-from _2025.day4 import (
-    compute_neighbour_count,
-    compute_solution,
-    get_neighbours,
-    mark,
-    parse_map,
-)
+from _2025.day4 import Map
+from _2025.day4.part1 import compute_solution
 
 INPUT = """..@@.@@@@.
 @@@.@.@.@@
@@ -19,58 +14,50 @@ INPUT = """..@@.@@@@.
 @.@.@@@.@.
 """
 
-MAP = [
-    [".", ".", "@", "@", ".", "@", "@", "@", "@", "."],
-    ["@", "@", "@", ".", "@", ".", "@", ".", "@", "@"],
-    ["@", "@", "@", "@", "@", ".", "@", ".", "@", "@"],
-    ["@", ".", "@", "@", "@", "@", ".", ".", "@", "."],
-    ["@", "@", ".", "@", "@", "@", "@", ".", "@", "@"],
-    [".", "@", "@", "@", "@", "@", "@", "@", ".", "@"],
-    [".", "@", ".", "@", ".", "@", ".", "@", "@", "@"],
-    ["@", ".", "@", "@", "@", ".", "@", "@", "@", "@"],
-    [".", "@", "@", "@", "@", "@", "@", "@", "@", "."],
-    ["@", ".", "@", ".", "@", "@", "@", ".", "@", "."],
-]
+SMALLEST_INPUT = """..@
+@@@
+@@@
+"""
 
 
-def test_map_can_be_parsed():
-    assert parse_map(INPUT) == MAP
+def compute_neighbour_count(map: Map) -> list[list[int]]:
+    new_map = []
+    for y, row in enumerate(map.cells):
+        new_row = []
+        for x, cell in enumerate(row):
+            count = cell.compute_nb_roll_neighbours()
+            new_row.append(count)
+        new_map.append(new_row)
+    return new_map
 
 
 @pytest.mark.parametrize(
     "position, expected_neighbours",
     [
-        ((0, 0), [".", "@", "@"]),
-        ((1, 0), [".", "@", "@", "@", "@"]),
-        ((2, 0), [".", "@", "@"]),
-        ((0, 1), [".", ".", "@", "@", "@"]),
-        ((1, 1), [".", ".", "@", "@", "@", "@", "@", "@"]),
-        ((2, 1), [".", "@", "@", "@", "@"]),
-        ((0, 2), ["@", "@", "@"]),
-        ((1, 2), ["@", "@", "@", "@", "@"]),
-        ((2, 2), ["@", "@", "@"]),
+        ((0, 0), [(1, 0), (0, 1), (1, 1)]),
+        ((1, 0), [(0, 0), (2, 0), (0, 1), (1, 1), (2, 1)]),
+        ((2, 0), [(1, 0), (1, 1), (2, 1)]),
+        (
+            (1, 1),
+            [(0, 0), (1, 0), (2, 0), (0, 1), (2, 1), (0, 2), (1, 2), (2, 2)],
+        ),
+        ((0, 2), [(0, 1), (1, 1), (1, 2)]),
+        ((1, 2), [(0, 1), (1, 1), (2, 1), (0, 2), (2, 2)]),
+        ((2, 2), [(1, 1), (2, 1), (1, 2)]),
     ],
 )
 def test_neighbours_can_be_fetched(position, expected_neighbours):
-    map = [
-        [".", ".", "@"],
-        ["@", "@", "@"],
-        ["@", "@", "@"],
-    ]
+    map = Map(SMALLEST_INPUT)
 
     x, y = position
-    assert get_neighbours(map, x, y) == expected_neighbours
+    assert map.get_neighbour_positions(x, y) == expected_neighbours
 
 
 @pytest.mark.parametrize(
-    "map, expected_output",
+    "input, expected_output",
     [
         (
-            [
-                [".", ".", "@"],
-                ["@", "@", "@"],
-                ["@", "@", "@"],
-            ],
+            SMALLEST_INPUT,
             [
                 [None, None, 2],
                 [3, 6, 4],
@@ -78,7 +65,7 @@ def test_neighbours_can_be_fetched(position, expected_neighbours):
             ],
         ),
         (
-            MAP,
+            INPUT,
             [
                 [None, None, 3, 3, None, 3, 3, 4, 3, None],
                 [3, 6, 6, None, 4, None, 4, None, 5, 4],
@@ -94,26 +81,10 @@ def test_neighbours_can_be_fetched(position, expected_neighbours):
         ),
     ],
 )
-def test_nb_adjacent_roll_of_papers_can_be_computed(map, expected_output):
+def test_nb_adjacent_roll_of_papers_can_be_computed(input, expected_output):
+    map = Map(input)
     assert compute_neighbour_count(map) == expected_output
 
 
-def test_map_can_be_marked_with_position_that_has_not_too_much_neighbours():
-    expected_marked_map = [
-        "..xx.xx@x.\n",
-        "x@@.@.@.@@\n",
-        "@@@@@.x.@@\n",
-        "@.@@@@..@.\n",
-        "x@.@@@@.@x\n",
-        ".@@@@@@@.@\n",
-        ".@.@.@.@@@\n",
-        "x.@@@.@@@@\n",
-        ".@@@@@@@@.\n",
-        "x.x.@@@.x.\n",
-    ]
-
-    assert mark(MAP) == expected_marked_map
-
-
 def test_solution_can_be_computed():
-    assert compute_solution(MAP) == 13
+    assert compute_solution(Map(INPUT)) == 13
