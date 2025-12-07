@@ -11,14 +11,13 @@ def compute_simplified_ranges(ranges: list[range]) -> list[range]:
         while i < len(ranges):
             r_1 = ranges[i]
 
-            start = r_1.start
-            stop = r_1.stop
-
             j = i + 1
             while j < len(ranges):
                 r_2 = ranges[j]
 
-                if start in r_2 or stop in r_2:
+                if (r_1.start in r_2 or r_1.stop - 1 in r_2) or (
+                    r_2.start in r_1 or r_2.stop - 1 in r_1
+                ):
                     new_range = range(
                         min(r_2.start, r_1.start), max(r_2.stop, r_1.stop)
                     )
@@ -50,5 +49,4 @@ def main():
 
 
 if __name__ == "__main__":
-    # < 351366045178999
     main()
