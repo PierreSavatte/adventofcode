@@ -1,9 +1,8 @@
+import abc
 from collections.abc import Callable
 from enum import Enum
 from functools import reduce
 from typing import Optional
-
-from _2025.load_input import load_input
 
 
 class Operator(Enum):
@@ -51,7 +50,12 @@ class Problem:
         return self.values == other.values and self.operator == other.operator
 
 
-class Problems:
+class BaseProblems(abc.ABC):
+    @staticmethod
+    @abc.abstractmethod
+    def parse_input(input: str) -> list[Problem]:
+        ...
+
     def __init__(
         self,
         input: Optional[str] = None,
@@ -62,15 +66,7 @@ class Problems:
         if problems:
             self.problems = problems
         if input:
-            lines = input.splitlines()
-            nb_problems = len(lines[0].split())
-            self.problems = [Problem() for _ in range(nb_problems)]
-            for line in lines[:-1]:
-                for i, value in enumerate(line.split()):
-                    self.problems[i].add_value(int(value))
-
-            for i, operator in enumerate(lines[-1].split()):
-                self.problems[i].set_operator(operator)
+            self.problems = self.parse_input(input)
 
     def compute_solution(self) -> int:
         return sum(problem.solve() for problem in self.problems)
@@ -82,15 +78,6 @@ class Problems:
         return str(self)
 
     def __eq__(self, other) -> bool:
-        if not isinstance(other, Problems):
+        if not isinstance(other, BaseProblems):
             return False
         return self.problems == other.problems
-
-
-def main():
-    problems = Problems(load_input(6))
-    print(problems.compute_solution())
-
-
-if __name__ == "__main__":
-    main()

@@ -1,5 +1,6 @@
 import pytest
-from _2025.day6 import Operator, Problem, Problems
+from _2025.day6 import Operator, Problem
+from _2025.day6.part1 import HumanProblems
 
 TEST_INPUT = """123 328  51 64 
  45 64  387 23 
@@ -9,7 +10,7 @@ TEST_INPUT = """123 328  51 64
 
 
 def test_instructions_can_be_parsed():
-    assert Problems(input=TEST_INPUT) == Problems(
+    assert HumanProblems(input=TEST_INPUT) == HumanProblems(
         problems=[
             Problem(values=[123, 45, 6], operator=Operator.MULTIPLICATION),
             Problem(values=[328, 64, 98], operator=Operator.ADDITION),
@@ -45,4 +46,4 @@ def test_problems_can_be_solved(problem, expected_result):
 
 
 def test_solution_can_be_computed():
-    assert Problems(input=TEST_INPUT).compute_solution() == 4277556
+    assert HumanProblems(input=TEST_INPUT).compute_solution() == 4277556
