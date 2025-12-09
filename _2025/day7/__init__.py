@@ -55,7 +55,7 @@ class Diagram:
             splitter_hit=splitter_hit,
         )
 
-    def _generate_all_beams(self) -> list[Beam]:
+    def _generate_all_beams(self, quantum_mode: bool = False) -> list[Beam]:
         total_beams = []
         new_beams = [self.generate_beam(self.spawn)]
         while new_beams:
@@ -70,7 +70,7 @@ class Diagram:
                 new_spawns = beam.splitter_hit.split()
                 for new_spawn in new_spawns:
                     new_beam = self.generate_beam(new_spawn)
-                    if (
+                    if (quantum_mode) or (
                         new_beam not in total_beams
                         and new_beam not in new_beams
                     ):
@@ -82,6 +82,12 @@ class Diagram:
         return sum(
             beam.splitter_hit is not None
             for beam in self._generate_all_beams()
+        )
+
+    def count_total_beams_that_reached_the_bottom(self) -> int:
+        return sum(
+            beam.splitter_hit is None
+            for beam in self._generate_all_beams(quantum_mode=True)
         )
 
     def export_output_map(self) -> str:
