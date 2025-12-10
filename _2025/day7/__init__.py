@@ -25,11 +25,18 @@ class Beam:
 
     parents: list["Beam"] = field(default_factory=list)
 
+    _timelines_nb: Optional[int] = None
+
     @property
     def timelines_nb(self):
-        if not self.parents:
-            return 1
-        return sum(parent.timelines_nb for parent in self.parents)
+        if self._timelines_nb is None:
+            if not self.parents:
+                return 1
+            self._timelines_nb = sum(
+                parent.timelines_nb for parent in self.parents
+            )
+
+        return self._timelines_nb
 
     def __eq__(self, other):
         if not isinstance(other, Beam):
