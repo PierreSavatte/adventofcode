@@ -55,47 +55,24 @@ class Diagram:
             splitter_hit=splitter_hit,
         )
 
-    def _generate_all_beams(self, quantum_mode: bool = False) -> list[Beam]:
-        total_beams = []
-        new_beams = [self.generate_beam(self.spawn)]
-        while new_beams:
-            total_beams.extend(new_beams[:])
-            current_beams = new_beams[:]
-            new_beams = []
-
-            for beam in current_beams:
-                if not beam.splitter_hit:
-                    continue
-
-                new_spawns = beam.splitter_hit.split()
-                for new_spawn in new_spawns:
-                    new_beam = self.generate_beam(new_spawn)
-                    if (quantum_mode) or (
-                        new_beam not in total_beams
-                        and new_beam not in new_beams
-                    ):
-                        new_beams.append(new_beam)
-
-        return total_beams
-
     def count_beams_that_has_split(self) -> int:
-        return sum(
-            beam.splitter_hit is not None
-            for beam in self._generate_all_beams()
-        )
+        beams = BeamGenerator(self).generate_all_beams(self.spawn)
+        return sum(beam.splitter_hit is not None for beam in beams)
 
     def count_total_beams_that_reached_the_bottom(self) -> int:
-        return sum(
-            beam.splitter_hit is None
-            for beam in self._generate_all_beams(quantum_mode=True)
+        beams = BeamGenerator(self, quantum_mode=True).generate_all_beams(
+            self.spawn
         )
+        return sum(beam.splitter_hit is None for beam in beams)
 
     def export_output_map(self) -> str:
         map = []
         for y in range(self.height):
             map.append(["." for _ in range(self.width)])
 
-        for beam in self._generate_all_beams():
+        beams = BeamGenerator(self).generate_all_beams(self.spawn)
+
+        for beam in beams:
             for position in beam.positions:
                 if map[position.y][position.x] == ".":
                     map[position.y][position.x] = "|"
@@ -145,3 +122,51 @@ def parse_diagram(input: str) -> Diagram:
         spawn=spawn,
         splitters=splitters,
     )
+
+
+class BeamGenerator:
+    def __init__(self, diagram: Diagram, quantum_mode: bool = False):
+        self.total_beams: list[Beam] = []
+        self.new_beams: list[Beam] = []
+        self.current_beams: list[Beam] = []
+
+        self.diagram = diagram
+        self.quantum_mode = quantum_mode
+
+    def generate_beam(self, spawn: Position) -> Beam:
+        splitter_hit = None
+        position_list = []
+        for y in range(spawn.y, self.diagram.height):
+            target = Position((spawn.x, y))
+            if target in self.diagram.splitters:
+                splitter_hit = target
+                break
+            position_list.append(target)
+
+        new_beam = Beam(
+            positions=position_list,
+            splitter_hit=splitter_hit,
+        )
+
+        if self.quantum_mode or (
+            new_beam not in self.total_beams and new_beam not in self.new_beams
+        ):
+            self.new_beams.append(new_beam)
+
+    def generate_all_beams(self, spawn: Position) -> list[Beam]:
+        self.generate_beam(spawn)
+
+        while self.new_beams:
+            self.total_beams.extend(self.new_beams[:])
+            self.current_beams = self.new_beams[:]
+            self.new_beams = []
+
+            for beam in self.current_beams:
+                if not beam.splitter_hit:
+                    continue
+
+                new_spawns = beam.splitter_hit.split()
+                for new_spawn in new_spawns:
+                    self.generate_beam(new_spawn)
+
+        return self.total_beams
