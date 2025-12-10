@@ -1,5 +1,5 @@
-from dataclasses import dataclass
-from typing import Optional
+from dataclasses import dataclass, field
+from typing import Any, Optional
 
 
 class Position(tuple[int, int]):
@@ -22,6 +22,14 @@ class Position(tuple[int, int]):
 class Beam:
     positions: list[Position]
     splitter_hit: Optional[Position]
+
+    parents: list["Beam"] = field(default_factory=list)
+
+    @property
+    def timelines_nb(self):
+        if not self.parents:
+            return 1
+        return sum(parent.timelines_nb for parent in self.parents)
 
     def __eq__(self, other):
         if not isinstance(other, Beam):
@@ -63,14 +71,16 @@ class Diagram:
         beams = BeamGenerator(self, quantum_mode=True).generate_all_beams(
             self.spawn
         )
-        return sum(beam.splitter_hit is None for beam in beams)
+        return sum(
+            beam.timelines_nb for beam in beams if beam.splitter_hit is None
+        )
 
-    def export_output_map(self) -> str:
+    def export_snapshot(
+        self, beams: list[Beam], with_count: bool = False
+    ) -> str:
         map = []
         for y in range(self.height):
             map.append(["." for _ in range(self.width)])
-
-        beams = BeamGenerator(self).generate_all_beams(self.spawn)
 
         for beam in beams:
             for position in beam.positions:
@@ -80,6 +90,9 @@ class Diagram:
                     raise RuntimeError(
                         f"Error while applying beam on {position=}"
                     )
+            if with_count:
+                last_pos = beam.positions[-1]
+                map[last_pos.y][last_pos.x] = f"{beam.timelines_nb:X}"
 
         for splitter in self.splitters:
             if map[splitter.y][splitter.x] == ".":
@@ -92,6 +105,12 @@ class Diagram:
         map[self.spawn.y][self.spawn.x] = "S"
 
         return "\n".join(["".join(line) for line in map]) + "\n"
+
+    def export_output_map(self, with_count: bool = False) -> str:
+        beams = BeamGenerator(self, quantum_mode=True).generate_all_beams(
+            self.spawn
+        )
+        return self.export_snapshot(beams=beams, with_count=with_count)
 
 
 def parse_diagram(input: str) -> Diagram:
@@ -124,6 +143,13 @@ def parse_diagram(input: str) -> Diagram:
     )
 
 
+def get_index(l: list, item: Any) -> Optional[int]:
+    try:
+        return l.index(item)
+    except ValueError:
+        return None
+
+
 class BeamGenerator:
     def __init__(self, diagram: Diagram, quantum_mode: bool = False):
         self.total_beams: list[Beam] = []
@@ -133,7 +159,9 @@ class BeamGenerator:
         self.diagram = diagram
         self.quantum_mode = quantum_mode
 
-    def generate_beam(self, spawn: Position) -> Beam:
+    def build_beam(
+        self, spawn: Position, parent: Optional[Beam] = None
+    ) -> Beam:
         splitter_hit = None
         position_list = []
         for y in range(spawn.y, self.diagram.height):
@@ -143,18 +171,32 @@ class BeamGenerator:
                 break
             position_list.append(target)
 
-        new_beam = Beam(
+        parents = [parent] if parent else []
+        return Beam(
             positions=position_list,
             splitter_hit=splitter_hit,
+            parents=parents,
         )
 
-        if self.quantum_mode or (
-            new_beam not in self.total_beams and new_beam not in self.new_beams
-        ):
-            self.new_beams.append(new_beam)
+    def continue_generation(
+        self, start_position: Position, parent: Optional[Beam] = None
+    ):
+        target_beam = self.build_beam(start_position, parent)
+        i = get_index(self.total_beams, target_beam)
+        j = get_index(self.new_beams, target_beam)
+
+        if i is None and j is None:
+            self.new_beams.append(target_beam)
+
+        elif self.quantum_mode:
+            if i is not None:
+                assert j is None, "We have a problem..."
+                self.total_beams[i].parents.append(parent)
+            elif j is not None:
+                self.new_beams[j].parents.append(parent)
 
     def generate_all_beams(self, spawn: Position) -> list[Beam]:
-        self.generate_beam(spawn)
+        self.continue_generation(spawn)
 
         while self.new_beams:
             self.total_beams.extend(self.new_beams[:])
@@ -167,6 +209,8 @@ class BeamGenerator:
 
                 new_spawns = beam.splitter_hit.split()
                 for new_spawn in new_spawns:
-                    self.generate_beam(new_spawn)
+                    self.continue_generation(
+                        start_position=new_spawn, parent=beam
+                    )
 
         return self.total_beams
