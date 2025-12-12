@@ -6,6 +6,9 @@ from _2025.load_input import load_input
 
 
 class Playground(BasePlayground):
+    def get_group_sizes(self) -> list[int]:
+        return sorted([len(group) for group in self.groups], reverse=True)
+
     def compute_solution(self, nb_connections: int) -> int:
         for _ in tqdm.tqdm(range(nb_connections)):
             self.make_next_connection()

@@ -1,8 +1,6 @@
 import math
 from dataclasses import dataclass
 
-import tqdm
-
 
 @dataclass
 class Position:
@@ -64,19 +62,6 @@ class BasePlayground:
     def make_next_connection(self):
         closest_boxes = self.pop_closest_boxes()
         self.update_groups(closest_boxes)
-
-    def get_group_sizes(self) -> list[int]:
-        return sorted([len(group) for group in self.groups], reverse=True)
-
-    def get_last_connection_pair(self) -> tuple[Position, Position]:
-        progress_bar = tqdm.tqdm(total=len(self.positions))
-        while len(self.groups) > 1:
-            closest_boxes = self.pop_closest_boxes()
-            has_linked_boxes = self.update_groups(closest_boxes)
-
-            if has_linked_boxes:
-                progress_bar.update()
-        return closest_boxes
 
     @classmethod
     def from_input(cls, input: str) -> "BasePlayground":
