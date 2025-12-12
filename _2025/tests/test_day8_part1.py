@@ -1,5 +1,6 @@
 import pytest
-from _2025.day8 import Playground, Position, compute_distance
+from _2025.day8 import Position, compute_distance
+from _2025.day8.part1 import Playground
 
 
 @pytest.fixture

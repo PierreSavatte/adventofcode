@@ -1,6 +1,5 @@
 import math
 from dataclasses import dataclass
-from functools import reduce
 
 import tqdm
 
@@ -19,7 +18,7 @@ class Position:
 
 
 @dataclass
-class Playground:
+class BasePlayground:
     def __init__(self, positions: list[Position]):
         self.positions = positions
 
@@ -69,21 +68,23 @@ class Playground:
     def get_group_sizes(self) -> list[int]:
         return sorted([len(group) for group in self.groups], reverse=True)
 
-    def compute_solution(self, nb_connections: int) -> int:
-        for _ in tqdm.tqdm(range(nb_connections)):
-            self.make_next_connection()
+    def get_last_connection_pair(self) -> tuple[Position, Position]:
+        progress_bar = tqdm.tqdm(total=len(self.positions))
+        while len(self.groups) > 1:
+            closest_boxes = self.pop_closest_boxes()
+            has_linked_boxes = self.update_groups(closest_boxes)
 
-        group_sizes = self.get_group_sizes()
-        _3_largest_group_sizes = group_sizes[:3]
-        return reduce(lambda a, b: a * b, _3_largest_group_sizes)
+            if has_linked_boxes:
+                progress_bar.update()
+        return closest_boxes
 
     @classmethod
-    def from_input(cls, input: str) -> "Playground":
+    def from_input(cls, input: str) -> "BasePlayground":
         positions = []
         for line in input.strip().splitlines():
             position = Position(*map(int, line.split(",")))
             positions.append(position)
-        return Playground(positions)
+        return cls(positions)
 
 
 def compute_distance(a: Position, b: Position) -> float:
